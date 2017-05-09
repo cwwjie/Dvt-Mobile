@@ -3,7 +3,7 @@
  * 生产环境 www.divingtime.asia
  * 生产环境 http://112.74.92.97:8080
  */
-const URLbase = "http://192.168.2.100:8080";
+const URLbase = "http://192.168.0.100:8080";
 /**
  * 本地 /Dvt-web
  * 生产 /dvtweb
@@ -11,6 +11,7 @@ const URLbase = "http://192.168.2.100:8080";
 const URLversion = "/Dvt-web"
 const appConfig = {
 	URLbase:URLbase,
+	URLversion:URLbase+URLversion,
 	listWithCat:URLbase+URLversion+"/product/listWithCat.do",
 	findByElement:URLbase + URLversion+"/system/carousel/findByElement.do",
 	findByElement:URLbase + URLversion+"/system/carousel/findByElement.do",

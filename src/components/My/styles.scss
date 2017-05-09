@@ -1,0 +1,243 @@
+// 用户中心部分
+.personalCenter{
+	overflow: hidden;
+	> div {
+		width:33.33%;
+		float: left;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 登录部分
+.divInput{
+	padding-top:20px;
+	position: relative;
+	input {
+		position: relative;
+	    padding-left:20px;
+	    height: 0.84rem;
+	    width: 96.5%;
+	    border:2px solid #dbdbdb;
+	    border-radius: 0.1rem;
+	}
+}
+.eyeSvg {
+	position:absolute;
+	top: 0.25rem;
+	right: 0.35rem;
+	z-index: 10;
+}
+.loginLink {
+	position: relative;
+	div{
+		color: #999;
+	}
+}
+.loginLinkL{
+	div{
+		float: left;
+		margin-right: 0.1rem;
+	}
+}
+.loginLinkR{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	div{
+		float: left;
+		margin-right: 0.1rem;
+	}
+}
+.VerificationCode{
+	height: 0.84rem;
+	padding-left: 0.18rem;
+	padding-right: 0.18rem;
+	position: relative;
+    > div {
+    	position: relative;
+		padding-left: 20px;
+    }
+	input {
+		position: relative;
+	    padding-left:20px;
+	    margin-left: -20px;
+	    height: 0.84rem;
+	    width: 100%;
+	    border:2px solid #dbdbdb;
+	    border-radius: 0.1rem;
+	}
+}
+.Code {
+	color:#888;
+	position:absolute;
+	right:0.5rem;
+	top:0.3rem;
+}
+
+// 忘记密码
+.newInput {
+	padding-left: 0.18rem;
+	padding-right: 0.18rem;
+    > div {
+    	position: relative;
+		padding-left: 20px;
+    }
+	input {
+		position: relative;
+	    padding-left:20px;
+	    margin-left: -20px;
+	    height: 0.84rem;
+	    width: 100%;
+	    border:2px solid #dbdbdb;
+	    border-radius: 0.1rem;
+	}
+}
+.forget {
+    position: relative;
+    height: 0.84rem;
+    margin-left:0.18rem;
+    margin-right:0.18rem;
+    > div {
+    	width: 50%;
+    	float:left;
+    	text-align: center;
+    	line-height: 0.84rem;
+		color:#888;
+    }
+}
+.forgetMail {
+	div {
+		margin-right:0.09rem;
+	    border: 0.02rem solid #dbdbdb;
+    	height: 0.84rem;
+	    border-radius: 0.1rem;
+    	background: #fff;
+	}
+}
+.forgetPhone {
+	div {
+		margin-left:0.09rem;
+    	height: 0.84rem;
+	    border: 0.02rem solid #dbdbdb;
+	    border-radius: 0.1rem;
+    	background: #fff;
+	}
+}
+
+
+
+
+
+
+// 底部导航
+.bottomNav{
+	position: fixed;
+	bottom: 0px;
+	height: 100px;
+	width: 100%;
+	background: #fff;
+	border-top: 1px solid #ddd;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	> div {
+		float: left;
+		height: 100px;
+	}
+ }
+	.botNavLeft {
+		width: 50%;
+	}
+	.botNavLeftA{
+		padding:16px 16px 4px 16px;
+		font-size: 28px;
+	}
+	.botNavLeftB {
+		font-size: 20px;
+		padding:8px 0px 0px 16px;
+	    font-family: 'Helvetica';
+	    color: #f23030;
+	    font-weight: bold;
+	    span {
+	        display: inline-block;
+	    }
+	}
+	.botNavMid {
+		background: #ffb03f;
+		color: #fff;
+		width: 25%;
+		>div {
+			line-height: 100px;
+			text-align: center;
+		}
+	}
+	.botNavRight {
+		background: #f23030;
+		color: #fff;
+		width: 25%;
+		>div {
+			line-height: 100px;
+			text-align: center;
+		}
+	}
+	.bottomPay {
+		position: fixed;
+		bottom: 0px;
+		height: 130px;
+		width: 100%;
+		background: #fff;
+		border-top: 1px solid #ddd;
+		div{
+			width: 94%;
+			height: 80px;
+			line-height: 80px;
+			font-size: 32px;
+			color: #fff;
+			background-color: #01b969;
+			text-align: center;
+			border-radius: 2px;
+			margin: 3%;
+		}
+	}
+	.bottomEdit {
+		position: fixed;
+		bottom: 0px;
+		height: 130px;
+		width: 100%;
+		background: #fff;
+		border-top: 1px solid #ddd;
+		>div{
+			float: left;
+		}
+	}
+	.Edit {
+		margin: 3%;
+		width: 45.5%;
+		height: 80px;
+		line-height: 80px;
+		text-align: center;
+		color: #fff;
+		background-color: #01b969;
+	}
+	.Delete {
+		margin: 3% 3% 3% 0%;
+		width: 45.5%;
+		height: 80px;
+		line-height: 80px;
+		text-align: center;
+		color: #fff;
+		background-color: #f23030;
+	}

@@ -1,10 +1,16 @@
 import { combineReducers } from 'redux'
-import todos from './todos'
 import Nav from './Nav'
+import product from './product'
+import user from './user'
+import Order from './Order'
+import Passenger from './Passenger'
 
 const todoApp = combineReducers({
-  todos,
-  Nav
+  Nav,
+  product,
+  user,
+  Order,
+  Passenger
 })
 
 export default todoApp

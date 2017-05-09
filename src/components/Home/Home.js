@@ -1,8 +1,17 @@
+import { connect } from 'react-redux'
 import React, {Component} from 'react';
+
+
 import { Carousel , Card , WhiteSpace , List } from 'antd-mobile';
+
+
+import assign from 'lodash.assign'
 import appConfig from './../../config/index.js';
 import styles from './styles.scss';
 import More from './More.svg';
+import taobao from './taobao.png';
+import weibo from './weibo.png';
+import weixin from './weixin.png';
 
 
 class Home extends Component {
@@ -15,8 +24,7 @@ class Home extends Component {
     };
   }
   componentDidMount() {
-    console.log(document.body.clientWidth)
-    var _this = this;
+    let _this = this;
     // 图片 fetch
     fetch(
       appConfig.findByElement,{
@@ -53,7 +61,6 @@ class Home extends Component {
      }).then(function(response) {
       return response.json()
      }).then(function(json) {
-      console.log(json)
       if (json.result=="0") {
         _this.setState({
           product:json.data
@@ -80,7 +87,7 @@ class Home extends Component {
       <div>
         <div>
         <Carousel
-          className={styles.Carousel} autoplay={false} infinite selectedIndex={0}
+          className={styles.Carousel} autoplay={true} infinite selectedIndex={0}
           >
           {this.state.carousel.map(data => (
             <a href={data.onclick} key={data}>
@@ -102,7 +109,7 @@ class Home extends Component {
           ))}
         </Carousel>
         </div>
-        {this.state.product.map(data => (
+        {this.state.product.map((data,num) => (
           <div>
             <div className={styles.subtitle}>{data.catName}
               <div className="right" style={{display:'inline-block',float:'right',paddingRight:'16px'}}>
@@ -120,11 +127,30 @@ class Home extends Component {
               />
               </div>
             </div>
-            {data.productList.map(product => (
-              <div>
-                <div onClick={()=>{
+            {data.productList.map((product, key) => (
+              <div key={key} style={{cursor:'pointer'}} onClick={()=>{
                   // 页面跳转
-                  }}>
+                  let _this = this
+                  let _data = assign({},_this.props.Nav);
+                  _data.navtitle.push("订单详情");
+                  _data.PreURL.push("/Detail");
+                  _data.leftContent={
+                    return:'left',
+                    logo:false
+                  };
+                  _data.hidden = true;
+                  _data.productId = _this.state.product[num].productList[key].productId;
+                  _this.props.dispatch({
+                    type:'Chan_Nav',
+                    data:_data
+                  });
+                  _this.props.dispatch({
+                    type:'product_Id',
+                    data:_this.state.product[num].productList[key].productId
+                  })
+                  _this.context.router.push('/Detail');
+                }}>
+                <div>
                   <Card full>
                     <Card.Header
                       title={product.productName}
@@ -142,14 +168,68 @@ class Home extends Component {
             ))}
           </div>
         ))}
-        <List>
-          <div className={styles.List}>
-            <a href="./other/aboutUs.html">关于我们</a> | <a href="./other/teamStory.html">团队故事</a> | <a href="./other/joinUs.html">加入我们</a> | <a href="./other/help.html">帮助</a> | <a href="./other/Privacy.html">隐私声明</a> | <a href="./other/policy.html">政策条款</a>
-          </div>
-        </List>
+        <div>
+          <List>
+            <div className={styles.List}>
+              <div>
+              <a href="./other/aboutUs.html">关于我们</a> | <a href="./other/teamStory.html">团队故事</a> | <a href="./other/joinUs.html">加入我们</a> | <a href="./other/help.html">帮助</a> | <a href="./other/Privacy.html">隐私声明</a> | <a href="./other/policy.html">政策条款</a>
+              </div>
+            </div>
+          </List>
+          <List>
+            <div className={styles.botIcon}>
+              <div>
+                <i style={{
+                  position: 'relative',
+                  top:'2px',
+                  paddingLeft: '4px',
+                  display:'inline-block',
+                  width: '42px',
+                  height: '42px',
+                  background: 'url('+taobao+') center center /  42px 42px no-repeat' }}
+                /><span> | </span><i style={{
+                  position: 'relative',
+                  top:'2px',
+                  paddingLeft: '4px',
+                  display:'inline-block',
+                  width: '42px',
+                  height: '42px',
+                  background: 'url('+weibo+') center center /  42px 42px no-repeat' }}
+                /><span> | </span><i style={{
+                  position: 'relative',
+                  top:'2px',
+                  paddingLeft: '4px',
+                  display:'inline-block',
+                  width: '42px',
+                  height: '42px',
+                  background: 'url('+weixin+') center center /  42px 42px no-repeat' }}
+                />
+              </div>
+            </div>
+          </List>
+          <List>
+            <div style={{textAlign:'center',padding:'16px 8px',fontSize:'14px',color:"#888"}}>
+            Copyright © 2016 DivingTime. 潜游时光 版权所有
+            </div>
+          </List>
+        </div>
       </div>
     )
   }
 }
 
-export default Home
+Home.contextTypes = {
+  router: Object
+}
+
+
+const mapStateToProps = (state, ownProps) => ({
+  Nav:state.reducer.Nav
+})
+
+
+export default Home = connect(
+  mapStateToProps
+)(Home)
+
+

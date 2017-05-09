@@ -1,14 +1,24 @@
+import assign from 'lodash.assign'
+
 let _state = {
-  selectedTab: 'Home',      // 表示选择 底部TabBar   Home Service Order Me
-  nav:{display:"block"},    // 表示显示隐藏 顶部所有  nav
-  hidden: false,            // 表示显示隐藏 底部所有  TabBar
+  nav:{display:"block"},    // 顶部 nav 显隐
+
+
+  RightContent:'login',     // 登录状态 'login' 'successful'
+
+
+  productId:false,          // 产品ID  false -> 失效
+
+
+  navtitle:['潜游时光'],    // 中心标题
+  PreURL:['/'],             // 返回 URL
   leftContent:{
-    return:false,           // 表示显示返回按钮       false   'left'
-    logo:'home'             // 表示显示显示首页logo   false   'home'
+    return:false,           // 返回按钮  首页->false   'left'
+    logo:'home'             // 返回logo  首页->'home'   false
   },
-  RightContent:'login',     // 表示还登录状态 'login' 'successful'
-  navtitle:'潜游时光',      // 表示标题
-  PreURL:['/']                // 表示要返回的URL
+
+  hidden: false,            // 底部  TabBar 显隐
+  selectedTab: 'Home'       // 底部  TabBar 选择  Home Service Order Me
 }
 
 
@@ -16,22 +26,39 @@ let _state = {
 
 const Nav = (state = _state, action) => {
   switch (action.type) {
+
     case 'Chan_Nav':
+      // 这个是全部改变
       state = action.data;
-      let newstate = Object.assign({},state)
+      let newstate = assign({},state)
       return newstate
+
+    case 'Chan_Part':
+      // 这个是部分改变 貌似用不到，瞎操心了！算了，放在这里蹦？
+      for (_name in state) {
+        for (_target in action.data) {
+          if (_name == _target) {
+            state[_name] = action.data[_target];
+          }
+        }
+      }
+      let statePart = assign({},state)
+      return statePart
+
     case 'Chan_Url':
       // 左上角的切换
       state.PreURL = action.data;
-      let URLstate = Object.assign({},state)
+      let URLstate = assign({},state)
       return URLstate
+
     case 'Chan_Url_Tab':
       // 底部的切换
       state.PreURL = action.data.PreURL;
       state.selectedTab = action.data.selectedTab;
       state.leftContent = action.data.leftContent;
-      let UTstate = Object.assign({},state)
+      let UTstate = assign({},state)
       return UTstate
+
     default:
       return state
   }
