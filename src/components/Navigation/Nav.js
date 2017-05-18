@@ -269,7 +269,7 @@ class Nav extends Component {
             }}
             >
           </TabBar.Item>
-          <TabBar.Item
+          {/*<TabBar.Item
             icon={
               <div style={{
                 margin:'0px 0px 0px 7.5px',
@@ -303,7 +303,7 @@ class Nav extends Component {
               this.context.router.push('/village');
             }}
             >
-          </TabBar.Item>
+          </TabBar.Item>*/}
           <TabBar.Item
             icon={
               <div style={{

@@ -95,8 +95,8 @@ class Detail extends Component {
        }).then(function(response) {
         return response.json()
        }).then(function(json) {
-        console.log('产品信息相关')
-        console.log(json)
+        // console.log('产品信息相关')
+        // console.log(json)
         if (json.result=="0") {
           _this.props.dispatch({
             type:'product_Infor',
@@ -118,8 +118,8 @@ class Detail extends Component {
        }).then(function(response) {
         return response.json()
        }).then(function(json) {
-        console.log('套餐说明，交通信息相关')
-        console.log(json)
+        // console.log('套餐说明，交通信息相关')
+        // console.log(json)
         if (json.result=="0") {
           _this.setState({
             productTravel:json.data
@@ -136,8 +136,8 @@ class Detail extends Component {
        }).then(function(response) {
         return response.json()
        }).then(function(json) {
-        console.log('套餐行程相关')
-        console.log(json)
+        // console.log('套餐行程相关')
+        // console.log(json)
         if (json.result=="0") {
           _this.props.dispatch({
             type:'product_travel',
@@ -158,8 +158,8 @@ class Detail extends Component {
        }).then(function(response) {
         return response.json()
        }).then(function(json) {
-        console.log('套餐包含相关')
-        console.log(json)
+        // console.log('套餐包含相关')
+        // console.log(json)
         if (json.result=="0") {
           _this.setState({
             productInclude:json.data
@@ -177,8 +177,8 @@ class Detail extends Component {
          }).then(function(response) {
           return response.json()
          }).then(function(json) {
-          console.log('退款说明相关')
-          console.log(json)
+          // console.log('退款说明相关')
+          // console.log(json)
           if (json.result=="0") {
             _this.setState({
               productRule:json.data

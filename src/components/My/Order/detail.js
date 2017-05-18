@@ -3,8 +3,9 @@ import React, {Component} from 'react';
 import assign from 'lodash.assign'
 import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
+import styles from '../styles.scss';
 
-import { WhiteSpace , List } from 'antd-mobile';
+import { WhiteSpace , List , Toast} from 'antd-mobile';
 
 const Item = List.Item;
 const Brief = Item.Brief;
@@ -33,7 +34,7 @@ class detail extends Component {
   }
   componentDidMount() {
     const _this = this;
-    // 这个后期要过滤掉
+    // 过滤成功，这里为了保险起见、没什么卵用
     if ( this.props.Order.select == 'false') {
 
       // let _data = assign({},_this.props.Nav);
@@ -73,7 +74,7 @@ class detail extends Component {
   }
   componentWillReceiveProps(nextProps) {
     const _this = this;
-    // 这个后期要过滤掉
+    // 过滤成功，这里为了保险起见、没什么卵用
     if ( _this.props.Order.select == 'false') {
       // let _data = assign({},_this.props.Nav);
 
@@ -114,7 +115,7 @@ class detail extends Component {
       <div>
         <WhiteSpace size="lg" />
           <List renderHeader={() => '订单状态'} className="my-list">
-            {OrderStatus(this.state.data.orderStatus)}
+            {OrderStatus(this.state.data.orderStatus,this.state.data.countDown)}
           </List>
         <WhiteSpace size="lg" />
           <List renderHeader={() => '订单信息'} className="my-list">
@@ -127,6 +128,9 @@ class detail extends Component {
           </List>
         {RenderItemList(this.state.data.orderItemList)}
         {RenderUserinfo(this.state.OrderUserinfo)}
+        <WhiteSpace size="lg" />
+        <WhiteSpace size="lg" />
+        {RenderSubmit(this.state.data,this)}
       </div>
     )
   }
@@ -137,9 +141,9 @@ detail.contextTypes = {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  Order:state.reducer.Order
-  // Nav:state.reducer.Nav,
-  // routing:state.routing.detaillocationBeforeTransitions
+  Order:state.reducer.Order,
+  Nav:state.reducer.Nav,
+  routing:state.routing.detaillocationBeforeTransitions
 })
 
 
@@ -153,13 +157,17 @@ export default detail = connect(
 
 
 // 渲染订单状态
-function OrderStatus(status) {
+function OrderStatus(status,countDown) {
   if (status == 1) {
     return <Item>预订中</Item>
   }else if (status == 2) {
     return <Item>预订失败</Item>
   }else if (status == 3) {
-    return <Item>预订成功、待付款</Item>
+    if (countDown == null) {
+      return <Item>预订失败</Item>
+    }else {
+      return <Item>预订成功、待付款</Item>
+    }
   }else if (status == 4) {
     return <Item>退订成功、已取消</Item>
   }else if (status == 5) {
@@ -198,10 +206,11 @@ function RenderUserinfo(Info) {
     return
   }
   let _Array = [];
-  for (var i = 0; i < Info.length; i++) {
-    _Array.push(<div>
-      <WhiteSpace size="lg" />
-        <List renderHeader={(i) => {return '旅客信息' + 1;}} className="my-list">
+  for (let i = 0; i < Info.length; i++) {
+    _Array.push(
+      <div>
+        <WhiteSpace size="lg" />
+        <List renderHeader={(key) => {return '旅客信息' + (i+1)}} className="my-list">
           <Item>护照号码: {Info[i].passportNo==null?"未填写":Info[i].passportNo}</Item>
           <Item>中文姓名: {Info[i].chineseName==null?"未填写":Info[i].chineseName}</Item>
           <Item>英文姓名: {Info[i].pinyinName==null?"未填写":Info[i].pinyinName}</Item>
@@ -213,10 +222,114 @@ function RenderUserinfo(Info) {
           <Item>性别: {Info[i].gender==0?"男":'女'}</Item>
           <Item>邮箱: {Info[i].email==null?"未填写":Info[i].email}</Item>
         </List>
-    </div>);
+      </div>
+    );
   }
   return _Array
 }
+// 渲染提交按钮
+function RenderSubmit(val,_this) {
+  if (val.orderStatus == 0) {
+    return
+  }
+  if (val.orderStatus == 1) {
+    return <div className={styles.bottomPay}>
+      <div id='BTN_Cancel' className={styles.bottomPay} onClick={function(){
+        let r = confirm("确认取消订单?")
+        if (r == true) {
+          document.getElementById('BTN_Cancel').innerHTML = '正在取消'
+        }else{
+          return
+        }
+        fetch(
+          appConfig.URLversion + "/order/id/" + _this.state.data.orderId +"/cancelOrder.do" ,{
+          method: "GET",
+          headers:{
+            token:cookie.getItem('token'),
+            digest:cookie.getItem('digest')
+          }
+        }).then(function(response) {
+          return response.json()
+        }).then(function(json) {
+          if (json.result=="0") {
+            alert("订单成功取消");
+            // 这里返回上一页
+            let _data = assign({},_this.props.Nav);
+            let _Url = _this.props.Nav.PreURL[(_data.PreURL.length-2)]
+            _data.PreURL.pop();
+            _data.navtitle.pop();
+            _this.props.dispatch({type:'Chan_Nav',data:_data})
+            _this.context.router.push(_Url);
+            location.reload();
+          }else {
+            Toast.fail('取消失败，原因'+json.message, 1);
+          }
+        })
+      }}>取消订单</div>
+    </div>
+  }else if (val.orderStatus == 3) {
+    if (val.countDown != null) {
+      return <div className={styles.bottomPay}>
+        <div id='alipayMob'></div>
+        <div className={styles.bottomPay} onClick={function(){
+          fetch(
+            appConfig.URLversion + "/payment/alipayMob.do?orderId=" + _this.state.data.orderId ,{
+            method: "GET",
+            headers:{
+              token:cookie.getItem('token'),
+              digest:cookie.getItem('digest')
+            }
+          }).then(function(response) {
+            response.text().then(function (text) {
+              if (response == "FAILED") {
+                alert("您在30分钟内未完成付款，交易已关闭");
+              }else {
+                document.getElementById('alipayMob').innerHTML=text;
+                document.getElementById('alipaysubmit').submit();
+              }
+            });
+          })
+        }}>去付款</div>
+      </div>
+    }
+  }else if (val.orderStatus == 6) {
+    return <div className={styles.bottomPay}>
+      <div id='BTN_Refund' className={styles.bottomPay} onClick={function(){
+        let r = confirm("确认申请退款?")
+        if (r == true) {
+          document.getElementById('BTN_Refund').innerHTML = '正在取消'
+        }else{
+          return
+        }
+        fetch(
+          appConfig.URLversion + "/order/id/" + _this.state.data.orderId +"/refund.do" ,{
+          method: "GET",
+          headers:{
+            token:cookie.getItem('token'),
+            digest:cookie.getItem('digest')
+          }
+        }).then(function(response) {
+          return response.json()
+        }).then(function(json) {
+          if (json.result=="0") {
+            alert("退款申请成功");
+            // 这里返回上一页
+            let _data = assign({},_this.props.Nav);
+            let _Url = _this.props.Nav.PreURL[(_data.PreURL.length-2)]
+            _data.PreURL.pop();
+            _data.navtitle.pop();
+            _this.props.dispatch({type:'Chan_Nav',data:_data})
+            _this.context.router.push(_Url);
+            location.reload();
+          }else {
+            Toast.fail('取消失败，原因'+json.message, 1);
+          }
+        })
+      }}>申请退款</div>
+    </div>
+  }
+}
+
 
 
 

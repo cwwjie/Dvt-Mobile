@@ -47,19 +47,18 @@
 		color: #888;
 	}
 }
-.botIcon {
-	color: #888;
-	padding:10px 16px;
-	overflow: auto;
-	> div {
-		width: 350px;
-		margin: 0px auto;
+	.botIcon {
+		color: #888;
+		padding:10px 16px;
+		overflow: auto;
+		> div {
+			width: 350px;
+			margin: 0px auto;
+		}
+		span {
+			position: relative;
+			top: -25px;
+			font-size: 40px;
+		}
 	}
-	span {
-		position: relative;
-		top: -25px;
-		font-size: 40px;
-	}
-}
-
 

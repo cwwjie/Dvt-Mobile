@@ -172,6 +172,72 @@ const HomeFilter = () => {
 
   store.dispatch({type:'Chan_Nav',data:_data});
 }
+const SubmitFilter = () => {
+  let _Nav = store.getState().reducer.Nav,
+    _User = store.getState().reducer.user;
+  if ( cookie.getItem('token')==null && cookie.getItem('digest')==null ) {
+    history.push('/Cent/login');
+    location.reload();
+    return
+  }else {
+    if (_User == false ) {
+      fetch(
+        appConfig.getUserInfo,{
+        method: "GET",
+        contentType: "application/json; charset=utf-8",
+        headers:{
+          token:cookie.getItem('token'),
+          digest:cookie.getItem('digest')
+        }
+       }).then(function(response) {
+        return response.json()
+       }).then(function(json) {
+        if (json.result=="0") {
+          // 数据储存到 redux
+          store.dispatch({
+            type:'USER_ADD',
+            data:json.data
+          })
+          return
+        }else {
+          // 先将 cookie 移除掉
+          cookie.removeItem('token',"/");
+          cookie.removeItem('digest',"/");
+          history.push('/Cent/login');
+          location.reload();
+          return
+        }
+      })
+      return
+    }else {
+      // 获取所有旅客信息
+      fetch(
+        appConfig.userinfoFindByUserId,{
+        method: "GET",
+        contentType: "application/json; charset=utf-8",
+        headers:{
+          token:cookie.getItem('token'),
+          digest:cookie.getItem('digest')
+        }
+       }).then(function(response) {
+        return response.json()
+       }).then(function(json) {
+        if (json.result=="0") {
+          // 数据储存到 redux
+          store.dispatch({
+            type:'Chan_Passenger',
+            data:json.data
+          })
+        }else {
+          alert("获取所有旅客信息失败");
+          history.push('/');
+          location.reload();
+        }
+      })
+    }
+  }
+
+}
 const CentFilter = () => {
   let _Nav = store.getState().reducer.Nav,
     _User = store.getState().reducer.user;
@@ -203,6 +269,9 @@ const CentFilter = () => {
           // 先将 cookie 移除掉
           cookie.removeItem('token',"/");
           cookie.removeItem('digest',"/");
+          history.push('/Cent/login');
+          location.reload();
+          return
         }
       })
       return
@@ -235,7 +304,7 @@ const DetailFilter = () => {
   }
 }
 const PassengerFilter = () => {
-  // 获取所有订单
+  // 获取所有旅客信息
   fetch(
     appConfig.userinfoFindByUserId,{
     method: "GET",
@@ -269,7 +338,7 @@ ReactDOM.render(
         <Route path="/Detail">
           <IndexRoute getComponent={Detail}/>
           <Route path="/Detail/travel" getComponent={travel}/>
-          <Route path="/Detail/submit" getComponent={submit}/>
+          <Route path="/Detail/submit" getComponent={submit} onEnter={SubmitFilter}/>
         </Route>
         <Route path="/Cus" getComponent={Cus}/>
         <Route path="/village" getComponent={village}/>

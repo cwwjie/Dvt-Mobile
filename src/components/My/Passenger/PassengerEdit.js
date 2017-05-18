@@ -184,10 +184,10 @@ class PassengerEdit extends Component {
           <List>
             <InputItem
               placeholder='护照号码'
-              value={this.state.data.passportNo}
+              value={this.state.passportNo}
               onChange={function(val){
                 let _data = assign({},this.state);
-                _data.data.passportNo = val
+                _data.passportNo = val
                 this.setState(_data)
               }.bind(this)}
               >

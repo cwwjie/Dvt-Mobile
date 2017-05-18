@@ -115,10 +115,52 @@
 			margin: 3%;
 		}
 	}
+	.bottomEdit {
+		position: fixed;
+		bottom: 0px;
+		height: 130px;
+		width: 100%;
+		background: #fff;
+		border-top: 1px solid #ddd;
+		>div{
+			float: left;
+		}
+	}
+	.Edit {
+		margin: 3%;
+		width: 45.5%;
+		height: 80px;
+		line-height: 80px;
+		text-align: center;
+		color: #fff;
+		background-color: #01b969;
+	}
+	.Delete {
+		margin: 3% 3% 3% 0%;
+		width: 45.5%;
+		height: 80px;
+		line-height: 80px;
+		text-align: center;
+		color: #fff;
+		background-color: #f23030;
+	}
 
-
-
-
+.PopupConfirm {
+	height: 80px;
+	line-height: 80px;
+	margin: 3% 0%;
+	text-align: center;
+	background-color: #01b969;
+	color: #fff;
+}
+.addPassenger {
+	height: 80px;
+	line-height: 80px;
+	margin: 3% 0%;
+	text-align: center;
+	background-color: #f23030;
+	color: #fff;
+}
 
 
 
