@@ -40,13 +40,21 @@ class Nav extends Component {
         _data.navtitle = ['客服中心'];
         _data.selectedTab ='Service';
       }else if (_this.props.routing.pathname == '/village') {
-        _data.navtitle = ['度假村直定'];
+        _data.navtitle = ['度假村直订'];
         _data.selectedTab ='Order';
       }else if (_this.props.routing.pathname == '/Cent') {
         _data.navtitle = ['个人中心'];
         _data.selectedTab ='Me';
       }
     }
+    // 登录 特殊过滤
+    if (_this.props.routing.pathname == '/Cent/login' ) {
+      _this.setState({
+        hidden:false,
+        selectedTab: 'Me'
+      })
+    }
+    // 判断登录  删除后将不进行判断
     if ( cookie.getItem('token')!=null && cookie.getItem('digest')!=null ) {
       _data.RightContent = 'successful';
     }
@@ -57,11 +65,19 @@ class Nav extends Component {
   }
   // 接收 redux state
   componentWillReceiveProps(nextProps) {
+    const _this = this
     this.setState(nextProps.Nav)
     // 如果 URL 不是 '/' '/village' "/village" '/Cent' 隐藏       - 暂时过滤这几个
     if (this.props.routing.pathname != '/' && this.props.routing.pathname != '/Cus' && this.props.routing.pathname != '/village' && this.props.routing.pathname != '/Cent' ) {
       this.setState({
         hidden:true
+      })
+    }
+    // 登录 特殊过滤
+    if (_this.props.routing.pathname == '/Cent/login' ) {
+      _this.setState({
+        hidden:false,
+        selectedTab: 'Me'
       })
     }
   }
@@ -239,6 +255,41 @@ class Nav extends Component {
             >
           </TabBar.Item>
           <TabBar.Item
+            icon={
+              <div style={{
+                margin:'0px 0px 0px 7.5px',
+                width: '0.44rem',
+                height: '0.44rem',
+                background: 'url('+Ordersvg+') center center /  0.42rem 0.42rem no-repeat' }}
+              />
+            }
+            selectedIcon={
+              <div style={{
+                margin:'0px 0px 0px 7.5px',
+                width: '0.44rem',
+                height: '0.44rem',
+                background: 'url('+Order_hover+') center center /  0.42rem 0.42rem no-repeat' }}
+              />
+            }
+            title="度假村"
+            key="度假村"
+            dot
+            selected={this.state.selectedTab === 'Order'}
+            onPress={() => {
+              let _data = this.state;
+              _data.PreURL = ['/village'];
+              _data.navtitle = ['度假村直订'];
+              _data.selectedTab = 'Order';
+              _data.leftContent = {
+                return:false,
+                logo:'home'
+              };
+              this.props.dispatch({type:'Chan_Nav',data:_data})
+              this.context.router.push('/village');
+            }}
+            >
+          </TabBar.Item>
+          <TabBar.Item
             icon={<div style={{
               width: '0.44rem',
               height: '0.44rem',
@@ -269,41 +320,6 @@ class Nav extends Component {
             }}
             >
           </TabBar.Item>
-          {/*<TabBar.Item
-            icon={
-              <div style={{
-                margin:'0px 0px 0px 7.5px',
-                width: '0.44rem',
-                height: '0.44rem',
-                background: 'url('+Ordersvg+') center center /  0.42rem 0.42rem no-repeat' }}
-              />
-            }
-            selectedIcon={
-              <div style={{
-                margin:'0px 0px 0px 7.5px',
-                width: '0.44rem',
-                height: '0.44rem',
-                background: 'url('+Order_hover+') center center /  0.42rem 0.42rem no-repeat' }}
-              />
-            }
-            title="度假村"
-            key="度假村"
-            dot
-            selected={this.state.selectedTab === 'Order'}
-            onPress={() => {
-              let _data = this.state;
-              _data.PreURL = ['/village'];
-              _data.navtitle = ['度假村直定'];
-              _data.selectedTab = 'Order';
-              _data.leftContent = {
-                return:false,
-                logo:'home'
-              };
-              this.props.dispatch({type:'Chan_Nav',data:_data})
-              this.context.router.push('/village');
-            }}
-            >
-          </TabBar.Item>*/}
           <TabBar.Item
             icon={
               <div style={{

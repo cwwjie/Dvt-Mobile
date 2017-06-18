@@ -45,7 +45,8 @@ const appConfig = {
 	userinfoAdd: URLbase + URLversion+"/user/userinfo/add.do",
 	userinfoId: URLbase + URLversion+"/user/userinfo/delete.do?userinfoId=",
 	userupdate: URLbase + URLversion+"/user/userinfo/update.do",
-	selectProvince: URLbase + URLversion+"/system/region/regiontype/"
+	selectProvince: URLbase + URLversion+"/system/region/regiontype/",
+	// allListRoom: URLbase + URLversion+"/product/apartment/1/0/list.do"
 }
 
 

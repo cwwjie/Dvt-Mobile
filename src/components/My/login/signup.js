@@ -56,7 +56,7 @@ class signup extends Component {
         if ( this.state.displayMail=='none' && this.state.PhoneMail=='block' ) {
           if ( !(/^1[34578]\d{9}$/.test(this.state.mobile)) ) {
             Toast.info('手机格式不正确', 2, null, false );return
-          }else if (this.state.password < 8) {
+          }else if (this.state.password.length < 8) {
             Toast.info('密码要大于8位', 2, null, false );return
           }else if (this.state.Code.length != 6) {
             Toast.info('验证码不正确', 2, null, false );return
@@ -65,7 +65,7 @@ class signup extends Component {
         }else if ( this.state.displayMail=='block' && this.state.PhoneMail=='none' ) {
           if ( !(/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(this.state.mailBox)) ) {
             Toast.info('邮箱不正确', 2, null, false );return
-          }else if ( this.state.mailBoxPW < 8 ) {
+          }else if ( this.state.mailBoxPW.length < 8 ) {
             Toast.info('密码要大于8位', 2, null, false );return
           }
         }
@@ -153,7 +153,7 @@ class signup extends Component {
         _message = "正在获取"
         const _json = {
           mobile:_this.state.mobile,
-          authAction:"forgetPw"
+          authAction:"register"
         }
         fetch(
           appConfig.getMobileCode,{
@@ -255,7 +255,25 @@ class signup extends Component {
           <WhiteSpace size="lg" />
             <div className={styles.newInput}>
               <div>
-                <input placeholder="您的邮箱" value={this.state.mailBox} onChange={function(){this.mailBoxFilter(event)}.bind(this)}/>
+                <input placeholder="您的邮箱" value={this.state.mailBox} onChange={function(){this.mailBoxFilter(event)}.bind(this)} onBlur={function(val){
+                  if ( /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(event.target.value) ) {
+                    fetch(
+                      appConfig.checkEmail+'?email='+event.target.value,{
+                      method: "GET",
+                      contentType: "application/json; charset=utf-8"
+                    }).then(function(response) {
+                      return response.json()
+                    }).then(function(json) {
+                      if (json.result == '0') {
+                        // 邮箱可用
+                      }else{
+                        Toast.info('邮箱已被注册', 2, null, false );return
+                      }
+                    })
+                  }else {
+                    Toast.info('邮箱格式不正确', 2, null, false );return
+                  }
+                }.bind(this)}/>
               </div>
             </div>
           <WhiteSpace size="lg" />
@@ -283,7 +301,25 @@ class signup extends Component {
           <WhiteSpace size="lg" />
             <div className={styles.newInput}>
               <div>
-                <input placeholder="您的手机" value={this.state.mobile} onChange={function(){this.mobileFilter(event)}.bind(this)}/>
+                <input placeholder="您的手机" value={this.state.mobile} onChange={function(){this.mobileFilter(event)}.bind(this)}  onBlur={function(val){
+                  if ( /^1[34578]\d{9}$/.test(event.target.value) ) {
+                    fetch(
+                      appConfig.checkMobile+'?mobile='+event.target.value,{
+                      method: "GET",
+                      contentType: "application/json; charset=utf-8"
+                    }).then(function(response) {
+                      return response.json()
+                    }).then(function(json) {
+                      if (json.result == '0') {
+                        // 邮箱可用
+                      }else{
+                        Toast.info('手机已被注册', 2, null, false );return
+                      }
+                    })
+                  }else {
+                    Toast.info('手机格式不正确', 2, null, false );return
+                  }
+                }.bind(this)}/>
               </div>
             </div>
           <WhiteSpace size="lg" />

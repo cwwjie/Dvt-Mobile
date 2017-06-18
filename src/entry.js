@@ -65,6 +65,17 @@ const village = (location, callback) => {
     callback(null, require('./components/village/village').default)
   }, 'village')
 }
+  const villageDetail = (location, callback) => {
+    require.ensure([], require => {
+      callback(null, require('./components/village/detail').default)
+    }, 'villageDetail')
+  }
+  const villageSubmit = (location, callback) => {
+    require.ensure([], require => {
+      callback(null, require('./components/village/submit').default)
+    }, 'villageSubmit')
+  }
+
 // 个人中心
 const Cent = (location, callback) => {
   require.ensure([], require => {
@@ -197,6 +208,30 @@ const SubmitFilter = () => {
           store.dispatch({
             type:'USER_ADD',
             data:json.data
+          })
+          // 获取所有旅客信息
+          fetch(
+            appConfig.userinfoFindByUserId,{
+            method: "GET",
+            contentType: "application/json; charset=utf-8",
+            headers:{
+              token:cookie.getItem('token'),
+              digest:cookie.getItem('digest')
+            }
+           }).then(function(response) {
+            return response.json()
+           }).then(function(json) {
+            if (json.result=="0") {
+              // 数据储存到 redux
+              store.dispatch({
+                type:'Chan_Passenger',
+                data:json.data
+              })
+            }else {
+              alert("获取所有旅客信息失败");
+              history.push('/');
+              location.reload();
+            }
           })
           return
         }else {
@@ -341,7 +376,11 @@ ReactDOM.render(
           <Route path="/Detail/submit" getComponent={submit} onEnter={SubmitFilter}/>
         </Route>
         <Route path="/Cus" getComponent={Cus}/>
-        <Route path="/village" getComponent={village}/>
+        <Route path="/village">
+          <IndexRoute getComponent={village}/>
+          <Route path="/village/detail" getComponent={villageDetail}/>
+          <Route path="/village/submit" getComponent={villageSubmit} onEnter={SubmitFilter}/>
+        </Route>
         <Route path="/Cent">
           <IndexRoute getComponent={Cent} onEnter={CentFilter}/>
           <Route path="/Cent/forget" getComponent={forget}/>

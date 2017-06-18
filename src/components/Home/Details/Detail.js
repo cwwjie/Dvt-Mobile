@@ -71,7 +71,7 @@ class Detail extends Component {
         let _W = document.body.clientWidth;
         let _data = json.data,
           _Array = [],
-          _Width =540 * _W / 1680;
+          _Width =1200 * _W / 1680;
         for (let i = 0; i < _data.length; i++) {
           let obj = {
             src:appConfig.URLbase + _data[i].gallery.thumbUrl,
@@ -272,7 +272,7 @@ class Detail extends Component {
           <WingBlank size="md">套餐行程</WingBlank>
           <WhiteSpace size="lg" />
           <List>
-            <Item arrow="horizontal" onClick={() => {
+            <Item arrow="horizontal" onClick={function(){
               // 页面跳转
               let _this = this
               let _data = assign({},_this.props.Nav);
@@ -283,7 +283,7 @@ class Detail extends Component {
                 data:_data
               })
               _this.context.router.push('/Detail/travel');
-            }} multipleLine>
+              }.bind(this)} multipleLine>
               <div style={{color:"#000"}}>查看行程详情</div>
             </Item>
             {this.state.productRoute.map(data => (

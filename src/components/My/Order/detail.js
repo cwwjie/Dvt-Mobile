@@ -49,7 +49,8 @@ class detail extends Component {
       return
     }
     let _state = assign({},this.state);
-    _state.data = this.props.Order.data[this.props.Order.select]
+    _state.data = this.props.Order.data[this.props.Order.select];
+    console.log(this.props.Order.data[this.props.Order.select]);
     this.setState(_state);
     fetch(
       appConfig.findByOrderId+"?orderId="+_state.data.orderId,{
@@ -126,7 +127,7 @@ class detail extends Component {
             <Item>入住日期: {getnoUTCdate(this.state.data.departureDate)}</Item>
             <Item>离开日期: {getnoUTCdate(this.state.data.leaveDate)}</Item>
           </List>
-        {RenderItemList(this.state.data.orderItemList)}
+        {RenderItemList(this.state.data.orderItemList,this)}
         {RenderUserinfo(this.state.OrderUserinfo)}
         <WhiteSpace size="lg" />
         <WhiteSpace size="lg" />
@@ -159,7 +160,7 @@ export default detail = connect(
 // 渲染订单状态
 function OrderStatus(status,countDown) {
   if (status == 1) {
-    return <Item>预订中</Item>
+    return <Item>预订中、24小时内将会有客服联系您</Item>
   }else if (status == 2) {
     return <Item>预订失败</Item>
   }else if (status == 3) {
@@ -178,16 +179,40 @@ function OrderStatus(status,countDown) {
     return <Item>申请退款</Item>
   }else if (status == 8) {
     return <Item>退款成功</Item>
+  }else if (status == 9) {
+    return <Item>退款失败</Item>
+  }else if (status == 10) {
+    return <Item>待付尾款</Item>
   }
 }
 // 渲染产品信息
-function RenderItemList(_Item) {
+function RenderItemList(_Item,_this) {
   let _Array = [];
-  for (var i = 0; i < _Item.length; i++) {
+  for (let i = 0; i < _Item.length; i++) {
     _Array.push(<div>
       <WhiteSpace size="lg" />
         <List renderHeader={(i) => {return '产品信息' + 1;}} className="my-list">
-          <Item>产品名称: {_Item[i].productName}</Item>
+          <div onClick={function(){
+            // 页面跳转
+            let _data = assign({},_this.props.Nav);
+            _data.navtitle.push("订单详情");
+            _data.PreURL.push("/Detail");
+            _data.leftContent={
+              return:'left',
+              logo:false
+            };
+            _data.hidden = true;
+            _data.productId = _Item[i].productId;
+            _this.props.dispatch({
+              type:'Chan_Nav',
+              data:_data
+            });
+            _this.props.dispatch({
+              type:'product_Id',
+              data:_Item[i].productId
+            })
+            _this.context.router.push('/Detail');
+          }.bind(i)}><Item arrow="horizontal">{_Item[i].productName}</Item></div>
           <Item>简单描述: {_Item[i].productBrief}</Item>
           <Item>产品价格: {_Item[i].productPrice}</Item>
           <Item>促销价格: {_Item[i].promotePrice}</Item>
@@ -211,16 +236,16 @@ function RenderUserinfo(Info) {
       <div>
         <WhiteSpace size="lg" />
         <List renderHeader={(key) => {return '旅客信息' + (i+1)}} className="my-list">
-          <Item>护照号码: {Info[i].passportNo==null?"未填写":Info[i].passportNo}</Item>
-          <Item>中文姓名: {Info[i].chineseName==null?"未填写":Info[i].chineseName}</Item>
-          <Item>英文姓名: {Info[i].pinyinName==null?"未填写":Info[i].pinyinName}</Item>
-          <Item>手机号码: {Info[i].mobile==null?"未填写":Info[i].mobile}</Item>
-          <Item>潜水等级: {Info[i].divingRank==null?"未填写":Info[i].divingRank}</Item>
-          <Item>潜水次数: {Info[i].divingCount==null?"未填写":Info[i].divingCount}</Item>
-          <Item>出生日期: {getdate(UTC2LocalTime(Info[i].birthday))}</Item>
-          <Item>年龄: {Info[i].age==null?"未填写":Info[i].age}</Item>
-          <Item>性别: {Info[i].gender==0?"男":'女'}</Item>
-          <Item>邮箱: {Info[i].email==null?"未填写":Info[i].email}</Item>
+          <Item>护照号码: { Info[i].passportNo==null?"未填写":Info[i].passportNo }</Item>
+          <Item>中文姓名: { Info[i].chineseName==null?"未填写":Info[i].chineseName }</Item>
+          <Item>英文姓名: { Info[i].pinyinName==null?"未填写":Info[i].pinyinName }</Item>
+          <Item>手机号码: { Info[i].mobile==null?"未填写":Info[i].mobile }</Item>
+          <Item>潜水等级: { InfodivingRank(Info[i].divingRank) }</Item>
+          <Item>潜水次数: { Info[i].divingCount==null?"未填写":Info[i].divingCount }</Item>
+          <Item>出生日期: { getdate(UTC2LocalTime(Info[i].birthday)) }</Item>
+          <Item>年龄: { Info[i].age==null?"未填写":Info[i].age }</Item>
+          <Item>性别: { Info[i].gender==0?"男":'女' }</Item>
+          <Item>邮箱: { Info[i].email==null?"未填写":Info[i].email }</Item>
         </List>
       </div>
     );
@@ -271,24 +296,54 @@ function RenderSubmit(val,_this) {
     if (val.countDown != null) {
       return <div className={styles.bottomPay}>
         <div id='alipayMob'></div>
-        <div className={styles.bottomPay} onClick={function(){
-          fetch(
-            appConfig.URLversion + "/payment/alipayMob.do?orderId=" + _this.state.data.orderId ,{
-            method: "GET",
-            headers:{
-              token:cookie.getItem('token'),
-              digest:cookie.getItem('digest')
-            }
-          }).then(function(response) {
-            response.text().then(function (text) {
-              if (response == "FAILED") {
-                alert("您在30分钟内未完成付款，交易已关闭");
-              }else {
-                document.getElementById('alipayMob').innerHTML=text;
-                document.getElementById('alipaysubmit').submit();
+        <div id='alipayBTN' className={styles.bottomPay} onClick={function(){
+          document.getElementById('alipayMob').innerHTML='正在付款';
+          // 表示是
+          if (_this.state.data.orderType == "P") {
+            fetch(
+              appConfig.URLversion + "/payment/alipayMob.do?orderId=" + _this.state.data.orderId ,{
+              method: "GET",
+              headers:{
+                token:cookie.getItem('token'),
+                digest:cookie.getItem('digest')
               }
-            });
-          })
+            }).then(function(response) {
+              response.text().then(function (text) {
+                if (response == "FAILED") {
+                  alert("您在30分钟内未完成付款，交易已关闭");
+                }else {
+                  document.getElementById('alipayMob').innerHTML=text;
+                  console.log(text);
+                  return
+                  document.getElementById('alipaysubmit').submit();
+                }
+                document.getElementById('alipayMob').innerHTML='去付款';
+              });
+            })
+          }else if(_this.state.data.orderType == "C"){
+            // 证明该订单为度假村直订（C:custom）显示支付定金按钮
+            fetch(
+              appConfig.URLversion + "/payment/"//
+              +_this.state.data.orderSn+"/E/alipay4Custom.do?dev=Mobile",{
+              method: "GET",
+              headers:{
+                token:cookie.getItem('token'),
+                digest:cookie.getItem('digest')
+              }
+            }).then(function(response) {
+              response.text().then(function (text) {
+                if (response == "FAILED") {
+                  alert("您在30分钟内未完成付款，交易已关闭");
+                }else {
+                  document.getElementById('alipayMob').innerHTML=text;
+                  console.log(text);
+                  return
+                  document.getElementById('alipaysubmit').submit();
+                }
+                document.getElementById('alipayMob').innerHTML='去付款';
+              });
+            })
+          }
         }}>去付款</div>
       </div>
     }
@@ -327,6 +382,33 @@ function RenderSubmit(val,_this) {
         })
       }}>申请退款</div>
     </div>
+  }else if (val.orderStatus == 10) {
+    return <div className={styles.bottomPay}>
+      <div id='alipayMob'></div>
+      <div id='alipayBTN' className={styles.bottomPay} onClick={function(){
+        document.getElementById('alipayMob').innerHTML='正在付款';
+        // 证明该订单为度假村直订（C:custom）显示支付定金按钮
+        fetch(
+          appConfig.URLversion + "/payment/"//
+          +_this.state.data.orderSn+"/R/alipay4Custom.do?dev=Mobile",{
+          method: "GET",
+          headers:{
+            token:cookie.getItem('token'),
+            digest:cookie.getItem('digest')
+          }
+        }).then(function(response) {
+          response.text().then(function (text) {
+            if (response == "FAILED") {
+              alert("您在30分钟内未完成付款，交易已关闭");
+            }else {
+              document.getElementById('alipayMob').innerHTML=text;
+              document.getElementById('alipaysubmit').submit();
+            }
+            document.getElementById('alipayMob').innerHTML='去付款';
+          });
+        })
+      }}>去付款</div>
+    </div>
   }
 }
 
@@ -359,6 +441,31 @@ function getnoUTCdate(date) {
 // 方法 - 获取时间返回201x-xx-xx xx:xx:
 function getsecond(data) {
   var newdate = new Date(UTC2LocalTime(data)),
-    thisString = newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate() + " " + newdate.getHours()+ ":" + newdate.getMinutes()+ ":"  + newdate.getSeconds();
+    thisString = newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate() + " ";
+    if (newdate.getHours() < 10) {
+      thisString += '0'+ newdate.getHours()+ ":";
+    }else {
+     thisString += newdate.getHours()+ ":";
+    }
+    if (newdate.getMinutes() < 10 ) {
+      thisString += '0'+ newdate.getMinutes()+ ":";
+    }else {
+      thisString += newdate.getMinutes()+ ":";
+    }
+    if (newdate.getSeconds() < 10) {
+      thisString += '0'+ newdate.getSeconds();
+
+    }else {
+      thisString += newdate.getSeconds();
+    }
   return thisString
+}
+function InfodivingRank(num) {
+  if (num == 1) {
+    return "OW级别"
+  }else if(num == 2) {
+    return "AOW级别以上"
+  }else {
+    return "未填写"
+  }
 }

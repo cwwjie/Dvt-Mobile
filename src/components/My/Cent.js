@@ -292,6 +292,7 @@ class Foo extends Component {
                   logo:false
                 };
 
+                _data.hidden= true,
                 _data.selectedTab='Home'
 
                 _this.props.dispatch({

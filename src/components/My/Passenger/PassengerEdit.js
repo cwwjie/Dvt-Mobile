@@ -7,6 +7,7 @@ import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
 import dateToFormat from './dateToFormat.js';
 import styles from '../styles.scss';
+import convertToPinyinLower from './convertToPinyinLower.js';
 
 import { Modal , WhiteSpace , List , InputItem , Picker , DatePicker , WingBlank , Toast} from 'antd-mobile';
 
@@ -64,7 +65,7 @@ class PassengerEdit extends Component {
           value: '1',
         },
         {
-          label: 'OW以上',
+          label: 'AOW以上',
           value: '2',
         }
       ],
@@ -153,8 +154,10 @@ class PassengerEdit extends Component {
                   Toast.info('中文姓名为必填', 1.2);
                 }else if ( !(/^[\u2E80-\u9FFF]+$/.test(val)) ) {
                   Toast.info('必须全为中文(不能有空格)', 1.5);
+                }else {
+                  this.setState({pinyinName:convertToPinyinLower.getFullChars(val)});
                 }
-              }}
+              }.bind(this)}
               >
               姓名中文
             </InputItem>
@@ -220,7 +223,12 @@ class PassengerEdit extends Component {
               minDate={_minDate}
               maxDate={_maxDate}
               onChange={function(val){
-                this.setState({ birthday: val })
+                let _data = assign({},this.state);
+                _data.birthday = val;
+                let myDate = new Date();
+                let StateDate = new Date(Date.parse(val._d));
+                _data.age = myDate.getFullYear() - StateDate.getFullYear();
+                this.setState(_data)
               }.bind(this)}
             >
             <List.Item arrow="horizontal">出生日期</List.Item>
@@ -306,7 +314,7 @@ class PassengerEdit extends Component {
         <WhiteSpace size="lg" />
           <List>
             <InputItem
-              placeholder='潜水次数'
+              placeholder='请填写100以下次数'
               value={this.state.divingCount}
               onChange={function(val){
                 let _data = assign({},this.state);
@@ -318,6 +326,9 @@ class PassengerEdit extends Component {
                 }else {
                   if (!(/^[0-9]*$/.test(val))) {
                     Toast.info('潜水次数必须为数字', 1.5);
+                    return false
+                  }else if ( parseInt(val) > 100) {
+                    Toast.info('只能填写100以下的数字', 1.5);
                     return false
                   }
                 }
@@ -351,7 +362,7 @@ PassengerEdit.contextTypes = {
 )(PassengerEdit)
 
 
-
+let repeatedSubmit = true;
 function RenderSubmit(type,_this) {
   if (type == false) {
     return <div className={styles.bottomPay}><div>正在加载...</div></div>
@@ -478,6 +489,9 @@ function RenderSubmit(type,_this) {
     </div>
   }else if (type == 'add') {
     return <div className={styles.bottomPay}><div onClick={function(){
+      if (repeatedSubmit == false) {
+        return
+      }
       if (JudgeAll(_this.state) == false) {
         return
       }
@@ -511,6 +525,7 @@ function RenderSubmit(type,_this) {
         "divingRank":_diving,
         "divingCount":_this.state.divingCount
       }
+      repeatedSubmit = false;
       fetch(
         appConfig.userinfoAdd,{
         method: "POST",
@@ -547,6 +562,7 @@ function RenderSubmit(type,_this) {
         }else {
           alert("未知错误，可能是输入参数有误，请重试");
         }
+        repeatedSubmit = true;
       })
     }.bind(_this)}>添加</div></div>
   }

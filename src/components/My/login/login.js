@@ -140,7 +140,7 @@ class login extends Component {
     this.setState({
       account:event.target.value
     })
-    if ( event.target.value != "" && this.state.password.length > 8 ) {
+    if ( event.target.value != "" && this.state.password.length >= 8 ) {
       this.setState({
         submit:true
       })
@@ -154,7 +154,7 @@ class login extends Component {
     this.setState({
       password:event.target.value
     })
-    if ( this.state.account != "" && event.target.value.length > 8 ) {
+    if ( this.state.account != "" && event.target.value.length >= 8 ) {
       this.setState({
         submit:true
       })

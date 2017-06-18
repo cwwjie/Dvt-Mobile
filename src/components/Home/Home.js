@@ -178,7 +178,27 @@ class Home extends Component {
           </List>
           <List>
             <div className={styles.botIcon}>
-              <div>
+              <div onClick={function(){
+                // 页面跳转
+                let _this = this
+                let _data = assign({},_this.props.Nav);
+
+
+
+                _data.navtitle=["客服中心"];
+                _data.PreURL=["/Cus"];
+
+                _data.hidden = false;
+                _data.selectedTab = 'Service';
+
+
+
+                _this.props.dispatch({
+                  type:'Chan_Nav',
+                  data:_data
+                });
+                _this.context.router.push('/Cus');
+              }.bind(this)}>
                 <i style={{
                   position: 'relative',
                   top:'2px',

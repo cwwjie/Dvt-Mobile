@@ -86,7 +86,7 @@ class forget extends Component {
             _this.context.router.push(_Url);
           }else {
             Toast.fail('提交失败，原因'+json.message, 2, () => {
-              _this.setState({submit:true})
+              _this.setState({submit:'mailBox'})
             });
           }
         })
@@ -120,7 +120,7 @@ class forget extends Component {
             _this.context.router.push(_Url);
           }else {
             Toast.fail('提交失败，原因'+json.message, 2, () => {
-              _this.setState({submit:true})
+              _this.setState({submit:'mobile'})
             });
           }
         })

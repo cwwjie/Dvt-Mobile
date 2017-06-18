@@ -3,10 +3,11 @@ import React, {Component} from 'react';
 
 import { Popup , List , WhiteSpace } from 'antd-mobile';
 
-import styles from './styles.scss'
+import styles from './styles.scss';
 import QQ from './QQ.svg';
 import weche from './weche.svg';
 import weche2Dcode from './weche.jpg';
+import company from './company.jpg';
 import divingtime from './divingtime.png';
 
 const Item = List.Item;
@@ -51,8 +52,25 @@ class Cus extends Component {
             arrow="horizontal"
             onClick={function(){
               Popup.show(<div>
+                <List renderHeader={() => (
+                  <div style={{ position: 'relative' }}>
+                    二维码
+                    <span
+                      style={{
+                        position: 'absolute', right: 3, top: -5,
+                      }}
+                      onClick={() => this._onClose('cancel')}
+                    >
+                      X
+                    </span>
+                  </div>)}
+                  className="popup-list"
+                />
                 <div className={styles.Popup}>
+                  <div>海浪</div>
                   <img src={weche2Dcode} />
+                  <div>公众号</div>
+                  <img src={company} />
                 </div>
               </div>, { animationType: 'slide-up', maskProps, maskClosable: false });
             }.bind(this)}

@@ -220,9 +220,9 @@ class travel extends Component {
             选择套餐数量
             </List.Item>
           </List>
-          <WhiteSpace size="lg" />
-          <WingBlank size="md">客人信息</WingBlank>
-          <WhiteSpace size="lg" />
+          <WhiteSpace size="lg"/>
+          <WingBlank size="md">客人信息 (至少提供一人信息)</WingBlank>
+          <WhiteSpace size="lg"/>
           <List>
             <List.Item extra="选择" arrow="horizontal" onClick={function(){
               Popup.show(
@@ -344,18 +344,14 @@ class travel extends Component {
               Toast.info('请选择时间!!!', 2, null, false);
               return
             }
-            if (_this.state.passenger.length == 0) {
-              Toast.info('请选旅客信息!!!', 2, null, false);
-              return
-            }
-            if (choke == true) {return}
-            choke = true;
             let _json = {
               userInfoList:[],
               address:{}
             };
+            let _allow = false;
             for (let i = 0; i < _this.state.passenger.length; i++) {
-              if (_this.state.passenger[i].select = true) {
+              if (_this.state.passenger[i].select == true) {
+                _allow = true;
                 let tem_Obj = {};
                 tem_Obj.relId = null;
                 tem_Obj.orderId = null;
@@ -372,11 +368,19 @@ class travel extends Component {
                 _json.userInfoList.push(tem_Obj);
               }
             }
+            if (_allow == false) {
+              Toast.info('请选旅客信息!!!', 2, null, false);
+              return
+            }
             let _date = new Date(Date.parse(_this.state.date._d));
             let _string = '';
             _string += _date.getFullYear();
             ( (_date.getMonth()+1)<10) ? (_string += "0" + (_date.getMonth()+1)) : (_string += (_date.getMonth()+1) );
             ( (_date.getDate()<10) ? (_string += "0" + _date.getDate()) : (_string += _date.getDate()) );
+
+            // 进入提交阶段，进行阻塞
+            if (choke == true) {return}
+            choke = true;
             fetch(
               appConfig.URLversion+'/order/'//
                 + _this.props.product.productId + "/"//
@@ -389,9 +393,9 @@ class travel extends Component {
                 digest:cookie.getItem('digest')
               },
               body:JSON.stringify(_json)
-            }).then(function(response) {
+             }).then(function(response) {
               return response.json()
-            }).then(function(json) {
+             }).then(function(json) {
               if (json.result == "0") {
                 Toast.info('恭喜你提交成功!!!', 2, null, false);
                 let _data = assign({},_this.props.Nav);
@@ -416,6 +420,7 @@ class travel extends Component {
               }else {
                 alert('发生未知错误，错误代码:'+json.result);
               }
+              choke = false;
             })
           }.bind(this)}>预定套餐</div>
         </div>
