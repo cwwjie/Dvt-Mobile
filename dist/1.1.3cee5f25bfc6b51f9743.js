@@ -1,1 +1,0 @@
-webpackJsonp([1,3],{119:function(e,t,u){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var r=u(1),l=n(r),d=function(){return l.default.createElement("div",null,"Order")};t.default=d}});

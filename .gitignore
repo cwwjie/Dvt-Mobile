@@ -21,5 +21,4 @@ npm-debug.log
 .module-cache
 .*.sw*
 dist/*
-dist
-/dist
+dist/
