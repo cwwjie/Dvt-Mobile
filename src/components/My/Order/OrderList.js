@@ -1,31 +1,103 @@
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
 import assign from 'lodash.assign'
+import styles from './styles.scss'
 
-import { WhiteSpace , List } from 'antd-mobile';
+import { WhiteSpace, List, Tabs } from 'antd-mobile';
 
 const Item = List.Item;
 const Brief = Item.Brief;
 
+const TabPane = Tabs.TabPane;
 
 
 class Order extends Component {
   constructor(props, context) {
     super(props,context);
-    this.state = {};
+    this.state = {
+      defaultActiveKey:'1',
+      filter:"all"
+    };
   }
   componentDidMount() {
+    let _state = assign({},this.state);
+    if (this.props.Order.filter == "all") {
+      _state.defaultActiveKey = '1';
+      _state.filter = "all";
+    }else if (this.props.Order.filter == "ing") {
+      _state.defaultActiveKey = '2';
+      _state.filter = "ing";
+    }else if (this.props.Order.filter == "pay") {
+      _state.defaultActiveKey = '3';
+      _state.filter = "pay";
+    }else if (this.props.Order.filter == "complete") {
+      _state.defaultActiveKey = '4';
+      _state.filter = "complete";
+    }
+    this.setState(_state);
   }
   render() {
     return (
       <div style={{position:'relative'}}>
-        <div style={{
-          position: 'absolute',
-          textAlign:'center',
-          width:'100%',
-          padding:'37px 0px 0px 0px'
-        }}>暂无数据</div>
-        <div>{renderOrder(this.props.Order.data,this.props.Order.filter,this)}</div>
+        <div style={{height:"1px",background:"#ddd"}}></div>
+        <div className={styles.NavL}>
+          <div className={styles.NavLL}>商城订单</div>
+          <div className={styles.NavLR} onClick={function(){
+            this.context.router.push('/Cent/taobao');
+          }.bind(this)}>淘宝订单</div>
+        </div>
+        <div style={{height:"1px",background:"#ddd"}}></div>
+        <Tabs activeKey={this.state.defaultActiveKey} animated={false} onChange={function(key){
+          let _state = assign({},this.state);
+            _state.defaultActiveKey = key;
+            if (key == "1") {
+              _state.filter = "all";
+            }else if (key == "2") {
+              _state.filter = "ing";
+            }else if (key == "3") {
+              _state.filter = "pay";
+            }else if (key == "4") {
+              _state.filter = "complete";
+            }
+          this.setState(_state);
+        }.bind(this)}>
+          <TabPane tab="所有订单" key="1">
+            <div style={{
+              position: 'absolute',
+              textAlign:'center',
+              width:'100%',
+              padding:'37px 0px 0px 0px'
+            }}>暂无数据</div>
+            <div>{renderOrder(this.props.Order.data,this.state.filter,this)}</div>
+          </TabPane>
+          <TabPane tab="预定中" key="2">
+            <div style={{
+              position: 'absolute',
+              textAlign:'center',
+              width:'100%',
+              padding:'37px 0px 0px 0px'
+            }}>暂无数据</div>
+            <div>{renderOrder(this.props.Order.data,this.state.filter,this)}</div>
+          </TabPane>
+          <TabPane tab="等付款" key="3">
+            <div style={{
+              position: 'absolute',
+              textAlign:'center',
+              width:'100%',
+              padding:'37px 0px 0px 0px'
+            }}>暂无数据</div>
+            <div>{renderOrder(this.props.Order.data,this.state.filter,this)}</div>
+          </TabPane>
+          <TabPane tab="成功/退款" key="4">
+            <div style={{
+              position: 'absolute',
+              textAlign:'center',
+              width:'100%',
+              padding:'37px 0px 0px 0px'
+            }}>暂无数据</div>
+            <div>{renderOrder(this.props.Order.data,this.state.filter,this)}</div>
+          </TabPane>
+        </Tabs>
       </div>
     )
   }

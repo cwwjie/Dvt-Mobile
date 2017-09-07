@@ -296,55 +296,60 @@ function RenderSubmit(val,_this) {
     if (val.countDown != null) {
       return <div className={styles.bottomPay}>
         <div id='alipayMob'></div>
-        <div id='alipayBTN' className={styles.bottomPay} onClick={function(){
-          document.getElementById('alipayMob').innerHTML='正在付款';
-          // 表示是
+        {(function(){
           if (_this.state.data.orderType == "P") {
-            fetch(
-              appConfig.URLversion + "/payment/alipayMob.do?orderId=" + _this.state.data.orderId ,{
-              method: "GET",
-              headers:{
-                token:cookie.getItem('token'),
-                digest:cookie.getItem('digest')
-              }
-            }).then(function(response) {
-              response.text().then(function (text) {
-                if (response == "FAILED") {
-                  alert("您在30分钟内未完成付款，交易已关闭");
-                }else {
-                  document.getElementById('alipayMob').innerHTML=text;
-                  console.log(text);
-                  return
-                  document.getElementById('alipaysubmit').submit();
+            return <div id='alipayBTN' className={styles.bottomPay2} onClick={function(){
+              document.getElementById('alipayMob').innerHTML='正在付款';
+              // 表示是商城订单
+              fetch(
+                appConfig.URLversion + "/payment/alipayMob.do?orderId=" + _this.state.data.orderId ,{
+                method: "GET",
+                headers:{
+                  token:cookie.getItem('token'),
+                  digest:cookie.getItem('digest')
                 }
-                document.getElementById('alipayMob').innerHTML='去付款';
-              });
-            })
-          }else if(_this.state.data.orderType == "C"){
-            // 证明该订单为度假村直订（C:custom）显示支付定金按钮
-            fetch(
-              appConfig.URLversion + "/payment/"//
-              +_this.state.data.orderSn+"/E/alipay4Custom.do?dev=Mobile",{
-              method: "GET",
-              headers:{
-                token:cookie.getItem('token'),
-                digest:cookie.getItem('digest')
-              }
-            }).then(function(response) {
-              response.text().then(function (text) {
-                if (response == "FAILED") {
-                  alert("您在30分钟内未完成付款，交易已关闭");
-                }else {
-                  document.getElementById('alipayMob').innerHTML=text;
-                  console.log(text);
-                  return
-                  document.getElementById('alipaysubmit').submit();
+              }).then(function(response) {
+                response.text().then(function (text) {
+                  if (response == "FAILED") {
+                    alert("您在30分钟内未完成付款，交易已关闭");
+                  }else {
+                    document.getElementById('alipayMob').innerHTML=text;
+                    console.log(text);
+                    return
+                    document.getElementById('alipaysubmit').submit();
+                  }
+                  document.getElementById('alipayMob').innerHTML='去付款';
+                });
+              })
+            }}>去付款</div>
+          }else if (_this.state.data.orderType == "C") {
+            return <div id='alipayBTN' className={styles.bottomPay2} onClick={function(){
+              document.getElementById('alipayMob').innerHTML='正在付款';
+              // 证明该订单为度假村直订（C:custom）显示支付定金按钮
+              fetch(
+                appConfig.URLversion + "/payment/"//
+                +_this.state.data.orderSn+"/E/alipay4Custom.do?dev=Mobile",{
+                method: "GET",
+                headers:{
+                  token:cookie.getItem('token'),
+                  digest:cookie.getItem('digest')
                 }
-                document.getElementById('alipayMob').innerHTML='去付款';
-              });
-            })
+              }).then(function(response) {
+                response.text().then(function (text) {
+                  if (response == "FAILED") {
+                    alert("您在30分钟内未完成付款，交易已关闭");
+                  }else {
+                    document.getElementById('alipayMob').innerHTML=text;
+                    console.log(text);
+                    return
+                    document.getElementById('alipaysubmit').submit();
+                  }
+                  document.getElementById('alipayMob').innerHTML='去付款';
+                });
+              })
+            }}>支付定金</div>
           }
-        }}>去付款</div>
+        })()}
       </div>
     }
   }else if (val.orderStatus == 6) {

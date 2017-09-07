@@ -54,6 +54,9 @@ class villageDetail extends Component {
       initialHeight:230,
       sel: '',
 
+      checkInDate:null,
+      leaveDate:null,
+      setoffDate:setoffDate,
 
       roomType:[],
       total:0
@@ -61,6 +64,7 @@ class villageDetail extends Component {
   }
   componentWillMount(){
     let _this = this;
+    // 判断是否过期
     if (this.props.village.selected == false) {
       this.setState({
         modal:true
@@ -105,7 +109,6 @@ class villageDetail extends Component {
       return response.json()
      }).then(function(json) {
       if (json.result=="0") {
-        console.log(json.data);
         // if (_this.props.village.roomType.length == 0) {
           _this.setState({
             roomType:json.data.list
@@ -121,6 +124,14 @@ class villageDetail extends Component {
       }else {
         alert("房型加载失败，原因:"+json.message);
       }
+    })
+    // 初始化时间
+    let _villageTime = timeConversion.dateToFormat(_this.props.village.villageSelected.villageTime)+' +0800';
+    let checkInDate = moment(_villageTime,'YYYY-MM-DD Z');
+    _this.setState({
+      checkInDate:checkInDate,
+      leaveDate:todefine(_timestamp + _this.props.village.villageSelected.villageLeave),
+      setoffDate:todefine( _timestamp + 86400000 ),
     })
   }
   _onClick = () => {
@@ -192,17 +203,21 @@ class villageDetail extends Component {
                     minDate={setoffDate}
                     value={this.state.checkInDate}
                     onChange = {function(date){
+                      // 退房日期
+                      let leaveTamp = Date.parse(this.state.leaveDate._d);
                       this.setState({
                         checkInDate:date,
-                        setoffDate:date,
+                        setoffDate:todefine(Date.parse(date._d)+86400000),
                       });
-                      if (this.state.leaveDate != null) {
-                        if (Date.parse(date._d) > Date.parse(this.state.leaveDate._d)) {
-                          this.setState({
-                            leaveDate:date
-                          });
-                        }
+                      // 退房日期 必须大于 入住日期+1
+                      if ( Date.parse(this.state.leaveDate._d) < (Date.parse(date._d)+86400000) ) {
+                        // 如果小于 表示 需要修改 退房日期
+                        leaveTamp = Date.parse(date._d) + 86400000;
+                        this.setState({
+                          leaveDate:todefine(leaveTamp)
+                        });
                       }
+                      renderRooms(Date.parse(date._d),leaveTamp,this);
                     }.bind(this)}>
                     <List.Item arrow="horizontal">入住日期</List.Item>
                   </DatePicker>
@@ -211,14 +226,14 @@ class villageDetail extends Component {
                   <DatePicker
                     mode="date"
                     title="选择日期"
-                    minDate={setoffDate}
+                    minDate={this.state.setoffDate}
                     value={this.state.leaveDate}
-                    onChange = {(date) => {
+                    onChange = {function(date){
                       this.setState({
                         leaveDate:date
                       });
-                    }}
-                    >
+                      renderRooms(Date.parse(this.state.checkInDate._d),Date.parse(date._d),this);
+                    }.bind(this)}>
                     <List.Item arrow="horizontal">退房日期</List.Item>
                   </DatePicker>
                 </List>
@@ -293,7 +308,16 @@ class villageDetail extends Component {
 
         <div className={styles.bottomNav}>
           <div className={styles.botNavLeft}>
-            <div>￥ {this.state.total} 起</div>
+            <div>定金 {(function(){
+              let roomNum = 0;
+              for (let i = 0; i < this.state.roomType.length; i++) {
+                if (this.state.roomType[i].selected != undefined) {
+                  roomNum = roomNum + this.state.roomType[i].selected;
+                }
+              }
+              roomNum = roomNum * this.props.village.villageSelected.earnest;
+              return roomNum
+            }.bind(this))()} RMB</div>
           </div>
           <div className={styles.botNavRight}><div onClick={()=>{
             // 页面跳转
@@ -364,8 +388,9 @@ export default villageDetail = connect(
 
 
 
-
+// 渲染每一间房间
 function RenderRoom(roomType,_this) {
+  console.log(roomType)
   return roomType.map(function(value,ref){
     return <div style={{position:'relative'}}>
     <div className={styles.onClickPrice}>{(function(){
@@ -402,7 +427,12 @@ function RenderRoom(roomType,_this) {
             background: 'url('+plus+') center center /  0.42rem 0.42rem no-repeat'
           }} onClick={function(){
             let _state = assign({},_this.state);
-            _state.roomType[ref].selected += 1;
+            // 必须小于库存量
+            if ( (_state.roomType[ref].selected+1) <=  value.skuNum) {
+              _state.roomType[ref].selected += 1;
+            }else {
+              Toast.fail('此房型最大库存为:' + value.skuNum, 1);
+            }
             _this.setState(_state);
           }}></div>
           </div>
@@ -441,6 +471,7 @@ function RenderRoom(roomType,_this) {
   });
 }
 
+// 渲染点击弹出的模态框
 function RenderModal(value,img,_this) {
   return <div>
     <List renderHeader={() => (
@@ -504,3 +535,52 @@ function RenderModal(value,img,_this) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 将 时间戳 转换成为 指定格式
+function todefine(arg) {
+  let defineDate = new Date(arg);
+    let defineTime = timeConversion.dateToFormat(defineDate)+' +0800';
+    return moment(defineTime,'YYYY-MM-DD Z');
+}
+
+
+// 查询所有房型方法
+function renderRooms(stampIn,stampOut,_this) {
+  Toast.info('正在查询!!!', 1);
+  fetch(
+    appConfig.URLbase +'/Dvt-reserve/product/apartment/1/0/searchSource.do?startDate='//
+    + timeConversion.timestampToxxxx(stampIn) +'&endDate='//
+    + timeConversion.timestampToxxxx(stampOut) +'&resortCode='//
+    + _this.props.village.villageSelected.resortCode,{
+    method: 'GET',
+    contentType: "application/json; charset=utf-8"
+   }).then(function(response) {
+    return response.json()
+   }).then(function(json) {
+    console.log(json)
+    if (json.result=="0") {
+        Toast.success('查询完毕!!!', 1);
+        _this.setState({
+          roomType:json.data.list
+        })
+      _this.props.dispatch({
+        type:'ADD_roomType',
+        data:json.data.list
+      });
+    }else {
+      alert("房型加载失败，原因:"+json.message);
+    }
+  })
+}

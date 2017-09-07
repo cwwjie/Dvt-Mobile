@@ -1,3 +1,18 @@
+/**
+ * 目录
+ * 用户中心部分
+ * 登录部分
+ * 忘记密码
+ * 底部导航
+ */
+
+
+
+
+
+
+
+
 // 用户中心部分
 .personalCenter{
 	overflow: hidden;
@@ -88,6 +103,9 @@
 	right:0.5rem;
 	top:0.3rem;
 }
+
+
+
 
 // 忘记密码
 .newInput {
@@ -212,6 +230,13 @@
 			margin: 3%;
 		}
 	}
+	.bottomPay2 {
+		position: fixed;
+		bottom: 0px;
+		height: 130px;
+		width: 100%;
+		background: #fff;
+	}
 	.bottomEdit {
 		position: fixed;
 		bottom: 0px;
@@ -241,3 +266,42 @@
 		color: #fff;
 		background-color: #f23030;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

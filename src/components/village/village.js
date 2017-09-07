@@ -54,7 +54,7 @@ class village extends Component {
   }
   componentWillMount(){
     const _this = this;
-    // 图片 fetch
+    // 图片fetch
     fetch(
       appConfig.URLbase +'/Dvt-reserve/product/resort/1/0/list.do',{
       method: 'GET',

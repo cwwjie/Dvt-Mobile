@@ -82,7 +82,7 @@ class villageSubmit extends Component {
         // 初始化 每间房人数 数据格式
         selectedDate.push({
           children:0,
-          adult:0
+          adult:1
         });
         // 初始化 每间房床型 数据格式
         let bedType = _this.props.village.roomType[i].bedType.split(","),
@@ -105,6 +105,12 @@ class villageSubmit extends Component {
 
     // 加载旅客信息
     _state.passenger = _this.props.Passenger.data;
+
+
+    // 初始化入住日期
+    _state.checkInDate = _this.props.village.villageSelected.villageTime;
+    _state.leaveDate = new Date(Date.parse(_this.props.village.villageSelected.villageTime)+_this.props.village.villageSelected.villageLeave);
+
 
     _this.setState(_state);
   }
@@ -144,42 +150,41 @@ class villageSubmit extends Component {
   render() {
     return (
       <div>
-        <List renderHeader={() => '选择日期'}>
-          <DatePicker
-            mode="date"
-            title="选择日期"
-            minDate={setoffDate}
-            value={this.state.checkInDate}
-            onChange = {function(date){
-              this.setState({
-                checkInDate:date,
-                setoffDate:date,
-              });
-              if (this.state.leaveDate != null) {
-                if (Date.parse(date._d) > Date.parse(this.state.leaveDate._d)) {
-                  this.setState({
-                    leaveDate:date
-                  });
-                }
-              }
-            }.bind(this)}>
-            <List.Item arrow="horizontal">入住日期</List.Item>
-          </DatePicker>
-        </List>
-        <List>
-          <DatePicker
-            mode="date"
-            title="选择日期"
-            minDate={this.state.setoffDate}
-            value={this.state.leaveDate}
-            onChange = {(date) => {
-              this.setState({
-                leaveDate:date
-              });
-            }}
-            >
-            <List.Item arrow="horizontal">退房日期</List.Item>
-          </DatePicker>
+        <List renderHeader={() => '日期'}>
+          <Item extra={(function(){
+            if (this.state.checkInDate == null) {return}
+            return timeConversion.dateToFormat(this.state.checkInDate);
+          }.bind(this))()} arrow="horizontal" onClick={function(){
+            // 储存必要的信息
+            this.props.dispatch({
+              type:'ADD_roomType',
+              data:this.state.roomType
+            });
+            // 这里返回上一页
+            let _data = assign({},this.props.Nav);
+            let _Url = this.props.Nav.PreURL[(_data.PreURL.length-2)]
+            _data.PreURL.pop();
+            _data.navtitle.pop();
+            this.props.dispatch({type:'Chan_Nav',data:_data})
+            this.context.router.push(_Url);
+          }.bind(this)}>入住日期</Item>
+          <Item extra={(function(){
+            if (this.state.checkInDate == null) {return}
+            return timeConversion.dateToFormat(this.state.leaveDate);
+          }.bind(this))()} arrow="horizontal" onClick={function(){
+            // 储存必要的信息
+            this.props.dispatch({
+              type:'ADD_roomType',
+              data:this.state.roomType
+            });
+            // 这里返回上一页
+            let _data = assign({},this.props.Nav);
+            let _Url = this.props.Nav.PreURL[(_data.PreURL.length-2)]
+            _data.PreURL.pop();
+            _data.navtitle.pop();
+            this.props.dispatch({type:'Chan_Nav',data:_data})
+            this.context.router.push(_Url);
+          }.bind(this)}>退房日期</Item>
         </List>
         <List renderHeader={() => '房型'}>
           <Item arrow="horizontal" onClick={function(){
@@ -204,7 +209,9 @@ class villageSubmit extends Component {
               let _array = [];
               for (let i = 0; i < val.selected; i++) {
                 _array.push(
-                  <List>
+                  <List renderHeader={function(){
+                    return '房间' + (i + 1);
+                   }}>
                     <div onClick={function(){
                       let _this = this;
                       if (confirm("确认要删除？")) {
@@ -223,6 +230,7 @@ class villageSubmit extends Component {
                         _state.roomType[ref].selectedDate.splice(i,1);
                         _state.roomType[ref].bedTypeDate.splice(i,1);
                         this.setState(_state);
+                        Toast.success('删除成功!!!', 1);
                       }
                     }.bind(this)}>
                     <Item extra="删除" arrow="horizontal">{val.apartmentName}</Item>
@@ -259,7 +267,7 @@ class villageSubmit extends Component {
                         useTouch={false}
                       />}
                       wrap
-                    >儿童</Item>
+                    >儿童<Brief>儿童:0-12岁</Brief></Item>
                     <Item extra={
                       <Stepper
                         style={{ width: '100%', minWidth: '2rem' }}
@@ -280,7 +288,7 @@ class villageSubmit extends Component {
                         useTouch={false}
                       />}
                       wrap
-                    >成人</Item>
+                    >成人<Brief>成人: >12岁</Brief></Item>
                   </List>
                 )
               }
@@ -402,8 +410,6 @@ class villageSubmit extends Component {
               address:{},
               billItemList:[]
             };
-            console.log( _this.state.roomType )
-            console.log( _this.state.passenger )
 
             // 验证是否选择日期
             if ( _this.state.checkInDate == null || _this.state.leaveDate == null ) {
@@ -448,7 +454,6 @@ class villageSubmit extends Component {
               }
             }
             if (romm_allow == false) {
-              console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
               Toast.fail(inFor, 1);
               return
             }
@@ -482,13 +487,13 @@ class villageSubmit extends Component {
 
             // 进入提交阶段，进行阻塞
             if (choke == true) {return}
+            Toast.info('正在提交!!!', 2, null, false);
             choke = true;
-          console.log(_json)
             fetch(
               appConfig.URLversion+'/order/'//
                 + _this.props.village.villageSelected.resortCode + "/"//
-                + timeConversion.timestampToxxxx(Date.parse(_this.state.checkInDate._d)) + "/"//
-                + timeConversion.timestampToxxxx(Date.parse(_this.state.leaveDate._d)) + "/custom.do",{
+                + timeConversion.timestampToxxxx(Date.parse(_this.state.checkInDate)) + "/"//
+                + timeConversion.timestampToxxxx(Date.parse(_this.state.leaveDate)) + "/custom.do",{
               method: "POST",
               headers:{
                 "Content-Type": "application/json; charset=utf-8",
@@ -504,23 +509,22 @@ class villageSubmit extends Component {
                 let _data = assign({},_this.props.Nav);
 
                 _data.navtitle.push('全部订单');
-                _data.PreURL.push('/Cent/Order');
+                _data.PreURL.push('/village/submit');
                 _data.leftContent = {
-                return:'left',
-                logo:false
+                  return:'left',
+                  logo:false
                 };
 
                 _this.props.dispatch({
-                type:'Chan_Nav',
-                data:_data
+                  type:'Chan_Nav',
+                  data:_data
                 });
                 _this.props.dispatch({
-                type:'filter_Order',
-                data:'all'
+                  type:'ADD_summary',
+                  data:json.data
                 });
 
-                _this.context.router.push('/Cent/Order');
-                window.location.reload();
+                _this.context.router.push('/village/summary');
               }else {
                 alert('发生未知错误，错误代码:'+json.result);
               }

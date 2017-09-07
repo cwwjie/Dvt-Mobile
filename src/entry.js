@@ -75,6 +75,11 @@ const village = (location, callback) => {
       callback(null, require('./components/village/submit').default)
     }, 'villageSubmit')
   }
+  const villageSummary = (location, callback) => {
+    require.ensure([], require => {
+      callback(null, require('./components/village/summary').default)
+    }, 'villageSummary')
+  }
 
 // 个人中心
 const Cent = (location, callback) => {
@@ -132,6 +137,11 @@ const Cent = (location, callback) => {
       require.ensure([], require => {
         callback(null, require('./components/My/Order/detail').default)
       }, 'detail')
+    }
+    const taobaoList = (location, callback) => {
+      require.ensure([], require => {
+        callback(null, require('./components/My/Order/taobaoList').default)
+      }, 'taobaoList')
     }
     // 旅客信息
     const Passenger = (location, callback) => {
@@ -380,6 +390,7 @@ ReactDOM.render(
           <IndexRoute getComponent={village}/>
           <Route path="/village/detail" getComponent={villageDetail}/>
           <Route path="/village/submit" getComponent={villageSubmit} onEnter={SubmitFilter}/>
+          <Route path="/village/summary" getComponent={villageSummary}/>
         </Route>
         <Route path="/Cent">
           <IndexRoute getComponent={Cent} onEnter={CentFilter}/>
@@ -389,14 +400,18 @@ ReactDOM.render(
           <Route path="/Cent/password" getComponent={password}/>
           <Route path="/Cent/phone" getComponent={phone}/>
           <Route path="/Cent/mailbox" getComponent={mailbox}/>
+
           <Route path="/Cent/Order" getComponent={Orderfilter}>
             <IndexRoute getComponent={Order}/>
             <Route path="/Cent/Order/detail" getComponent={detail} onEnter={DetailFilter}/>
           </Route>
+          <Route path="/Cent/taobao" getComponent={taobaoList}/>
+
           <Route path="/Cent/Passenger" onEnter={PassengerFilter}>
             <IndexRoute getComponent={Passenger}/>
             <Route path="/Cent/Passenger/edit" getComponent={PassengerEdit}/>
           </Route>
+
         </Route>
         <Route path="/Cent/login" getComponent={login}/>
       </Route>
