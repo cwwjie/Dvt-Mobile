@@ -1,83 +1,66 @@
 import { connect } from 'react-redux'
-import React, {Component} from 'react';
-import moment from 'moment';
-import timeConversion from './../timeConversion.js';
-import cookie from './../cookie.js';
+import React, {Component} from 'react'
+import moment from 'moment'
+import timeConversion from './../timeConversion.js'
+import cookie from './../cookie.js'
 
-
-import { Popup, Modal, Toast, InputItem, DatePicker, List, WhiteSpace, WingBlank, Stepper, Picker, Checkbox } from 'antd-mobile';
-
+import { Popup, Modal, Toast, List, WhiteSpace, WingBlank, Stepper, Picker, Checkbox } from 'antd-mobile'
 
 import assign from 'lodash.assign'
-import appConfig from './../../config/index.js';
-import styles from './styles.scss';
+import appConfig from './../../config/index.js'
+import styles from './css/styles.scss'
 
-const Item = List.Item;
-const Brief = Item.Brief;
-const CheckboxItem = Checkbox.CheckboxItem;
-let choke = false;// 阻塞提交，防止重复提交
+const Item = List.Item
+const Brief = Item.Brief
+const CheckboxItem = Checkbox.CheckboxItem
+let choke = false// 阻塞提交，防止重复提交
 
-
-
-
-let nawDate = new Date();
-nawDate = timeConversion.dateToFormat(nawDate)+' +0800';
-const setoffDate = moment(nawDate,'YYYY-MM-DD Z');
-
-
-let minDate = new Date(-1351929600000);
-minDate = timeConversion.dateToFormat(minDate)+' +0800';
-const _minDate = moment(minDate,'YYYY-MM-DD Z');
-
-let maxDate = new Date();
-maxDate = timeConversion.dateToFormat(maxDate)+' +0800';
-const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
+let nawDate = new Date()
+nawDate = timeConversion.dateToFormat(nawDate)+' +0800'
+const setoffDate = moment(nawDate, 'YYYY-MM-DD Z')
 
 // 弹窗口
-const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
-let maskProps;
+const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)
+let maskProps
 if (isIPhone) {
   // Note: the popup content will not scroll.
   maskProps = {
-    onTouchStart: e => e.preventDefault(),
-  };
+    onTouchStart: e => e.preventDefault()
+  }
 }
-
-
 
 class villageSubmit extends Component {
   constructor(props, context) {
-    super(props,context);
+    super(props, context)
     this.state = {
       modal: false,
 
-      checkInDate:null,
-      leaveDate:null,
-      setoffDate:setoffDate,
+      checkInDate: null,
+      leaveDate: null,
+      setoffDate: setoffDate,
 
-      roomType:[],
+      roomType: [],
 
-      passenger:[]
-    };
+      passenger: []
+    }
   }
-  componentWillMount(){
-    let _this = this;
+  componentWillMount() {
+    let _this = this
 
     // 验证 过滤
-    if (_this.props.village.selected == false) {
+    if (_this.props.village.selected === false) {
       _this.setState({
-        modal:true
+        modal: true
       })
       return
     }
 
-
     // 下面是初始化 每间房 人数 和 床型
-    let _state = assign({},_this.state);
-    _state.roomType = _this.props.village.roomType;
+    let _state = assign({}, _this.state)
+    _state.roomType = _this.props.village.roomType
     for (let i = 0; i < _this.props.village.roomType.length; i++) {
       let selectedDate = [],
-        bedTypeDate = [];
+        bedTypeDate = []
       for (var j = 0; j < _this.props.village.roomType[i].selected; j++) {
         // 初始化 每间房人数 数据格式
         selectedDate.push({
@@ -109,7 +92,7 @@ class villageSubmit extends Component {
 
     // 初始化入住日期
     _state.checkInDate = _this.props.village.villageSelected.villageTime;
-    _state.leaveDate = new Date(Date.parse(_this.props.village.villageSelected.villageTime)+_this.props.village.villageSelected.villageLeave);
+    _state.leaveDate = new Date(Date.parse(_this.props.village.villageSelected.villageTime) + _this.props.village.villageSelected.villageLeave);
 
 
     _this.setState(_state);

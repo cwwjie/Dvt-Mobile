@@ -30,7 +30,7 @@ import reducer from './reducers';
  */
 
 import Nav from './components/Navigation/Nav';
-import Home from './components/Home/Home';
+import Home from './components/Home/Home2';
 
 
 
@@ -62,7 +62,7 @@ const Cus = (location, callback) => {
 // 度假村指定
 const village = (location, callback) => {
   require.ensure([], require => {
-    callback(null, require('./components/village/village').default)
+    callback(null, require('./components/village/index').default)
   }, 'village')
 }
   const villageDetail = (location, callback) => {

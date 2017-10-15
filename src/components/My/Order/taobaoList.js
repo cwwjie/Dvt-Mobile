@@ -34,6 +34,7 @@ class taobaoList extends Component {
       return response.json()
      }).then(function(json) {
       if (json.result=="0") {
+        console.log(json.data);
         _this.setState({List:json.data});
       }
     })
@@ -54,26 +55,7 @@ class taobaoList extends Component {
           width:'100%',
           padding:'20px 0px 0px 0px'
         }}>暂无数据</div>
-        <List className="my-list">
-          <Item arrow="horizontal" multipleLine>
-            <div className={styles.taobaotitle} onClick={() => {}}>
-              <div>订单号:20170627<span>状态:已付全款</span></div>
-            </div>
-            <Brief>
-              <div className={styles.taobaoList}>
-                <div>马达京ce</div>
-                <div>马达京套餐测试</div>
-                <div>2017-08-25到2017-08-26<span>1间房/2成人/0儿童</span></div>
-                <div>产品总金额:1200RMB</div>
-                <div>优惠金额:200RMB<span>订单总金额:1000RMB</span></div>
-                <div>已付金额:500RMB<span>未付金额:700RMB</span></div>
-              </div>
-            </Brief>
-          </Item>
-        </List>
-        <WhiteSpace size="lg" />
         {this.state.List.map(function(index, elem) {
-          console.log(index);
           if (index.payStatus == 1) {
             return <div onClick={() => {
               localStorage.setItem('_token',cookie.getItem('token'));
@@ -83,7 +65,7 @@ class taobaoList extends Component {
               // 页面跳转
               // window.open("./../info/gather.html");
               // 手机端测试的
-              window.open("./../Dvt-web/info/gather.html");
+              window.location.href="./../Dvt-web/info/gather.html";
             }}>
              <List className="my-list">
                 <Item arrow="horizontal" multipleLine>
@@ -112,7 +94,7 @@ class taobaoList extends Component {
               // 页面跳转
               // window.open("./../info/gather.html");
               // 手机端测试的
-              window.open("./../Dvt-web/info/gather.html");
+              window.location.href="./../Dvt-web/info/gather.html"
             }}>
              <List className="my-list">
                 <Item arrow="horizontal" multipleLine>

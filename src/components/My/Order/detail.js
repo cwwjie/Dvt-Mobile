@@ -327,8 +327,7 @@ function RenderSubmit(val,_this) {
               document.getElementById('alipayMob').innerHTML='正在付款';
               // 证明该订单为度假村直订（C:custom）显示支付定金按钮
               fetch(
-                appConfig.URLversion + "/payment/"//
-                +_this.state.data.orderSn+"/E/alipay4Custom.do?dev=Mobile",{
+                appConfig.URLversion + "/payment/" +_this.state.data.orderSn+ "/E/alipay4Custom.do?dev=Mobile",{
                 method: "GET",
                 headers:{
                   token:cookie.getItem('token'),
@@ -340,8 +339,6 @@ function RenderSubmit(val,_this) {
                     alert("您在30分钟内未完成付款，交易已关闭");
                   }else {
                     document.getElementById('alipayMob').innerHTML=text;
-                    console.log(text);
-                    return
                     document.getElementById('alipaysubmit').submit();
                   }
                   document.getElementById('alipayMob').innerHTML='去付款';
