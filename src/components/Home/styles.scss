@@ -75,12 +75,15 @@
 		position: relative;
 		height: 100%;
 		width: 25%;
+		font-size: 0.3rem;
 
 		>div {
 			height: 100%;
+			font-size: 0.3rem;
 
 			>div {
 				padding: 20px 10px;
+				font-size: 0.3rem;
 			}
 		}
 
@@ -114,6 +117,15 @@
 		overflow-y: scroll;
 
 		>div {
+			padding-bottom: 175px;
+		}
+
+
+		.mainItem {
+
+			.itemTitle {
+				padding-left: 10px;
+			}
 		}
 	}
 }

@@ -4,7 +4,8 @@ import assign from 'lodash.assign'
 import appConfig from './config/index.js';
 import cookie from './components/cookie.js';
 
-
+// import vconsole from 'vconsole';
+// new vconsole();
 
 // 引入React-Router模块
 import { Router, Route, hashHistory, IndexRoute} from 'react-router';

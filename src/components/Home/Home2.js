@@ -1,8 +1,9 @@
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
 
-import { Toast } from 'antd-mobile';
+import { Card, WhiteSpace } from 'antd-mobile';
 
+import assign from 'lodash.assign'
 import appConfig from './../../config/index.js';
 import styles from './styles.scss';
 
@@ -13,22 +14,70 @@ class Home extends Component {
       'selectNumber': 0,
       'dataList': [
         {
-          'catName': '一日游'
+          'catName': '一日游',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         },
         {
-          'catName': '包车'
+          'catName': '包车',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         },
         {
-          'catName': '保险'
+          'catName': '保险',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         },
         {
-          'catName': '沙巴中转酒店'
+          'catName': '沙巴中转酒店',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         },
         {
-          'catName': '潜水课程'
+          'catName': '潜水课程',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         },
         {
-          'catName': '装备租售'
+          'catName': '装备租售',
+          'productList': [
+            {
+              'productName': '天然小岛邦邦 3天2晚蜜月',
+              'productPrice': 5700,
+              'apartment': '邦邦 沙滩屋',
+              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
+            }
+          ]
         }
         // {
         //   'catDesc': null,
@@ -59,7 +108,7 @@ class Home extends Component {
         //       'productDesc': null,
         //       'productId': 64,
         //       'productImg': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-        //       'productName': '天然小岛邦邦 3天2晚蜜月/闺蜜行',
+        //       'productName': '天然小岛邦邦 3天2晚蜜月',
         //       'productPrice': 5700,
         //       'productSn': '000006',
         //       'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
@@ -74,6 +123,9 @@ class Home extends Component {
         // }
       ]
     };
+    this.selecting = false,
+
+    this.jumpToDetail.bind(this);
   }
 
   componentDidMount() {
@@ -83,7 +135,6 @@ class Home extends Component {
     .then( (response) => (response.json()), (error) => (alert(`加载数据出错, 原因${error}`)) )
     .then((val) => {
       if (val.result === '0') {
-        return false
         _this.setState({dataList: val.data}, () => {
           bindScroll();
         });
@@ -92,54 +143,119 @@ class Home extends Component {
       }
     })
 
-    let bindScroll = () => {
-      const DOMProductMain = document.getElementById('ProductMain');
+    const bindScroll = () => {
+      const ProductDOM = document.getElementById('ProductList'),
+        clientHeight = document.documentElement.clientHeight || document.body.clientHeight,
+        ProductList = [].slice.call(ProductDOM.childNodes);
 
-      DOMProductMain.onscroll = (event) => {
-        // console.log(DOMProductMain.scrollTop)
+      ProductDOM.onscroll = (event) => {
+        // 滚动的距离
+        const myScrollTop = ProductDOM.scrollTop + clientHeight - 95;
+        let mySelectNumber = 0;
+
+        ProductList.map((val, key) => {
+          if (myScrollTop > val.offsetTop ) {
+            mySelectNumber = key;
+          }
+        });
+        if (_this.selecting === false) {
+          _this.selecting = true
+          return
+        }
+        _this.setState({ 'selectNumber': mySelectNumber})
       }
     }
     bindScroll();
   }
 
   renderNavLeft() {
-    const selectNumber = this.state.selectNumber,
+    const _this = this,
+      selectNumber = this.state.selectNumber,
       myList = this.state.dataList;
-
-    return <div>
-      {myList.map((val, key) => {
+      
+    return <div className={styles.navLeft}>
+      <div id='NavList'>{myList.map((val, key) => {
         if (selectNumber === key) {
           return <div className={styles.activeItem}>{val.catName}</div>
         }
-        return <div className={styles.item}>{val.catName}</div>
-      })}
+        return <div
+          className={styles.item}
+          onClick={() => {
+            _this.selecting = false;
+            document.getElementById('ProductList').scrollTop = document.getElementById('ProductList').childNodes[key].offsetTop;
+            _this.setState({'selectNumber': key});
+          }}
+        >{val.catName}</div>
+      })}</div>
+      <span></span>
     </div>
   }
 
-  renderProductMain() {
-    const myList = this.state.dataList;
+  jumpToDetail(id) {
+    // 页面跳转
+    let _this = this,
+      myNavData = assign({}, _this.props.Nav);
 
-    return <div>
-      {myList.map((val, key) => {
-        return <div className={styles.item}>{val.catName}</div>
-      })}
+    myNavData.navtitle.push('订单详情');
+    myNavData.PreURL.push('/Detail');
+    myNavData.leftContent = {
+      'return': 'left',
+      'logo': false
+    };
+    myNavData.hidden = true;
+    myNavData.productId = id;
+    _this.props.dispatch({
+      'type': 'Chan_Nav',
+      'data': myNavData
+    });
+    _this.props.dispatch({
+      'type':  'product_Id',
+      'data':  id
+    })
+    _this.context.router.push('/Detail');
+  }
+
+  renderProductMain() {
+    const _this = this,
+      myList = this.state.dataList;
+
+    return <div id='ProductList' className={styles.main}>
+      {myList.map((ListItem, Listkey) => (
+        <div className={styles.mainItem}>
+          <h3 className={styles.itemTitle}>{ListItem.catName}</h3>
+          {ListItem.productList.map((productItem, productItemKey) => (
+            <div 
+              key={productItemKey}
+              style={{'padding': '10px'}}
+              onClick={() => { _this.jumpToDetail(productItem.productId) }}
+            >
+              <Card>
+                <Card.Header
+                  title={productItem.productName}
+                  />
+                <Card.Body>
+                  <div className={styles.body}>
+                    <img src={appConfig.URLbase + productItem.productThumb} />
+                  </div>
+                </Card.Body>
+                <Card.Footer className={styles.Footer}
+                  content={productItem.apartment}
+                  extra={productItem.productPrice}
+                />
+              </Card>
+              <WhiteSpace size="lg" />
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   }
 
   render() {
     return (
       <div className={styles.content}>
-        <div className={styles.navLeft}>
-          {this.renderNavLeft.call(this)}
-          <span></span>
-        </div>
-        <div id='ProductMain' className={styles.main}>
-          
-          {this.renderProductMain.call(this)}
-          <div style={{height: '1000px'}}>11</div>
-          <div style={{height: '1000px'}}>11</div>
-          <div style={{height: '1000px'}}>11</div>
-        </div>
+        {this.renderNavLeft.call(this)}
+        {this.renderProductMain.call(this)}
       </div>
     )
   }
