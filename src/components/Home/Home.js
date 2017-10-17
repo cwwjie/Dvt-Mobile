@@ -7,11 +7,12 @@ import { Carousel , Card , WhiteSpace , List } from 'antd-mobile';
 
 import assign from 'lodash.assign'
 import appConfig from './../../config/index.js';
-import styles from './styles.scss';
-import More from './More.svg';
-import taobao from './taobao.png';
-import weibo from './weibo.png';
-import weixin from './weixin.png';
+import styles from './index.scss';
+
+import More from './img/More.svg';
+import taobao from './img/taobao.png';
+import weibo from './img/weibo.png';
+import weixin from './img/weixin.png';
 
 
 class Home extends Component {

@@ -1,15 +1,13 @@
+import assign from 'lodash.assign'
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
-import assign from 'lodash.assign'
-import styles from './styles.scss'
-
 import { WhiteSpace, List, Tabs } from 'antd-mobile';
+
+import styles from './styles.scss'
 
 const Item = List.Item;
 const Brief = Item.Brief;
-
 const TabPane = Tabs.TabPane;
-
 
 class Order extends Component {
   constructor(props, context) {

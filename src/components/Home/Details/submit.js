@@ -1,17 +1,13 @@
-import { connect } from 'react-redux'
-import React, {Component} from 'react';
 import moment from 'moment';
-import dateToFormat from './dateToFormat.js';
-
+import assign from 'lodash.assign';
+import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import dateToFormat from './method/dateToFormat.js';
 import { Popup , InputItem , Picker , Checkbox , WhiteSpace , WingBlank , List , DatePicker , Stepper , Modal , Toast } from 'antd-mobile';
 
-
 import appConfig from './../../../config/index.js';
-import styles from './styles.scss';
-import assign from 'lodash.assign'
 import cookie from './../../cookie.js'
-
-
+import styles from './styles.scss';
 
 let nawDate = new Date();
 nawDate = dateToFormat(nawDate)+' +0800';

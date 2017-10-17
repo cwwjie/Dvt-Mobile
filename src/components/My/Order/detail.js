@@ -1,9 +1,11 @@
+import assign from 'lodash.assign'
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
-import assign from 'lodash.assign'
+
 import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
-import styles from '../styles.scss';
+
+import styles from './../index.scss';
 
 import { WhiteSpace , List , Toast} from 'antd-mobile';
 

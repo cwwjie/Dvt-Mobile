@@ -6,7 +6,7 @@ import cookie from './../../cookie.js';
 
 import { WhiteSpace , List } from 'antd-mobile';
 
-import styles from '../styles.scss';
+import styles from './../index.scss';
 
 
 const Item = List.Item;

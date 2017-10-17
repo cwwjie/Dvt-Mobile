@@ -1,16 +1,15 @@
+import assign from 'lodash.assign'
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
-
-
 import { WhiteSpace , WingBlank , Button , Toast} from 'antd-mobile';
 
-
-import assign from 'lodash.assign'
 import cookie from './../../cookie.js';
 import appConfig from './../../../config/index.js';
-import eye from '../eye.svg';
-import eye_hover from '../eye_hover.svg';
-import styles from '../styles.scss';
+
+import eye from './../svg/eye.svg';
+import eye_hover from './../svg/eye_hover.svg';
+
+import styles from './../index.scss';
 
 
 class phone extends Component {
@@ -28,6 +27,7 @@ class phone extends Component {
       eye:eye,
     };
   }
+
   renderSubmit = () => {
     if (this.state.submit == false) {
       return <Button className="btn" style={{color:"#888"}} onClick={function(){
@@ -77,6 +77,7 @@ class phone extends Component {
       return <Button className="btn" onClick={function(){}.bind(this)} loading>修改</Button>
     }
   }
+
   passwordFilter = (event) => {
     let _state = assign({},this.state);
     _state.password = event.target.value;
@@ -87,6 +88,7 @@ class phone extends Component {
     }
     this.setState(_state)
   }
+
   mobileFilter = (event) => {
     let _state = assign({},this.state);
       _state.mobile = event.target.value
@@ -97,6 +99,7 @@ class phone extends Component {
     }
     this.setState(_state)
   }
+
   messageContentFilter = (event) => {
     let _state = assign({},this.state);
     if (event.target.value.length == 6) {
@@ -112,6 +115,7 @@ class phone extends Component {
     }
     this.setState(_state)
   }
+
   renderVerification = () => {
     let _message = "点击获取"
     if (this.state.renderVerification) {
@@ -167,6 +171,7 @@ class phone extends Component {
       return <div className={styles.Code}>{this.state.count}</div>
     }
   }
+
   render() {
     return (
       <div>

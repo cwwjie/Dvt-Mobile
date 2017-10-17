@@ -1,14 +1,14 @@
-import { connect } from 'react-redux'
-import React, {Component} from 'react';
-
-import {DatePicker, WhiteSpace , List , InputItem , Radio , Flex , Picker , WingBlank , Toast} from 'antd-mobile';
-import assign from 'lodash.assign'
-import styles from './../styles.scss';
-import { createForm } from 'rc-form';
-import dateToFormat from './dateToFormat.js';
 import moment from 'moment';
-import appConfig from './../../../config/index.js';
+import assign from 'lodash.assign';
+import { createForm } from 'rc-form';
+import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {DatePicker, WhiteSpace , List , InputItem , Radio , Flex , Picker , WingBlank , Toast} from 'antd-mobile';
+
+import styles from './../index.scss';
 import cookie from './../../cookie.js';
+import dateToFormat from './dateToFormat.js';
+import appConfig from './../../../config/index.js';
 
 
 const Item = List.Item;

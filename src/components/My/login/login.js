@@ -6,11 +6,13 @@ import { Button, Flex, WingBlank , WhiteSpace , Toast  , Checkbox} from 'antd-mo
 import assign from 'lodash.assign'
 import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
-import styles from '../styles.scss';
-import eye from '../eye.svg';
-import eye_hover from '../eye_hover.svg';
-import findback from '../findback.svg';
-import register from '../register.svg';
+
+import styles from './../index.scss';
+
+import eye from './../svg/eye.svg';
+import register from './../svg/register.svg';
+import findback from './../svg/findback.svg';
+import eye_hover from './../svg/eye_hover.svg';
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;

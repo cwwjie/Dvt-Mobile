@@ -30,8 +30,8 @@ import reducer from './reducers';
  * components
  */
 
-import Nav from './components/Navigation/Nav';
-import Home from './components/Home/Home2';
+import Nav from './components/Navigation/index';
+import Home from './components/Home/index';
 
 
 
@@ -57,7 +57,7 @@ const history = syncHistoryWithStore(hashHistory, store);
 // 客服中心
 const Cus = (location, callback) => {
   require.ensure([], require => {
-    callback(null, require('./components/Service/Cus').default)
+    callback(null, require('./components/Service/index').default)
   }, 'Cus')
 }
 // 度假村指定
@@ -76,16 +76,16 @@ const village = (location, callback) => {
       callback(null, require('./components/village/submit').default)
     }, 'villageSubmit')
   }
-  const villageSummary = (location, callback) => {
+  const villageresult = (location, callback) => {
     require.ensure([], require => {
-      callback(null, require('./components/village/summary').default)
-    }, 'villageSummary')
+      callback(null, require('./components/village/result').default)
+    }, 'villageresult')
   }
 
 // 个人中心
 const Cent = (location, callback) => {
   require.ensure([], require => {
-    callback(null, require('./components/My/Cent').default)
+    callback(null, require('./components/My/index').default)
   }, 'Cent')
 }
   const login = (location, callback) => {
@@ -158,7 +158,7 @@ const Cent = (location, callback) => {
 // 详情页
 const Detail = (location, callback) => {
   require.ensure([], require => {
-    callback(null, require('./components/Home/Details/Detail').default)
+    callback(null, require('./components/Home/Details/index').default)
   }, 'Detail')
  }
   const travel = (location, callback) => {
@@ -391,7 +391,7 @@ ReactDOM.render(
           <IndexRoute getComponent={village}/>
           <Route path="/village/detail" getComponent={villageDetail}/>
           <Route path="/village/submit" getComponent={villageSubmit} onEnter={SubmitFilter}/>
-          <Route path="/village/summary" getComponent={villageSummary}/>
+          <Route path="/village/summary" getComponent={villageresult}/>
         </Route>
         <Route path="/Cent">
           <IndexRoute getComponent={Cent} onEnter={CentFilter}/>

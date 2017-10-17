@@ -86,11 +86,6 @@ let _state = {
   selected: false
 }
 
-
-
-
-
-
 const village = (state = _state, action) => {
   switch (action.type) {
 

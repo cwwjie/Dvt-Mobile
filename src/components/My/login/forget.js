@@ -8,9 +8,11 @@ import { WhiteSpace , WingBlank , Button , Toast} from 'antd-mobile';
 import assign from 'lodash.assign'
 import cookie from './../../cookie.js';
 import appConfig from './../../../config/index.js';
-import eye from '../eye.svg';
-import eye_hover from '../eye_hover.svg';
-import styles from '../styles.scss';
+
+import eye from './../svg/eye.svg';
+import eye_hover from './../svg/eye_hover.svg';
+
+import styles from './../index.scss';
 
 
 

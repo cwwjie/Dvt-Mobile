@@ -6,43 +6,25 @@ import moment from 'moment';
 import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
 import dateToFormat from './dateToFormat.js';
-import styles from '../styles.scss';
 import convertToPinyinLower from './convertToPinyinLower.js';
 
+import styles from './../index.scss';
+
 import { Modal , WhiteSpace , List , InputItem , Picker , DatePicker , WingBlank , Toast} from 'antd-mobile';
-
-
-
-
-
-const alert = Modal.alert;
-const Item = List.Item;
-const Brief = Item.Brief;
-
-let minDate = new Date(-1351929600000);
-minDate = dateToFormat(minDate)+' +0800';
-const _minDate = moment(minDate,'YYYY-MM-DD Z');
-
-let maxDate = new Date();
-maxDate = dateToFormat(maxDate)+' +0800';
-const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
-
-
-
 
 class PassengerEdit extends Component {
   constructor(props, context) {
     super(props,context);
     this.state = {
-      userinfoId:null,
-      chineseName:null,
-      pinyinName:null,
-      passportNo:null,
-      age:null,
-      mobile:null,
-      email:null,
-      divingCount:null,
-      type:false,
+      userinfoId: null,
+      chineseName: null,
+      pinyinName: null,
+      passportNo: null,
+      age: null,
+      mobile: null,
+      email: null,
+      divingCount: null,
+      type: false,
       birthday: null,//生日
       sexList:[
         {
@@ -54,7 +36,7 @@ class PassengerEdit extends Component {
           value: 'Girl',
         }
       ],
-      sex:null,
+      sex: null,
       divingList:[
         {
           label: '无',
@@ -69,10 +51,11 @@ class PassengerEdit extends Component {
           value: '2',
         }
       ],
-      diving:null,
+      diving: null,
     };
   }
-  componentWillMount(){
+
+  componentWillMount() {
     let _state = assign({},this.state);
     if ( this.props.Passenger.select == false && this.props.Passenger.type == false ) {
       // 返回 Passenger
@@ -136,6 +119,7 @@ class PassengerEdit extends Component {
     _state.data = this.props.Passenger.data;
     this.setState(_state);
   }
+
   render() {
     return (
       <div style={{position:'relative'}}>
@@ -346,6 +330,18 @@ class PassengerEdit extends Component {
 }
 
 
+const alert = Modal.alert;
+const Item = List.Item;
+const Brief = Item.Brief;
+
+let minDate = new Date(-1351929600000);
+minDate = dateToFormat(minDate)+' +0800';
+const _minDate = moment(minDate,'YYYY-MM-DD Z');
+
+let maxDate = new Date();
+maxDate = dateToFormat(maxDate)+' +0800';
+const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
+
 
 PassengerEdit.contextTypes = {
   router: Object
@@ -363,7 +359,7 @@ PassengerEdit.contextTypes = {
 
 
 let repeatedSubmit = true;
-function RenderSubmit(type,_this) {
+function RenderSubmit(type, _this) {
   if (type == false) {
     return <div className={styles.bottomPay}><div>正在加载...</div></div>
   }else if (type == 'edit') {
@@ -374,11 +370,13 @@ function RenderSubmit(type,_this) {
         }
         let _sex = 0,
           _diving=0;
+
         if (_this.state.sex[0] == 'Boy') {
           _sex = 0
         }else {
           _sex = 1
         }
+
         if (_this.state.diving == null) {
           _diving = null
         }else {
@@ -390,28 +388,28 @@ function RenderSubmit(type,_this) {
             _diving = 2
           }
         }
+
         const _json = {
-          "userinfoId":_this.state.userinfoId,
-          "chineseName":_this.state.chineseName,
-          "pinyinName":_this.state.pinyinName,
-          "gender": _sex,
-          "birthday": Date.parse(_this.state.birthday._d),
-          "age":_this.state.age,
-          "mobile":_this.state.mobile,
-          "email":_this.state.email,
-          "passportNo":_this.state.passportNo,
-          "divingRank":_diving,
-          "divingCount":_this.state.divingCount
+          'userinfoId': _this.state.userinfoId,
+          'chineseName': _this.state.chineseName,
+          'pinyinName': _this.state.pinyinName,
+          'gender': _sex,
+          'birthday': dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
+          'age': '' + _this.state.age,
+          'mobile': _this.state.mobile,
+          'email': _this.state.email,
+          'passportNo': _this.state.passportNo,
+          'divingRank': _diving,
+          'divingCount': _this.state.divingCount
         }
-        fetch(
-          appConfig.userupdate,{
+        fetch( appConfig.userupdate, {
           method: "POST",
           contentType: "application/json; charset=utf-8",
-          headers:{
-            token:cookie.getItem('token'),
-            digest:cookie.getItem('digest')
+          headers: {
+            token: cookie.getItem('token'),
+            digest: cookie.getItem('digest')
           },
-          body:JSON.stringify(_json)
+          body: JSON.stringify(_json)
          }).then(function(response) {
           return response.json()
          }).then(function(json) {
@@ -514,16 +512,16 @@ function RenderSubmit(type,_this) {
         }
       }
       const _json = {
-        "chineseName":_this.state.chineseName,
-        "pinyinName":_this.state.pinyinName,
-        "gender": _sex,
-        "birthday": Date.parse(_this.state.birthday._d),
-        "age":_this.state.age,
-        "mobile":_this.state.mobile,
-        "email":_this.state.email,
-        "passportNo":_this.state.passportNo,
-        "divingRank":_diving,
-        "divingCount":_this.state.divingCount
+        "chineseName": _this.state.chineseName,
+        "pinyinName": _this.state.pinyinName,
+        "gender":  _sex,
+        "birthday":  dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
+        "age":  '' + _this.state.age,
+        "mobile": _this.state.mobile,
+        "email": _this.state.email,
+        "passportNo": _this.state.passportNo,
+        "divingRank": _diving,
+        "divingCount": _this.state.divingCount
       }
       repeatedSubmit = false;
       fetch(

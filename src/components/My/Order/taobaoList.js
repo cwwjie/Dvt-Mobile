@@ -1,11 +1,12 @@
+import assign from 'lodash.assign'
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
 import { WhiteSpace, List, Tabs } from 'antd-mobile';
-import assign from 'lodash.assign'
 
-import styles from './styles.scss'
 import appConfig from './../../../config/index.js';
 import cookie from './../../cookie.js';
+
+import styles from './styles.scss'
 
 
 const TabPane = Tabs.TabPane;
