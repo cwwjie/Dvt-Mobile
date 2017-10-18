@@ -1,4 +1,13 @@
 node_modules
 .idea
 dist
-/index.html
+
+# dependencies
+/node_modules
+
+# production
+/dist
+
+# misc
+.DS_Store
+npm-debug.log*
