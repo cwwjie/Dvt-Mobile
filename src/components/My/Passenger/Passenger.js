@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import React, {Component} from 'react';
 import assign from 'lodash.assign';
 import appConfig from './../../../config/index.js';
-import cookie from './../../cookie.js';
+import cookie from './../../../method/cookie.js';
 
 import { WhiteSpace , List } from 'antd-mobile';
 

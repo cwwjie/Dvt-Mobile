@@ -1,11 +1,11 @@
 import { connect } from 'react-redux'
 import React, {Component} from 'react'
-import timeConversion from './../timeConversion.js'
+import timeConversion from './../../method/timeConversion.js'
 import {WhiteSpace, List, Modal} from 'antd-mobile'
 import assign from 'lodash.assign'
 import appConfig from './../../config/index.js'
 import styles from './css/styles.scss'
-import cookie from './../cookie.js'
+import cookie from './../../method/cookie.js'
 
 const Item = List.Item
 
@@ -82,6 +82,7 @@ class summary extends Component {
       }
     }
   }
+
   componentWillMount() {
     // 下面是初始化 数据
     if (this.props.village.summary === false) {
@@ -94,6 +95,7 @@ class summary extends Component {
     _state.val = this.props.village.summary
     this.setState(_state)
   }
+
   onClosemodal = key => () => {
     let _this = this
     let _data = assign({}, _this.props.Nav)
@@ -118,6 +120,7 @@ class summary extends Component {
       [key]: false
     })
   }
+
   render() {
     return (
       <div>

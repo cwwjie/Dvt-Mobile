@@ -6,7 +6,6 @@ import { WhiteSpace , WingBlank , Button , Toast} from 'antd-mobile';
 
 
 import assign from 'lodash.assign'
-import cookie from './../../cookie.js';
 import appConfig from './../../../config/index.js';
 
 import eye from './../svg/eye.svg';

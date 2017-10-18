@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import React, {Component} from 'react'
 import moment from 'moment'
-import timeConversion from './../timeConversion.js'
+import timeConversion from './../../method/timeConversion.js'
 
 import { Radio, Popup, WhiteSpace, DatePicker, List } from 'antd-mobile'
 

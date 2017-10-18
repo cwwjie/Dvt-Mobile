@@ -6,39 +6,10 @@ import dateToFormat from './method/dateToFormat.js';
 import { Popup , InputItem , Picker , Checkbox , WhiteSpace , WingBlank , List , DatePicker , Stepper , Modal , Toast } from 'antd-mobile';
 
 import appConfig from './../../../config/index.js';
-import cookie from './../../cookie.js'
+import cookie from './../../../method/cookie.js'
 import styles from './styles.scss';
 
-let nawDate = new Date();
-nawDate = dateToFormat(nawDate)+' +0800';
-const setoffDate = moment(nawDate,'YYYY-MM-DD Z');
-
-const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
-let maskProps;
-if (isIPhone) {
-  // Note: the popup content will not scroll.
-  maskProps = {
-    onTouchStart: e => e.preventDefault(),
-  };
-}
-
-
-const alert = Modal.alert;
-const Item = List.Item;
-const Brief = Item.Brief;
-const CheckboxItem = Checkbox.CheckboxItem;
-let choke = false;
-
-
-let minDate = new Date(-1351929600000);
-minDate = dateToFormat(minDate)+' +0800';
-const _minDate = moment(minDate,'YYYY-MM-DD Z');
-
-let maxDate = new Date();
-maxDate = dateToFormat(maxDate)+' +0800';
-const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
-
-
+import AddPassenger from './AddPassenger'
 
 class travel extends Component {
   constructor(props, context) {
@@ -78,7 +49,7 @@ class travel extends Component {
       divingCount:null,
       type:false,
       birthday: null,//生日
-      sexList:[
+      sexList: [
         {
           label: '男',
           value: 'Boy',
@@ -89,7 +60,7 @@ class travel extends Component {
         }
       ],
       sex:null,
-      divingList:[
+      divingList: [
         {
           label: '无',
           value: 'null',
@@ -168,10 +139,127 @@ class travel extends Component {
       [key]: false,
     });
   }
+
+  addPassenger() {
+    const _this = this;
+
+    Popup.show(<div>
+      <List className="popup-list" renderHeader={() => (
+        <div style={{ position: 'relative' }}>
+          新增旅客信息
+          <span style={{'position': 'absolute', 'right': 3, 'top': -5}}
+            onClick={() => {
+              _this.onClosePopup('cancel')
+              _this.popupShowPassenger.call(_this);
+            }}
+          >X</span>
+        </div>
+      )}>
+      <WhiteSpace size="lg" />
+      <AddPassenger
+        close={() => {
+          getUserInfo().then((val) => {
+            if (val.result === '0') {
+              _this.onClosePopup('cancel');
+              _this.setState({passenger: val.data});
+              _this.popupShowPassenger.call(_this);
+            } else {
+              alert(`获取旅客信息出错, 原因：${val.message}`)
+            }
+          })
+        }} 
+      />
+      </List>
+    </div>, { animationType: 'slide-up', maskProps, maskClosable: false });
+  }
+
+  renderPassengerList() {
+    const _this = this,
+      passengerList = _this.state.passenger;
+    
+    if (passengerList.length == 0) {
+      return <div style={{ 'width': '100%', 'textAlign': 'center', 'padding': '20px 0px 0px 0px' }}>
+        暂无数据
+      </div>
+    } else {
+      return <div>
+        <div className={styles.maxPassengerHight}>
+          <WhiteSpace size="lg" />
+          <List>
+            {passengerList.map(function(value, ref) {
+              if (value.select == true) {
+                return <CheckboxItem key={ref} 
+                  defaultChecked
+                  onChange={function(event){
+                    let _state = assign({}, this.state);
+                    if (event.target.checked == true) {
+                      _state.passenger[ref].select = true;
+                    }else {
+                      _state.passenger[ref].select = false;
+                    }
+                    this.setState(_state);
+                  }.bind(this)}
+                >{value.chineseName}</CheckboxItem>
+              }else {
+                return <CheckboxItem key={ref}
+                  onChange={function(event){
+                    let _state = assign({}, this.state);
+                    if (event.target.checked == true) {
+                      _state.passenger[ref].select = true;
+                    }else {
+                      _state.passenger[ref].select = false;
+                    }
+                    this.setState(_state);
+                  }.bind(this)}
+                >{value.chineseName}</CheckboxItem>
+              }
+            }.bind(this))}
+          </List>
+        </div>
+        <WhiteSpace size="lg" />
+        <List>
+          <div onClick={ this.addPassenger.bind(this) }>
+            <List.Item extra="新增" arrow="horizontal">新增旅客信息</List.Item>
+          </div>
+        </List>
+      </div>
+    }
+
+  }
+
+  popupShowPassenger() {
+    const _this = this;
+
+    Popup.show(
+      <div>
+        <List className="popup-list" renderHeader={() => (
+          <div style={{ position: 'relative' }}>
+            选择旅客信息
+            <span style={{ 'position': 'absolute', 'right': 3, 'top': -5, }}
+              onClick={() => this.onClosePopup('cancel')}
+            >X</span>
+          </div>
+        )}>
+
+        {this.renderPassengerList.call(this)}
+
+        <WingBlank size="md">
+          <div className={styles.PopupConfirm}
+            onClick={() => _this.onClosePopup('cancel')}
+          >确认</div>
+          </WingBlank>
+        </List>
+      </div>
+      ,{ animationType: 'slide-up', maskProps, maskClosable: false }
+    );
+  }
+
   render() {
+    const _this = this;
+
     return (
       <div>
-        <div style={{display:this.state.switch.main}}>
+        <div style={{'display': this.state.switch.main}}>
           <WhiteSpace size="lg" />
           <WingBlank size="md">订单</WingBlank>
           <WhiteSpace size="lg" />
@@ -187,141 +275,33 @@ class travel extends Component {
               title="选择日期"
               minDate={setoffDate}
               value={this.state.date}
-              onChange = {(date) => {
-                this.setState({
-                  date:date
-                });
-              }}
+              onChange = {(date) => { _this.setState({ 'date': date}); }}
             >
               <List.Item arrow="horizontal">请选择出发日期</List.Item>
             </DatePicker>
-            <List.Item extra={
-              <Stepper
-                style={{ width: '100%', minWidth: '2rem' }}
+            <List.Item wrap extra={
+              <Stepper style={{ width: '100%', minWidth: '2rem' }}
                 showNumber max={100} min={1}
                 value={this.state.Num}
                 useTouch={false}
-                onChange={
-                  (num) => {
-                    const _Price = ( num * (this.state.productPrice-this.state.promotePrice)).toFixed(2);
-                    this.setState({
-                      Num:num,
-                      totalPrice:_Price
-                    });
-                  }
-                }
+                onChange={ (num) => {
+                  const _Price = ( num * (_this.state.productPrice - _this.state.promotePrice)).toFixed(2);
+                  _this.setState({ 'Num': num, 'totalPrice': _Price });
+                }}
               />}
-              wrap
-            >
-            选择套餐数量
-            </List.Item>
+            >选择套餐数量</List.Item>
           </List>
           <WhiteSpace size="lg"/>
           <WingBlank size="md">客人信息 (至少提供一人信息)</WingBlank>
           <WhiteSpace size="lg"/>
           <List>
-            <List.Item extra="选择" arrow="horizontal" onClick={function(){
-              Popup.show(
-                <div>
-                  <List renderHeader={() => (
-                    <div style={{ position: 'relative' }}>
-                      选择旅客信息
-                      <span
-                        style={{
-                          position: 'absolute', right: 3, top: -5,
-                        }}
-                        onClick={() => this.onClosePopup('cancel')}
-                      >
-                        X
-                      </span>
-                    </div>)}
-                    className="popup-list"
-                  >
-                  {temporarily(this)}
-                  {this.state.passenger.map(function(value, ref) {
-                    if (value.select == undefined) {
-                      return <div>
-                        <WhiteSpace size="lg" />
-                          <List>
-                            <CheckboxItem key={ref} onChange={function(event){
-                              let _state = assign({},this.state);
-                              if (event.target.checked == true) {
-                                _state.passenger[ref].select = true;
-                              }else {
-                                _state.passenger[ref].select = false;
-                              }
-                              this.setState(_state);
-                            }.bind(this)}>
-                              {value.chineseName}
-                            </CheckboxItem>
-                          </List>
-                      </div>
-                    }else if (value.select == true) {
-                      return <div>
-                        <WhiteSpace size="lg" />
-                          <List>
-                            <CheckboxItem key={ref} onChange={function(event){
-                              let _state = assign({},this.state);
-                              if (event.target.checked == true) {
-                                _state.passenger[ref].select = true;
-                              }else {
-                                _state.passenger[ref].select = false;
-                              }
-                              this.setState(_state);
-                            }.bind(this)} defaultChecked>
-                              {value.chineseName}
-                            </CheckboxItem>
-                          </List>
-                      </div>
-                    }else {
-                      return <div>
-                        <WhiteSpace size="lg" />
-                          <List>
-                            <CheckboxItem key={ref} onChange={function(event){
-                              let _state = assign({},this.state);
-                              if (event.target.checked == true) {
-                                _state.passenger[ref].select = true;
-                              }else {
-                                _state.passenger[ref].select = false;
-                              }
-                              this.setState(_state);
-                            }.bind(this)}>
-                              {value.chineseName}
-                            </CheckboxItem>
-                          </List>
-                      </div>
-                    }
-                  }.bind(this))}
-                  <WingBlank size="md"><div onClick={function(){
-                    this.onClosePopup('cancel');
-                    const _this = this;
-                    // 页面跳转
-                    let _data = assign({},_this.props.Nav);
+            <List.Item arrow="horizontal"
+              extra="选择"
+              onClick={this.popupShowPassenger.bind(this)}
+            >选择旅客信息</List.Item>
 
-                    _data.navtitle.push("编辑旅客信息");
-                    _data.PreURL.push("/Cent/Passenger/edit");
+            {renderPassenger(this)}
 
-                    _this.props.dispatch({
-                      type:'Chan_Nav',
-                      data:_data
-                    });
-                    _this.props.dispatch({
-                      type:'select_Passenger',
-                      data:{
-                        type:'add',
-                        select:false
-                      }
-                    })
-
-                    _this.context.router.push('/Cent/Passenger/edit');
-                  }.bind(this)} className={styles.addPassenger}>新增旅客信息</div></WingBlank>
-                  <WingBlank size="md"><div onClick={() => this.onClosePopup('cancel')} className={styles.PopupConfirm}>确认</div></WingBlank>
-                  </List>
-                </div>
-                ,{ animationType: 'slide-up', maskProps, maskClosable: false }
-              );
-            }.bind(this)}>选择旅客信息</List.Item>
-            {renderpPassenger(this)}
           </List>
           <WhiteSpace size="lg" />
           <WingBlank size="md">合计</WingBlank>
@@ -441,6 +421,35 @@ class travel extends Component {
   }
 }
 
+let nawDate = new Date();
+nawDate = dateToFormat(nawDate)+' +0800';
+const setoffDate = moment(nawDate,'YYYY-MM-DD Z');
+
+const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
+let maskProps;
+if (isIPhone) {
+  // Note: the popup content will not scroll.
+  maskProps = {
+    onTouchStart: e => e.preventDefault(),
+  };
+}
+
+
+const alert = Modal.alert;
+const Item = List.Item;
+const Brief = Item.Brief;
+const CheckboxItem = Checkbox.CheckboxItem;
+let choke = false;
+
+
+let minDate = new Date(-1351929600000);
+minDate = dateToFormat(minDate)+' +0800';
+const _minDate = moment(minDate,'YYYY-MM-DD Z');
+
+let maxDate = new Date();
+maxDate = dateToFormat(maxDate)+' +0800';
+const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
+
 travel.contextTypes = {
   router: Object
 }
@@ -452,41 +461,38 @@ const mapStateToProps = (state, ownProps) => ({
   product:state.reducer.product
 })
 
+const getUserInfo = () => (
+  fetch(appConfig.userinfoFindByUserId, {
+    method: "GET",
+    contentType: "application/json; charset=utf-8",
+    headers:{
+      token:cookie.getItem('token'),
+      digest:cookie.getItem('digest')
+  }}).then(
+    (response) => (response.json()),
+    (error) => ({'result': '1', 'message': error})
+  )
+)
 
 export default travel = connect(
   mapStateToProps
 )(travel)
 
 
-function renderpPassenger(_this) {
+function renderPassenger(_this) {
   let _array = [];
   const _data = _this.state.passenger;
   for (let i = 0; i < _data.length; i++) {
     if (_data[i].select == true) {
       _array.push(
         <div onClick={function(){
-          // 页面跳转
-          let _data = assign({},_this.props.Nav);
-
-          _data.navtitle.push('旅客信息');
-          _data.PreURL.push('/Cent/Passenger');
-          _data.leftContent = {
-            return:'left',
-            logo:false
-          };
-
-          _this.props.dispatch({
-            type:'Chan_Nav',
-            data:_data
-          });
-          _this.props.dispatch({
-            type:'filter_Order',
-            data:'complete'
-          });
-
-          _this.context.router.push('/Cent/Passenger');
+          if ( confirm('确认要删除吗?') ){
+            let myState = assign({}, _this.state);
+            myState.passenger[i].select = false;
+            _this.setState(myState);
+          }
         }}>
-          <Item extra="编辑" align="top" multipleLine>
+          <Item extra="删除" align="top" multipleLine>
             {_data[i].chineseName}<Brief>{_data[i].mobile}</Brief>
           </Item>
         </div>
@@ -495,10 +501,6 @@ function renderpPassenger(_this) {
   }
   return _array;
 }
-
-
-
-
 
 // 渲染
 function temporarily(_this) {

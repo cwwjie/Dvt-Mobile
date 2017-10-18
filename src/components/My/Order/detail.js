@@ -3,16 +3,11 @@ import { connect } from 'react-redux'
 import React, {Component} from 'react';
 
 import appConfig from './../../../config/index.js';
-import cookie from './../../cookie.js';
+import cookie from './../../../method/cookie.js';
 
 import styles from './../index.scss';
 
 import { WhiteSpace , List , Toast} from 'antd-mobile';
-
-const Item = List.Item;
-const Brief = Item.Brief;
-
-
 
 class detail extends Component {
   constructor(props, context) {
@@ -113,6 +108,7 @@ class detail extends Component {
       }
     })
   }
+
   render() {
     return (
       <div>
@@ -244,7 +240,7 @@ function RenderUserinfo(Info) {
           <Item>手机号码: { Info[i].mobile==null?"未填写":Info[i].mobile }</Item>
           <Item>潜水等级: { InfodivingRank(Info[i].divingRank) }</Item>
           <Item>潜水次数: { Info[i].divingCount==null?"未填写":Info[i].divingCount }</Item>
-          <Item>出生日期: { getdate(UTC2LocalTime(Info[i].birthday)) }</Item>
+          <Item>出生日期: { getdate(Info[i].birthday) }</Item>
           <Item>年龄: { Info[i].age==null?"未填写":Info[i].age }</Item>
           <Item>性别: { Info[i].gender==0?"男":'女' }</Item>
           <Item>邮箱: { Info[i].email==null?"未填写":Info[i].email }</Item>
@@ -416,11 +412,8 @@ function RenderSubmit(val,_this) {
   }
 }
 
-
-
-
-
-
+const Item = List.Item;
+const Brief = Item.Brief;
 
 // 方法 - 时间差  timestamp -> 时间戳
 function UTC2LocalTime(timestamp) {
@@ -432,7 +425,7 @@ function UTC2LocalTime(timestamp) {
 }
 // 方法 - 获取时间返回201x-xx-xx
 function getdate(date) {
-  var newdate = new Date(UTC2LocalTime(date)),
+  var newdate = new Date(date),
     thisString = newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate();
   return thisString
 }

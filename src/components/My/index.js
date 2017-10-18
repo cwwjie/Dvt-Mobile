@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import assign from 'lodash.assign'
 import { WhiteSpace , List , Flex} from 'antd-mobile';
 
-import cookie from './../cookie.js';
+import cookie from './../../method/cookie.js';
 import appConfig from './../../config/index.js';
 
 import styles from './index.scss'

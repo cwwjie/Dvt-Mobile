@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import assign from 'lodash.assign'
 import appConfig from './config/index.js';
-import cookie from './components/cookie.js';
+import cookie from './method/cookie.js';
 
 // import vconsole from 'vconsole';
 // new vconsole();
@@ -217,8 +217,8 @@ const SubmitFilter = () => {
         if (json.result=="0") {
           // 数据储存到 redux
           store.dispatch({
-            type:'USER_ADD',
-            data:json.data
+            type: 'USER_ADD',
+            data: json.data
           })
           // 获取所有旅客信息
           fetch(

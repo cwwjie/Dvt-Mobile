@@ -7,7 +7,7 @@ import { DatePicker, Modal, Popup, List, Tabs, WhiteSpace, Carousel, Toast } fro
 import assign from 'lodash.assign'
 import appConfig from './../../config/index.js'
 import styles from './css/styles.scss'
-import timeConversion from './../timeConversion.js'
+import timeConversion from './../../method/timeConversion.js'
 
 import less from './img/less.png'
 import plus from './img/plus.png'

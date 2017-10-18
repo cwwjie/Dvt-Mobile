@@ -15,7 +15,7 @@ import Mesvg from './img/Me.svg';
 import Me_hover from './img/Me_hover.svg';
 import logo from './img/logo.png';
 
-import cookie from './../cookie.js';
+import cookie from './../../method/cookie.js';
 import appConfig from './../../config/index.js';
 
 

@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import { WhiteSpace, List, Tabs } from 'antd-mobile';
 
 import appConfig from './../../../config/index.js';
-import cookie from './../../cookie.js';
+import cookie from './../../../method/cookie.js';
 
 import styles from './styles.scss'
 

@@ -6,7 +6,7 @@ import React, {Component} from 'react';
 import {DatePicker, WhiteSpace , List , InputItem , Radio , Flex , Picker , WingBlank , Toast} from 'antd-mobile';
 
 import styles from './../index.scss';
-import cookie from './../../cookie.js';
+import cookie from './../../../method/cookie.js';
 import dateToFormat from './dateToFormat.js';
 import appConfig from './../../../config/index.js';
 

@@ -5,7 +5,7 @@ import { Button, Flex, WingBlank , WhiteSpace , Toast  , Checkbox} from 'antd-mo
 
 import assign from 'lodash.assign'
 import appConfig from './../../../config/index.js';
-import cookie from './../../cookie.js';
+import cookie from './../../../method/cookie.js';
 
 import styles from './../index.scss';
 

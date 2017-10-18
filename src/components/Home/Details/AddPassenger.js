@@ -1,18 +1,17 @@
-import { connect } from 'react-redux'
-import React, {Component} from 'react';
-import assign from 'lodash.assign';
 import moment from 'moment';
+import assign from 'lodash.assign';
+import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import { Modal , WhiteSpace , List , InputItem , Picker , DatePicker , WingBlank , Toast} from 'antd-mobile';
 
 import appConfig from './../../../config/index.js';
 import cookie from './../../../method/cookie.js';
 import convertToPinyinLower from './../../../method/convertToPinyinLower.js';
 import dateToFormat from './../../../method/dateToFormat.js';
 
-import styles from './../index.scss';
+import styles from './styles.scss'
 
-import { Modal , WhiteSpace , List , InputItem , Picker , DatePicker , WingBlank , Toast} from 'antd-mobile';
-
-class PassengerEdit extends Component {
+class AddPassenger extends Component {
   constructor(props, context) {
     super(props,context);
     this.state = {
@@ -26,112 +25,26 @@ class PassengerEdit extends Component {
       divingCount: null,
       type: false,
       birthday: null,//生日
-      sexList:[
-        {
-          label: '男',
-          value: 'Boy',
-        },
-        {
-          label: '女',
-          value: 'Girl',
-        }
-      ],
       sex: null,
-      divingList:[
-        {
-          label: '无',
-          value: 'null',
-        },
-        {
-          label: 'OW(初级潜水员)',
-          value: '1',
-        },
-        {
-          label: 'AOW以上',
-          value: '2',
-        }
-      ],
       diving: null,
     };
-  }
-
-  componentWillMount() {
-    let _state = assign({},this.state);
-    if ( this.props.Passenger.select == false && this.props.Passenger.type == false ) {
-      // 返回 Passenger
-      let _this = this
-      let _data = assign({},_this.props.Nav);
-
-      _data.navtitle.push('旅客信息');
-      _data.PreURL.push('/Cent/Passenger');
-      _data.leftContent = {
-        return:'left',
-        logo:false
-      };
-
-      _this.props.dispatch({
-        type:'Chan_Nav',
-        data:_data
-      });
-      _this.props.dispatch({
-        type:'filter_Order',
-        data:'complete'
-      });
-
-      _this.context.router.push('/Cent/Passenger');
-    }else if ( this.props.Passenger.type == 'edit' ) {
-      // 表示 编辑旅客信息
-        // 所有数据
-        let _Data = this.props.Passenger.data[this.props.Passenger.select];
-        _state.userinfoId = _Data.userinfoId;
-        _state.chineseName = _Data.chineseName;
-        _state.pinyinName = _Data.pinyinName;
-        _state.passportNo = _Data.passportNo;
-        _state.age = _Data.age;
-        _state.mobile = _Data.mobile;
-        _state.email = _Data.email;
-        _state.divingCount = _Data.divingCount;
-        // 初始化类型
-        _state.type = 'edit';
-        // 初始化时间
-        let nawDate = new Date(_Data.birthday);
-        nawDate = dateToFormat(nawDate)+' +0800';
-        const _Date = moment(nawDate,'YYYY-MM-DD Z');
-        _state.birthday = _Date
-        // 初始化性别
-        if (_Data.gender == 0) {
-          _state.sex = ['Boy']
-        }else {
-          _state.sex = ['Girl']
-        }
-        // 初始化潜水等级
-        if ( _Data.gender == 1 || _Data.gender == '1' ) {
-          _state.diving = ['1'];
-        }else if ( _Data.gender == 2 || _Data.gender == '2' ) {
-          _state.diving = ['2'];
-        }else {
-          _state.diving = ['null'];
-        }
-    }else if ( this.props.Passenger.type == 'add' ) {
-      // 表示 新增旅客信息
-      _state.type = 'add';
-    }
-    _state.data = this.props.Passenger.data;
-    this.setState(_state);
+    
+    this.isSubmiting = false;
   }
 
   render() {
+    const _this = this;
+
     return (
-      <div style={{position:'relative'}}>
-        <WhiteSpace size="lg" />
+      <div>
+        <div className={styles.maxPassengerHight}>
           <List>
+
             <InputItem
               placeholder='姓名/中文(必填)'
               value={this.state.chineseName}
               onChange={function(val){
-                let _data = assign({},this.state);
-                _data.chineseName = val
-                this.setState(_data)
+                this.setState({chineseName: val})
               }.bind(this)}
               onBlur={function(val) {
                 if (val == '') {
@@ -139,15 +52,11 @@ class PassengerEdit extends Component {
                 }else if ( !(/^[\u2E80-\u9FFF]+$/.test(val)) ) {
                   Toast.info('必须全为中文(不能有空格)', 1.5);
                 }else {
-                  this.setState({pinyinName:convertToPinyinLower.getFullChars(val)});
+                  this.setState({pinyinName: convertToPinyinLower.getFullChars(val)});
                 }
               }.bind(this)}
-              >
-              姓名中文
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >姓名中文</InputItem>
+
             <InputItem
               placeholder='姓名/拼音(必填)'
               value={this.state.pinyinName}
@@ -163,12 +72,8 @@ class PassengerEdit extends Component {
                   Toast.info('必须全为拼音(不能有空格)', 1.5);
                 }
               }}
-              >
-              姓名拼音
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >姓名拼音</InputItem>
+
             <InputItem
               placeholder='护照号码'
               value={this.state.passportNo}
@@ -177,14 +82,10 @@ class PassengerEdit extends Component {
                 _data.passportNo = val
                 this.setState(_data)
               }.bind(this)}
-              >
-              护照号码
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >护照号码</InputItem>
+
             <Picker
-              data={this.state.sexList}
+              data={sexList}
               cols={1}
               value={this.state.sex}
               title="请选择您的性别"
@@ -193,12 +94,10 @@ class PassengerEdit extends Component {
                 _data.sex = val;
                 this.setState(_data)
               }.bind(this)}
-              >
+            >
               <List.Item arrow="horizontal">性别</List.Item>
             </Picker>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+
             <DatePicker
               mode="date"
               title="选择出生日期"
@@ -215,11 +114,9 @@ class PassengerEdit extends Component {
                 this.setState(_data)
               }.bind(this)}
             >
-            <List.Item arrow="horizontal">出生日期</List.Item>
+              <List.Item arrow="horizontal">出生日期</List.Item>
             </DatePicker>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+
             <InputItem
               placeholder='年龄(必填)'
               value={this.state.age}
@@ -233,12 +130,8 @@ class PassengerEdit extends Component {
                   Toast.info('年龄为必填', 1.2);
                 }
               }}
-              >
-              年龄
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >年龄</InputItem>
+
             <InputItem
               placeholder='手机号码(必填)'
               value={this.state.mobile}
@@ -254,12 +147,8 @@ class PassengerEdit extends Component {
                   Toast.info('手机号码格式不正确', 1.5);
                 }
               }}
-              >
-              手机号码
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >手机号码</InputItem>
+
             <InputItem
               placeholder='邮箱(必填)'
               value={this.state.email}
@@ -275,14 +164,10 @@ class PassengerEdit extends Component {
                   Toast.info('邮箱格式不正确', 1.5);
                 }
               }}
-              >
-              邮箱
-            </InputItem>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+            >邮箱</InputItem>
+
             <Picker
-              data={this.state.divingList}
+              data={divingList}
               cols={1}
               value={this.state.diving}
               title="请选择潜水等级"
@@ -291,12 +176,10 @@ class PassengerEdit extends Component {
                 _data.diving = val
                 this.setState(_data)
               }.bind(this)}
-              >
+            >
               <List.Item arrow="horizontal">潜水等级</List.Item>
             </Picker>
-          </List>
-        <WhiteSpace size="lg" />
-          <List>
+
             <InputItem
               placeholder='请填写100以下次数'
               value={this.state.divingCount}
@@ -317,18 +200,113 @@ class PassengerEdit extends Component {
                   }
                 }
               }}
-              >
-              潜水次数
-            </InputItem>
+            >潜水次数</InputItem>
+
           </List>
-        <WhiteSpace size="lg" />
-        <WhiteSpace size="lg" />
-          {RenderSubmit(this.state.type,this)}
+        </div>
+
+        <WingBlank size="md">
+          <div className={styles.PopupConfirm}
+            onClick={() => {
+              _this.submitData.call(_this);
+            }}
+          >新增</div>
+        </WingBlank>
       </div>
     )
   }
+
+  submitData() {
+    const _this = this;
+    let isSubmiting = _this.isSubmiting;
+
+    if (isSubmiting) { return }
+
+    if (JudgeAll(_this.state) == false) { return }
+
+    let _sex = 0,
+      _diving=0;
+
+    _this.isSubmiting = true;
+      
+    if (_this.state.sex[0] == 'Boy') {
+      _sex = 0
+    }else {
+      _sex = 1
+    }
+
+    if (_this.state.diving == null) {
+      _diving = null
+    }else {
+      if (_this.state.diving[0] == 'null') {
+        _diving = null
+      }else if (_this.state.diving[0] == '1') {
+        _diving = 1
+      }else if (_this.state.diving[0] == '2') {
+        _diving = 2
+      }
+    }
+
+    const mySubmit = {
+      "chineseName": _this.state.chineseName,
+      "pinyinName": _this.state.pinyinName,
+      "gender":  _sex,
+      "birthday":  dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
+      "age":  '' + _this.state.age,
+      "mobile": _this.state.mobile,
+      "email": _this.state.email,
+      "passportNo": _this.state.passportNo,
+      "divingRank": _diving,
+      "divingCount": _this.state.divingCount
+    }
+
+    fetch( appConfig.userinfoAdd, {
+      method: "POST",
+      contentType: "application/json; charset=utf-8",
+      headers:{
+        token: cookie.getItem('token'),
+        digest: cookie.getItem('digest')
+      },
+      body: JSON.stringify(mySubmit)
+    }).then(
+      (response) => (response.json()),
+      (error) => ({'result': '1', 'message': error})
+    ).then((json) => {
+      if (json.result === '0') {
+        _this.props.close();
+      }else {
+        alert(`添加旅客信息发生错误, 原因: ${json.message}`);
+      }
+      _this.isSubmiting = false;
+    })
+  }
+
 }
 
+const sexList = [
+    {
+      label: '男',
+      value: 'Boy',
+    },
+    {
+      label: '女',
+      value: 'Girl',
+    }
+  ],
+  divingList = [
+    {
+      label: '无',
+      value: 'null',
+    },
+    {
+      label: 'OW(初级潜水员)',
+      value: '1',
+    },
+    {
+      label: 'AOW以上',
+      value: '2',
+    }
+  ];
 
 const alert = Modal.alert;
 const Item = List.Item;
@@ -343,19 +321,7 @@ maxDate = dateToFormat(maxDate)+' +0800';
 const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
 
 
-PassengerEdit.contextTypes = {
-  router: Object
- }
- const mapStateToProps = (state, ownProps) => ({
-  Passenger:state.reducer.Passenger,
-  Nav:state.reducer.Nav,
-  // routing:state.routing.locationBeforeTransitions
- })
-
-
- export default PassengerEdit = connect(
-  mapStateToProps
-)(PassengerEdit)
+export default AddPassenger
 
 
 let repeatedSubmit = true;
@@ -529,8 +495,8 @@ function RenderSubmit(type, _this) {
         method: "POST",
         contentType: "application/json; charset=utf-8",
         headers:{
-          token:cookie.getItem('token'),
-          digest:cookie.getItem('digest')
+          token: cookie.getItem('token'),
+          digest: cookie.getItem('digest')
         },
         body:JSON.stringify(_json)
        }).then(function(response) {

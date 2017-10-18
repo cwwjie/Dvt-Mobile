@@ -1,14 +1,16 @@
 import { connect } from 'react-redux'
 import React, {Component} from 'react'
 import moment from 'moment'
-import timeConversion from './../timeConversion.js'
-import cookie from './../cookie.js'
+import timeConversion from './../../method/timeConversion.js'
+import cookie from './../../method/cookie.js'
 
 import { Popup, Modal, Toast, List, WhiteSpace, WingBlank, Stepper, Picker, Checkbox } from 'antd-mobile'
 
 import assign from 'lodash.assign'
 import appConfig from './../../config/index.js'
 import styles from './css/styles.scss'
+
+import AddPassenger from './AddPassenger'
 
 
 class villageSubmit extends Component {
@@ -32,7 +34,7 @@ class villageSubmit extends Component {
   }
 
   componentWillMount() {
-    let _this = this
+    let _this = this;
 
     // 验证 过滤
     if (_this.props.village.selected === false) {
@@ -74,6 +76,13 @@ class villageSubmit extends Component {
 
     // 加载旅客信息
     myState.passenger = _this.props.Passenger.data;
+    getUserInfo().then((val) => {
+      if (val.result === '0') {
+        _this.setState({passenger: val.data})
+      } else {
+        alert(`获取旅客信息出错, 原因：${val.message}`)
+      }
+    })
 
     // 初始化入住日期
     myState.checkInDate = _this.props.village.villageSelected.villageTime;
@@ -243,28 +252,13 @@ class villageSubmit extends Component {
     return passengerList.map((val, i) => {
       if (val.select === true) {
         return  <div onClick={() => {
-          let myNavData = assign({}, _this.props.Nav);
-
-          myNavData.navtitle.push('旅客信息');
-          myNavData.PreURL.push('/Cent/Passenger');
-          myNavData.leftContent = {
-            return:'left',
-            logo:false
-          };
-
-          _this.props.dispatch({
-            'type': 'Chan_Nav',
-            'data': myNavData
-          });
-
-          _this.props.dispatch({
-            'type': 'filter_Order',
-            'data': 'complete'
-          });
-
-          _this.context.router.push('/Cent/Passenger');
+          if ( confirm('确认要删除吗?') ){
+            let myState = assign({}, _this.state);
+            myState.passenger[i].select = false;
+            _this.setState(myState);
+          }
         }}>
-          <Item extra="编辑" align="top" multipleLine>
+          <Item extra="删除" align="top" multipleLine>
             {val.chineseName}<Brief>{val.mobile}</Brief>
           </Item>
         </div>
@@ -277,69 +271,118 @@ class villageSubmit extends Component {
       passengerList = _this.state.passenger;
     
     if (passengerList.length == 0) {
-      return <div style={{ 'width': '100%', 'textAlign': 'center', 'padding': '20px 0px 0px 0px' }}>
-        暂无数据
-      </div>
-    } else {
       return <div>
+        <div style={{ 'width': '100%', 'textAlign': 'center', 'padding': '20px 0px 0px 0px' }}>
+          暂无数据
+        </div>
+          <WhiteSpace size="lg" />
+          <List>
+            <div onClick={ this.addPassenger.bind(this) }>
+              <List.Item extra="新增" arrow="horizontal">新增旅客信息</List.Item>
+            </div>
+          </List>
+        </div>
+      } else {
+      return <div>
+        <div className={styles.maxPassengerHight}>
+          <WhiteSpace size="lg" />
+          <List>
+            {passengerList.map(function(value, ref) {
+              if (value.select == true) {
+                return <CheckboxItem key={ref} 
+                  defaultChecked
+                  onChange={function(event){
+                    let _state = assign({}, this.state);
+                    if (event.target.checked == true) {
+                      _state.passenger[ref].select = true;
+                    }else {
+                      _state.passenger[ref].select = false;
+                    }
+                    this.setState(_state);
+                  }.bind(this)}
+                >{value.chineseName}</CheckboxItem>
+              }else {
+                return <CheckboxItem key={ref}
+                  onChange={function(event){
+                    let _state = assign({}, this.state);
+                    if (event.target.checked == true) {
+                      _state.passenger[ref].select = true;
+                    }else {
+                      _state.passenger[ref].select = false;
+                    }
+                    this.setState(_state);
+                  }.bind(this)}
+                >{value.chineseName}</CheckboxItem>
+              }
+            }.bind(this))}
+          </List>
+        </div>
         <WhiteSpace size="lg" />
         <List>
-          {passengerList.map(function(value, ref) {
-            if (value.select == true) {
-              return <CheckboxItem key={ref} 
-                defaultChecked
-                onChange={function(event){
-                  let _state = assign({}, this.state);
-                  if (event.target.checked == true) {
-                    _state.passenger[ref].select = true;
-                  }else {
-                    _state.passenger[ref].select = false;
-                  }
-                  this.setState(_state);
-                }.bind(this)}
-              >{value.chineseName}</CheckboxItem>
-            }else {
-              return <CheckboxItem key={ref}
-                onChange={function(event){
-                  let _state = assign({}, this.state);
-                  if (event.target.checked == true) {
-                    _state.passenger[ref].select = true;
-                  }else {
-                    _state.passenger[ref].select = false;
-                  }
-                  this.setState(_state);
-                }.bind(this)}
-              >{value.chineseName}</CheckboxItem>
-            }
-          }.bind(this))}
+          <div onClick={ this.addPassenger.bind(this) }>
+            <List.Item extra="新增" arrow="horizontal">新增旅客信息</List.Item>
+          </div>
         </List>
       </div>
     }
 
   }
 
-  jumpToEditPassenger() {
+  addPassenger() {
     const _this = this;
-    this.onClosePopup('cancel');
-    // 页面跳转
-    let _data = assign({},_this.props.Nav);
 
-    _data.navtitle.push("编辑旅客信息");
-    _data.PreURL.push("/Cent/Passenger/edit");
+    Popup.show(<div>
+      <List className="popup-list" renderHeader={() => (
+        <div style={{ position: 'relative' }}>
+          新增旅客信息
+          <span style={{'position': 'absolute', 'right': 3, 'top': -5}}
+            onClick={() => {
+              _this.onClosePopup('cancel')
+              _this.popupShowPassenger.call(_this);
+            }}
+          >X</span>
+        </div>
+      )}>
+      <WhiteSpace size="lg" />
+      <AddPassenger
+        close={() => {
+          getUserInfo().then((val) => {
+            if (val.result === '0') {
+              _this.onClosePopup('cancel');
+              _this.setState({passenger: val.data});
+              _this.popupShowPassenger.call(_this);
+            } else {
+              alert(`获取旅客信息出错, 原因：${val.message}`)
+            }
+          })
+        }} 
+      />
+      </List>
+    </div>, { animationType: 'slide-up', maskProps, maskClosable: false });
+  }
 
-    _this.props.dispatch({
-      type:'Chan_Nav',
-      data:_data
-    });
-    _this.props.dispatch({
-      type:'select_Passenger',
-      data:{
-        type:'add',
-        select:false
-      }
-    })
+  popupShowPassenger() {
+    Popup.show(
+      <div>
+        <List className="popup-list" renderHeader={() => (
+          <div style={{ position: 'relative' }}>
+            选择旅客信息
+            <span style={{'position': 'absolute', 'right': 3, 'top': -5}}
+              onClick={() => this.onClosePopup('cancel')}
+            >X</span>
+          </div>
+        )}>
 
-    _this.context.router.push('/Cent/Passenger/edit');
+        {this.renderPassengerList.call(this)}
+
+        <WingBlank size="md">
+          <div className={styles.PopupConfirm}
+            onClick={() => this.onClosePopup('cancel')}
+          >确认选择</div>
+        </WingBlank>
+        </List>
+      </div>, { animationType: 'slide-up', maskProps, maskClosable: false }
+    )
   }
 
   submitData() {
@@ -485,31 +528,7 @@ class villageSubmit extends Component {
         {this.renderRoom.call(this)}
 
         <List renderHeader={() => '客人信息 (至少提供一人信息)'}>
-          <List.Item extra="选择" arrow="horizontal" onClick={function(){ Popup.show(
-            <div>
-              <List className="popup-list" renderHeader={() => (
-                <div style={{ position: 'relative' }}>
-                  选择旅客信息
-                  <span style={{'position': 'absolute', 'right': 3, 'top': -5}}
-                    onClick={() => this.onClosePopup('cancel')}
-                  >X</span>
-                </div>
-              )}>
-
-              {this.renderPassengerList.call(this)}
-
-              <WingBlank size="md">
-                <div className={styles.addPassenger}
-                  onClick={ this.jumpToEditPassenger.bind(this) }
-                >新增旅客信息</div>
-              </WingBlank>
-              <WingBlank size="md">
-                <div className={styles.PopupConfirm}
-                  onClick={() => this.onClosePopup('cancel')}
-                >确认</div>
-              </WingBlank>
-              </List>
-            </div> , { animationType: 'slide-up', maskProps, maskClosable: false })}.bind(this)}
+          <List.Item extra="选择" arrow="horizontal" onClick={this.popupShowPassenger.bind(this)}
           >选择旅客信息</List.Item>
           {this.renderSelectedPassenger.call(this)}
         </List>
@@ -543,6 +562,19 @@ let nawDate = new Date()
 nawDate = timeConversion.dateToFormat(nawDate)+' +0800'
 const setoffDate = moment(nawDate, 'YYYY-MM-DD Z')
 
+const getUserInfo = () => (
+  fetch(appConfig.userinfoFindByUserId, {
+    method: "GET",
+    contentType: "application/json; charset=utf-8",
+    headers:{
+      token:cookie.getItem('token'),
+      digest:cookie.getItem('digest')
+  }}).then(
+    (response) => (response.json()),
+    (error) => ({'result': '1', 'message': error})
+  )
+)
+
 // 弹窗口
 const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)
 let maskProps
@@ -564,14 +596,10 @@ const mapStateToProps = (state, ownProps) => ({
   'routing': state.routing.locationBeforeTransitions
 })
 
-
 export default villageSubmit = connect(
   mapStateToProps
 )(villageSubmit)
 
-// 渲染
-function temporarily(_this) {
-}
 
 
 
