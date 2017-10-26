@@ -70,12 +70,39 @@ class Cus extends Component {
                 <div className={styles.Popup}>
                   <div>海浪</div>
                   <img src={weche2Dcode} />
+                </div>
+              </div>, { animationType: 'slide-up', maskProps, maskClosable: false });
+            }.bind(this)}
+          >微信客服</Item>
+        </List>
+        <WhiteSpace size="lg" />
+        <List>
+          <Item
+            thumb={weche}
+            arrow="horizontal"
+            onClick={function(){
+              Popup.show(<div>
+                <List renderHeader={() => (
+                  <div style={{ position: 'relative' }}>
+                    二维码
+                    <span
+                      style={{
+                        position: 'absolute', right: 3, top: -5,
+                      }}
+                      onClick={() => this._onClose('cancel')}
+                    >
+                      X
+                    </span>
+                  </div>)}
+                  className="popup-list"
+                />
+                <div className={styles.Popup}>
                   <div>公众号</div>
                   <img src={company} />
                 </div>
               </div>, { animationType: 'slide-up', maskProps, maskClosable: false });
             }.bind(this)}
-          >微信</Item>
+          >公众号</Item>
         </List>
         <WhiteSpace size="lg" />
         <List>

@@ -7,30 +7,16 @@ import {DatePicker, WhiteSpace , List , InputItem , Radio , Flex , Picker , Wing
 
 import styles from './../index.scss';
 import cookie from './../../../method/cookie.js';
-import dateToFormat from './dateToFormat.js';
 import appConfig from './../../../config/index.js';
-
-
-const Item = List.Item;
-const RadioItem = Radio.RadioItem;
-
-let minDate = new Date(-1351929600000);
-minDate = dateToFormat(minDate)+' +0800';
-const _minDate = moment(minDate,'YYYY-MM-DD Z');
-
-let maxDate = new Date();
-maxDate = dateToFormat(maxDate)+' +0800';
-const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
-
-
+import dateToFormat from './../../../method/dateToFormat.js';
 
 
 class personal extends Component {
   constructor(props, context) {
     super(props,context);
     this.state = {
-      nickname:null,
-      sexList:[
+      nickname: null,
+      sexList: [
         {
           label: '男',
           value: 'Boy',
@@ -40,19 +26,22 @@ class personal extends Component {
           value: 'Girl',
         }
       ],
-      sex:["Boy"],
-      birthday: null,//生日
-      telephone:null,
-      webchat:null,
-      qq:null,
+      sex: ["Boy"],
+      birthday:  null,//生日
+      telephone: null,
+      webchat: null,
+      qq: null,
 
-      userName:null,
-      mobile:null,
-      email:null,
-      userInfor:{}
+      userName: null,
+      mobile: null,
+      email: null,
+      userInfor: {},
+
+      isShowBaseInfor: true
     };
   }
-  componentDidMount(){
+
+  componentDidMount() {
     let _data = assign({},this.state);
     if (this.props.user != false) {
       // 初始化昵称
@@ -98,6 +87,7 @@ class personal extends Component {
       this.setState(_data);
     }
   }
+
   componentWillReceiveProps(nextProps) {
     let _data = assign({},this.state);
     if (nextProps.user != false) {
@@ -145,9 +135,34 @@ class personal extends Component {
       this.setState(_data);
     }
   }
-  render() {
-    return (
-      <div>
+
+  renderNav() {
+    const _this = this,
+      isShowBaseInfor = this.state.isShowBaseInfor;
+
+    if (isShowBaseInfor) {
+      return <div className={styles.Nav}>
+        <div className={styles.NavL_active}>基本信息</div>
+        <div className={styles.NavR} onClick={() => {
+          _this.setState({'isShowBaseInfor': false});
+        }}>账号信息</div>
+      </div>
+    } else {
+      return <div className={styles.Nav}>
+        <div className={styles.NavL} onClick={() => {
+          _this.setState({'isShowBaseInfor': true});
+        }}>基本信息</div>
+        <div className={styles.NavR_active}>账号信息</div>
+      </div>
+    }
+  }
+
+  renderBaseInfor() {
+    const _this = this,
+      isShowBaseInfor = this.state.isShowBaseInfor;
+
+    if (isShowBaseInfor) {
+      return <div>
         <List renderHeader={() => '基本信息'}>
           <InputItem
             placeholder='请输入你的昵称'
@@ -160,6 +175,13 @@ class personal extends Component {
             >
             昵称
           </InputItem>
+        </List>
+        <List>
+          <InputItem
+            placeholder='请输入你的用户名'
+            value={this.state.userName}
+            onChange={function(val){ this.setState({userName: val}) }.bind(this)}
+          >用户名</InputItem>
         </List>
         <List>
           <Picker
@@ -230,30 +252,55 @@ class personal extends Component {
             QQ号码
           </InputItem>
         </List>
+      </div>
+    }
+  }
+
+  renderAccountInfor() {
+    const _this = this,
+      isShowBaseInfor = this.state.isShowBaseInfor;
+
+    if (isShowBaseInfor === false) {
+      return <div>
         <List renderHeader={() => '账号信息'}>
           <Item
+            extra={'修改'}
             arrow="horizontal"
-            onClick={function(){
-            }.bind(this)}
-          >用户名</Item>
-          <WingBlank size="md">
-            <InputItem
-              placeholder='请输入你的用户名'
-              value={this.state.userName}
-              onChange={function(val){
-                let _data = assign({},this.state);
-                _data.userName = val
-                this.setState(_data)
-              }.bind(this)}
-              >
-            </InputItem>
-          </WingBlank>
+            onClick={() => {
+              let myNavData = assign({}, _this.props.Nav);
+
+              myNavData.navtitle.push('修改密码');
+              myNavData.PreURL.push('/Cent/password');
+
+              _this.props.dispatch({
+                'type': 'Chan_Nav',
+                'data': myNavData
+              });
+
+              _this.context.router.push('/Cent/password');
+            }}
+          >密码</Item>
+          <Item>
+            <WingBlank size="md">*********</WingBlank>
+          </Item>
         </List>
         <List>
           <Item
             extra={'修改/绑定'}
             arrow="horizontal"
-            onClick={() => {}}
+            onClick={() => {
+              let myNavData = assign({}, _this.props.Nav);
+
+              myNavData.navtitle.push('修改/绑定邮箱');
+              myNavData.PreURL.push('/Cent/mailbox');
+
+              _this.props.dispatch({
+                'type': 'Chan_Nav',
+                'data': myNavData
+              });
+
+              _this.context.router.push('/Cent/mailbox');
+            }}
           >邮箱</Item>
           <Item>
             <WingBlank size="md">{this.state.email}</WingBlank>
@@ -263,62 +310,114 @@ class personal extends Component {
           <Item
             extra={'修改/绑定'}
             arrow="horizontal"
-            onClick={() => {}}
+            onClick={() => {
+              let myNavData = assign({}, _this.props.Nav);
+
+              myNavData.navtitle.push('修改/绑定邮箱');
+              myNavData.PreURL.push('/Cent/phone');
+
+              _this.props.dispatch({
+                'type': 'Chan_Nav',
+                'data': myNavData
+              });
+
+              _this.context.router.push('/Cent/phone');
+            }}
           >手机</Item>
           <Item>
             <WingBlank size="md">{this.state.mobile}</WingBlank>
           </Item>
         </List>
-        <WhiteSpace size="lg" />
-        <WhiteSpace size="lg" />
+      </div>
+    }      
+  }
+
+  submitData() {
+    const _this = this;
+    let myGender = null;
+    if (this.state.sex == ["Boy"]) {
+      myGender = 1;
+    }else if (this.state.sex == ["Girl"]) {
+      myGender = 2;
+    }
+
+    if (this.state.birthday === null) {
+      Toast.info('生日为必填', 1);
+      return
+    }
+
+    const myFetchData = {
+      'userName': this.state.userName,
+      'nickname': this.state.nickname,
+      'gender': myGender,
+      'birthday':  dateToFormat(Date.parse(this.state.birthday._d)),
+      'telephone': this.state.telephone,
+      'webchat': this.state.webchat,
+      'qq': this.state.qq
+    }
+
+    fetch( appConfig.updateUser, {
+      method: 'POST',
+      headers: {
+        token: cookie.getItem('token'),
+        digest: cookie.getItem('digest')
+      },
+      contentType:  'application/json; charset=utf-8',
+      body: JSON.stringify(myFetchData)
+    }).then(function(response) {
+      return response.json()
+    }).then(function(json) {
+      if (json.result=="0") {
+        // 这里返回上一页
+        let _data = assign({},_this.props.Nav);
+        let _Url = _this.props.Nav.PreURL[(_data.PreURL.length-2)]
+        _data.PreURL.pop();
+        _data.navtitle.pop();
+        _this.props.dispatch({type:'Chan_Nav',data:_data})
+        _this.context.router.push(_Url);
+      }else {
+        Toast.fail('提交失败，原因'+json.message, 1);
+      }
+    })
+  }
+
+  renderBottomPay() {
+    const _this = this,
+      isShowBaseInfor = this.state.isShowBaseInfor;
+
+    if (isShowBaseInfor) {
+      return <div>
         <div className={styles.bottomPay}>
-          <div className={styles.bottomPay} onClick={function(){
-            let _this = this;
-            let _gender = null;
-            if (_this.state.sex == ["Boy"]) {
-              _gender = 1;
-            }else if (_this.state.sex == ["Girl"]) {
-              _gender = 2;
-            }
-            const _json = {
-              userName:_this.state.userName,
-              nickname:_this.state.nickname,
-              gender:_gender,
-              birthday:Date.parse(_this.state.birthday._d),
-              telephone:_this.state.telephone,
-              webchat:_this.state.webchat,
-              qq:_this.state.qq
-            }
-            fetch(
-              appConfig.updateUser,{
-              method: "POST",
-              headers:{
-                token:cookie.getItem('token'),
-                digest:cookie.getItem('digest')
-              },
-              contentType: "application/json; charset=utf-8",
-              body:JSON.stringify(_json)
-            }).then(function(response) {
-              return response.json()
-            }).then(function(json) {
-              if (json.result=="0") {
-                // 这里返回上一页
-                let _data = assign({},_this.props.Nav);
-                let _Url = _this.props.Nav.PreURL[(_data.PreURL.length-2)]
-                _data.PreURL.pop();
-                _data.navtitle.pop();
-                _this.props.dispatch({type:'Chan_Nav',data:_data})
-                _this.context.router.push(_Url);
-              }else {
-                Toast.fail('提交失败，原因'+json.message, 1);
-              }
-            })
-          }.bind(this)}>保存信息</div>
+          <div className={styles.bottomPay} onClick={_this.submitData.bind(_this)}>保存信息</div>
         </div>
+      </div>
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderNav.call(this)}
+        {this.renderBaseInfor.call(this)}
+        {this.renderAccountInfor.call(this)}
+        <WhiteSpace size="lg" />
+        <WhiteSpace size="lg" />
+        {this.renderBottomPay.call(this)}
       </div>
     )
   }
 }
+
+const Item = List.Item;
+const RadioItem = Radio.RadioItem;
+
+let minDate = new Date(-1351929600000);
+minDate = dateToFormat(minDate)+' +0800';
+const _minDate = moment(minDate,'YYYY-MM-DD Z');
+
+let maxDate = new Date();
+maxDate = dateToFormat(maxDate)+' +0800';
+const _maxDate = moment(maxDate,'YYYY-MM-DD Z');
 
 personal.contextTypes = {
   router: Object

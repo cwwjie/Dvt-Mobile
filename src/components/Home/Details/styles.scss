@@ -167,5 +167,39 @@
 	overflow-y: scroll;
 }
 
+.navTopHide {
+	display: none;
+}
 
+.navTopShow {
+	position: fixed;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+	display: flex;
+	justify-content: center;
+	top: 0px;
+	left: 0px;
+	height: 0.95rem;
+	width: 100%;
+	background: #fff;
+	z-index: 100;
+	border-bottom: 1PX solid #ddd;
+
+	.navContent {
+
+		.select {
+			color: #428bca;
+			border-bottom: 0.04rem solid #428bca;
+		}
+
+		>div {
+			display: inline-block;
+			line-height: 0.95rem;
+			font-size: 0.32rem;
+			padding: 0px 10px;
+		}
+	}
+}
 

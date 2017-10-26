@@ -13,72 +13,6 @@ class Home extends Component {
     this.state = {
       'selectNumber': 0,
       'dataList': [
-        {
-          'catName': '一日游',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        },
-        {
-          'catName': '包车',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        },
-        {
-          'catName': '保险',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        },
-        {
-          'catName': '沙巴中转酒店',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        },
-        {
-          'catName': '潜水课程',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        },
-        {
-          'catName': '装备租售',
-          'productList': [
-            {
-              'productName': '天然小岛邦邦 3天2晚蜜月',
-              'productPrice': 5700,
-              'apartment': '邦邦 沙滩屋',
-              'productThumb': '/source/image/product/thum/thum_34867ce5-d61a-4576-b4fb-060365c7d638.jpg',
-            }
-          ]
-        }
         // {
         //   'catDesc': null,
         //   'catId': 13,
@@ -234,13 +168,15 @@ class Home extends Component {
               >
                 <div className={styles.productItem}>
                   <div>
-                    <img src={appConfig.URLbase + productItem.productThumb} />
+                    <div className={styles.productItemimg}>
+                      <img src={appConfig.URLbase + productItem.productThumb} />
+                    </div>
                     <div className={styles.itemMain}>
                       <div>
-                        <div>{productItem.productName}</div>
+                        <div className={styles.productName}>{productItem.productName}</div>
                         <div className={styles.itemOther}>
                           <div className={styles.itemapartment}>{productItem.apartment}</div>
-                          <div className={styles.itemproductPrice}>{productItem.productPrice}</div>
+                          <div className={styles.itemproductPrice}>￥{productItem.productPrice}</div>
                         </div>
                       </div>
                     </div>

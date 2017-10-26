@@ -126,11 +126,17 @@
 			border: 1px solid #ddd;
 			position: relative;
 			width: 100%;
-			height: 150px;
+			height: 170px;
 
-			img {
+			.productItemimg {
 				width: 40%;
 				height: 150px;
+				padding: 10px;
+			}
+
+			img {
+				width: 100%;
+				height: 100%;
 			}
 
 			.itemMain {
@@ -139,15 +145,19 @@
 				left: 42.5%;
 				height: 150px;
 				width: 57.2%;
-				font-size: 0.1rem;
+				font-size: 0.2rem;
 
 				>div {
 					padding: 10px;
 				}
 
+				.productName {
+					font-size: 0.25rem;
+				}
+
 				.itemOther {
 					position: absolute;
-					bottom: 10px;
+					bottom: 0px;
 					width: 100%;
 
 					>div {

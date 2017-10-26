@@ -32,7 +32,11 @@ class villageDetail extends Component {
       setoffDate: setoffDate,
 
       roomType: [],
-      total: 0
+      total: 0,
+
+      myNavIsFixed: false,
+
+      defaultActiveKey: '1'
     }
 
     this.changeCheckInDate.bind(this);
@@ -42,7 +46,7 @@ class villageDetail extends Component {
   }
 
   componentWillMount() {
-    let _this = this
+    let _this = this;
     // 判断是否过期
     if (this.props.village.selected === false) {
       this.setState({ modal: true })
@@ -96,6 +100,34 @@ class villageDetail extends Component {
       'leaveDate': todefine(villageTimeStamp + _this.props.village.villageSelected.villageLeave),
       'setoffDate': todefine(villageTimeStamp + 86400000)
     })
+
+
+      
+    const bindScroll = (() => {
+      let isFixed = false;
+      const documentDOM = document || window.document;
+
+      documentDOM.onscroll = (event) => {
+        let yScroll;
+        if (self.pageYOffset) {
+          yScroll = self.pageYOffset;
+        } else if (document.documentElement && document.documentElement.scrollTop) { // Explorer 6 Strict
+          yScroll = document.documentElement.scrollTop;
+        } else if (document.body) {
+          yScroll = document.body.scrollTop;
+        }
+
+        if (yScroll > 370 && isFixed === false) {
+          isFixed = true;
+          _this.setState({myNavIsFixed: true});
+        }
+
+        if (yScroll < 370 && isFixed === true) {
+          isFixed = false;
+          _this.setState({myNavIsFixed: false});
+        }
+      }
+    })();
   }
 
   _onClick = () => {
@@ -254,7 +286,7 @@ class villageDetail extends Component {
     })
   }
 
-  renderRoomByType(roomType) {
+  renderRoomByType() {
     const _this = this;
 
     return this.state.roomType.map((value, ref) => (
@@ -386,6 +418,13 @@ class villageDetail extends Component {
 
     return (
       <div>
+        <div className={this.state.myNavIsFixed ? styles.detailNavShow : styles.NavHidden}>
+          <Tabs defaultActiveKey="1" activeKey={this.state.defaultActiveKey} animated={false} onChange={(key) => {_this.setState({defaultActiveKey: key})}}>
+            <TabPane tab="房型" key="1"/>
+            <TabPane tab="详情" key="2"/>
+            <TabPane tab="联系客服" key="3"/>
+          </Tabs>
+        </div>
         <div>
           <Carousel className='my-carousel' autoplay={true} selectedIndex={0} >{this.state.carousel.map((data) => (
             <img style={{ 'height': `${_this.state.initialHeight}px`, 'width': '100%' }}
@@ -398,7 +437,7 @@ class villageDetail extends Component {
           ))}</Carousel>
         </div>
         <div className={styles.TabPane}>
-          <Tabs defaultActiveKey="1">
+          <Tabs defaultActiveKey="1" activeKey={this.state.defaultActiveKey} onChange={(key) => {_this.setState({defaultActiveKey: key})}}>
             <TabPane tab="房型" key="1">
               <div>
                 <List renderHeader={() => '选择日期'}>

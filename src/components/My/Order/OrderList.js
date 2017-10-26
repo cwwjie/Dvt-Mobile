@@ -14,7 +14,7 @@ class Order extends Component {
     super(props,context);
     this.state = {
       defaultActiveKey:'1',
-      filter:"all"
+      filter: "all"
     };
   }
   componentDidMount() {
@@ -128,16 +128,16 @@ function renderOrder(argument,filter,_this) {
     //   return orderDivision(value,_this,ref);
     // });
     let newArgument = {
-      status1:[],
-      status2:[],
-      status3:[],
-      status4:[],
-      status5:[],
-      status6:[],
-      status7:[],
-      status8:[],
-      status9:[],
-      status10:[],
+      status1: [],
+      status2: [],
+      status3: [],
+      status4: [],
+      status5: [],
+      status6: [],
+      status7: [],
+      status8: [],
+      status9: [],
+      status10: [],
     }
     for (let i = 0; i < argument.length; i++) {
         argument[i].select_Order = i;

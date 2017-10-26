@@ -76,7 +76,67 @@
 
 
 
+.orderItem {
+	padding: 0.25rem 0.25rem 0rem 0.25rem;
 
+	.itemContent {
+		position: relative;
+		border: 0.01rem solid #ddd;
+		background: #fff;
+
+		.ContentImg {
+			width: 35%;
+
+			>div {
+				padding: 0.2rem;
+
+				>img {
+					width: 100%;
+					min-height: 200px;
+				}
+			}
+		}
+
+		.ContentRight {
+			position: absolute;
+			left: 35%;
+			width: 65%;
+			top: 0px;
+			height: 100%;
+
+
+			.ContentTitle {
+				padding-top: 0.2rem;
+				padding-right: 0.2rem;
+				font-size: 0.3rem;
+			}
+
+			.ContentNumber {
+				font-size: 0.20rem;
+				padding-top: 0.1rem;
+				overflow: hidden;
+				text-overflow:ellipsis;
+				white-space: nowrap;
+				color: #888;
+			}
+
+			.ContentBotton {
+				position: absolute;
+				bottom: 0.3rem;
+				width: 100%;
+				font-size: 0.25rem;
+				color: #888;
+
+				.BottonState {
+					position: absolute;
+					top: 0px;
+					right: 0.2rem;
+				}
+			}
+		}
+	}
+
+}
 
 
 

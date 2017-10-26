@@ -218,7 +218,8 @@ class PassengerEdit extends Component {
             <List.Item arrow="horizontal">出生日期</List.Item>
             </DatePicker>
           </List>
-        <WhiteSpace size="lg" />
+        <div style={{'display': 'none'}}>
+          <WhiteSpace size="lg" />
           <List>
             <InputItem
               placeholder='年龄(必填)'
@@ -237,6 +238,7 @@ class PassengerEdit extends Component {
               年龄
             </InputItem>
           </List>
+        </div>
         <WhiteSpace size="lg" />
           <List>
             <InputItem
@@ -400,7 +402,7 @@ function RenderSubmit(type, _this) {
           'email': _this.state.email,
           'passportNo': _this.state.passportNo,
           'divingRank': _diving,
-          'divingCount': _this.state.divingCount
+          'divingCount': _this.state.divingCount || ""
         }
         fetch( appConfig.userupdate, {
           method: "POST",

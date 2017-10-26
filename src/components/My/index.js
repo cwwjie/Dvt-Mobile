@@ -263,49 +263,45 @@ class Foo extends Component {
             }}>
             <List>
               <Item
-                extra={'添加/修改'}
                 arrow="horizontal"
                 onClick={() => {
               }} multipleLine>
-                <div style={{color:"#888"}}>旅客信息</div>
+                <div style={{color:"#888"}}>常用旅客信息</div>
               </Item>
             </List>
           </div>
         <WhiteSpace size="lg" />
-          <List>
-            <Item
-              extra={'退出'}
-              arrow="horizontal"
-              onClick={() => {
-                // 先将 cookie 移除掉
-                cookie.removeItem('token',"/");
-                cookie.removeItem('digest',"/");
+          <div className={styles.SignOut}
+            onClick={() => {
+              // 先将 cookie 移除掉
+              cookie.removeItem('token',"/");
+              cookie.removeItem('digest',"/");
 
-                // 页面跳转
-                let _this = this
-                let _data = assign({},_this.props.Nav);
+              // 页面跳转
+              let _this = this
+              let _data = assign({},_this.props.Nav);
 
-                _data.RightContent = 'login';
+              _data.RightContent = 'login';
 
-                _data.navtitle=['潜游时光','用户登录'];
-                _data.PreURL=['/','/Cent/login'];
-                _data.leftContent={
-                  return:'left',
-                  logo:false
-                };
+              _data.navtitle=['潜游时光','用户登录'];
+              _data.PreURL=['/','/Cent/login'];
+              _data.leftContent={
+                return:'left',
+                logo:false
+              };
 
-                _data.hidden= true,
-                _data.selectedTab='Home'
+              _data.hidden= true,
+              _data.selectedTab='Home'
 
-                _this.props.dispatch({
-                  type:'Chan_Nav',
-                  data:_data
-                });
-                _this.context.router.push('/Cent/login');
-              }} multipleLine>
-              <div style={{color:"#888"}}>账号</div>
-            </Item>
-          </List>
+              _this.props.dispatch({
+                type:'Chan_Nav',
+                data:_data
+              });
+              _this.context.router.push('/Cent/login');
+            }}
+          >
+            <div>账号退出</div>
+          </div>
       </div>
     )
   }

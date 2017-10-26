@@ -4,8 +4,8 @@ import assign from 'lodash.assign'
 import appConfig from './config/index.js';
 import cookie from './method/cookie.js';
 
-// import vconsole from 'vconsole';
-// new vconsole();
+import vconsole from 'vconsole';
+new vconsole();
 
 // 引入React-Router模块
 import { Router, Route, hashHistory, IndexRoute} from 'react-router';
@@ -126,7 +126,7 @@ const Cent = (location, callback) => {
     // 订单
     const Order = (location, callback) => {
       require.ensure([], require => {
-        callback(null, require('./components/My/Order/OrderList').default)
+        callback(null, require('./components/My/Order/index').default)
       }, 'Order')
     }
     const Orderfilter = (location, callback) => {
@@ -373,7 +373,20 @@ const PassengerFilter = () => {
       history.push('/');
       location.reload();
     }
-  })
+  });
+}
+
+const PassengerEditFilter = () => {
+  let myNav = store.getState().reducer.Nav;
+
+  myNav.PreURL = ['/Cent' , '/Cent/Passenger'];
+  myNav.navtitle = ['个人中心', '旅客信息'];
+  myNav.leftContent = { return: 'left', logo: false };
+
+  store.dispatch({
+    type: 'Chan_Nav',
+    data: myNav
+  });
 }
 
 ReactDOM.render(
@@ -409,7 +422,7 @@ ReactDOM.render(
           <Route path="/Cent/taobao" getComponent={taobaoList}/>
 
           <Route path="/Cent/Passenger" onEnter={PassengerFilter}>
-            <IndexRoute getComponent={Passenger}/>
+            <IndexRoute getComponent={Passenger}  onEnter={PassengerEditFilter}/>
             <Route path="/Cent/Passenger/edit" getComponent={PassengerEdit}/>
           </Route>
 

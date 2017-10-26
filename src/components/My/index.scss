@@ -22,9 +22,57 @@
 	}
 }
 
+.SignOut {
+	padding: 0px 2.5%;
 
+	div {
+    background: #fb8f1c;
+    border: #fb8f1c solid 1px;
+		height: 1rem;
+		line-height: 1rem;
+    font-size: 0.35rem;
+		color: #f5f5f5;
+    text-align: center;
+    cursor: pointer;
+	}
 
+	div:active {
+    background: #f5f5f9;
+    border: #fb8f1c solid 1px;
+		color: #fb8f1c;
+	}
+}
 
+.Nav {
+	margin:30px auto;
+	height: 60px;
+	background: #fff;
+	overflow: hidden;
+	width: 400px;
+	border-radius: 8px;
+	>div {
+		text-align: center;
+		line-height:56px;
+		width: 196px;
+		height: 56px;
+		float: left;
+	}
+	.NavL,.NavR {
+		border:1px solid #888;
+	}
+	.NavL_active {
+		color: #108ee9;
+		border-left:1px solid #108ee9;
+		border-top:1px solid #108ee9;
+		border-bottom:1px solid #108ee9;
+	}
+	.NavR_active {
+		color: #108ee9;
+		border-right:1px solid #108ee9;
+		border-top:1px solid #108ee9;
+		border-bottom:1px solid #108ee9;
+	}
+}
 
 
 

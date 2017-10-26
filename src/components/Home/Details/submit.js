@@ -90,7 +90,9 @@ class travel extends Component {
 
     _state.passenger = _this.props.Passenger.data;
     _state.productPrice = _this.props.product.productInfor.productPrice.toFixed(2);
-    _state.promotePrice = _this.props.product.productInfor.promotePrice.toFixed(2);
+
+    let mypromotePrice = _this.props.product.productInfor.promotePrice || 0;
+    _state.promotePrice = mypromotePrice.toFixed(2);
     const _total = (_this.props.product.productInfor.productPrice - _this.props.product.productInfor.promotePrice).toFixed(2);
     _state.totalPrice = _total;
     _state.productName = _this.props.product.productInfor.productName;
@@ -178,8 +180,16 @@ class travel extends Component {
       passengerList = _this.state.passenger;
     
     if (passengerList.length == 0) {
-      return <div style={{ 'width': '100%', 'textAlign': 'center', 'padding': '20px 0px 0px 0px' }}>
-        暂无数据
+      return <div>
+        <div style={{ 'width': '100%', 'textAlign': 'center', 'padding': '20px 0px 0px 0px' }}>
+          暂无数据
+        </div>
+        <WhiteSpace size="lg" />
+        <List>
+          <div onClick={ this.addPassenger.bind(this) }>
+            <List.Item extra="新增" arrow="horizontal">新增旅客信息</List.Item>
+          </div>
+        </List>
       </div>
     } else {
       return <div>
@@ -502,16 +512,6 @@ function renderPassenger(_this) {
   return _array;
 }
 
-// 渲染
-function temporarily(_this) {
-  if (_this.state.passenger.length == 0) {
-    return <div style={{
-      width:'100%',
-      textAlign:'center',
-      padding:'20px 0px 0px 0px'
-    }}>暂无数据</div>
-  }
-}
 
 
 

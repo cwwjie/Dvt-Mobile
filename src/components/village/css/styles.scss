@@ -73,6 +73,15 @@
 		}
 	}
 
+.detailNavShow {
+	position: fixed;
+	width: 100%;
+	top: 0px;
+	z-index: 100;
+}
+.NavHidden {
+	display: none;
+}
 
 // 标签页
 .TabPane {
@@ -93,7 +102,7 @@
 			color: #888;
 		}
 		> div{
-			position:relative;
+			position: relative;
 			margin:0.1rem 0;
 			font-size: 28px;
 			color: #888;
@@ -219,8 +228,4 @@
 	max-height: 800px;
 	overflow-y: scroll;
 }
-
-
-
-
 

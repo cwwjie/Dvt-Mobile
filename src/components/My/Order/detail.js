@@ -47,7 +47,6 @@ class detail extends Component {
     }
     let _state = assign({},this.state);
     _state.data = this.props.Order.data[this.props.Order.select];
-    console.log(this.props.Order.data[this.props.Order.select]);
     this.setState(_state);
     fetch(
       appConfig.findByOrderId+"?orderId="+_state.data.orderId,{
@@ -241,7 +240,6 @@ function RenderUserinfo(Info) {
           <Item>潜水等级: { InfodivingRank(Info[i].divingRank) }</Item>
           <Item>潜水次数: { Info[i].divingCount==null?"未填写":Info[i].divingCount }</Item>
           <Item>出生日期: { getdate(Info[i].birthday) }</Item>
-          <Item>年龄: { Info[i].age==null?"未填写":Info[i].age }</Item>
           <Item>性别: { Info[i].gender==0?"男":'女' }</Item>
           <Item>邮箱: { Info[i].email==null?"未填写":Info[i].email }</Item>
         </List>
@@ -312,8 +310,6 @@ function RenderSubmit(val,_this) {
                     alert("您在30分钟内未完成付款，交易已关闭");
                   }else {
                     document.getElementById('alipayMob').innerHTML=text;
-                    console.log(text);
-                    return
                     document.getElementById('alipaysubmit').submit();
                   }
                   document.getElementById('alipayMob').innerHTML='去付款';
