@@ -129,11 +129,6 @@ const Cent = (location, callback) => {
         callback(null, require('./components/My/Order/index').default)
       }, 'Order')
     }
-    const Orderfilter = (location, callback) => {
-      require.ensure([], require => {
-        callback(null, require('./components/My/Order/filter').default)
-      }, 'Orderfilter')
-    }
     const detail = (location, callback) => {
       require.ensure([], require => {
         callback(null, require('./components/My/Order/detail').default)
@@ -415,7 +410,7 @@ ReactDOM.render(
           <Route path="/Cent/phone" getComponent={phone}/>
           <Route path="/Cent/mailbox" getComponent={mailbox}/>
 
-          <Route path="/Cent/Order" getComponent={Orderfilter}>
+          <Route path="/Cent/Order">
             <IndexRoute getComponent={Order}/>
             <Route path="/Cent/Order/detail" getComponent={detail} onEnter={DetailFilter}/>
           </Route>

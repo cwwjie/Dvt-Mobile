@@ -1,11 +1,13 @@
 import assign from 'lodash.assign';
 import { connect } from 'react-redux';
 import React, {Component} from 'react';
-import { WhiteSpace, List, Tabs } from 'antd-mobile';
+import { Toast, WhiteSpace, List, Tabs } from 'antd-mobile';
 
 import styles from './styles.scss';
-import appConfig from './../../../config/index';
+import cookie from './../../../method/cookie.js';
+import appConfig from './../../../config/index.js';
 import dateToFormat from './../../../method/dateToFormat.js';
+
 
 class Order extends Component {
   constructor(props, context) {
@@ -17,10 +19,42 @@ class Order extends Component {
 
     this.renderOrderOther.bind(this);
     this.JumpToDetail.bind(this);
+    this.pageNum = 1;
+    this.pages;
+    this.pagetotalCountNum;
   }
 
   componentDidMount() {
-    const myfilter = this.props.Order.filter;
+    const _this = this,
+      myfilter = this.props.Order.filter;
+
+    getOrderList()
+    .then((json) => {
+      if (json.result == '0') {
+        _this.pages = json.data.pages;
+        _this.totalCount = json.data.totalCount;
+        _this.props.dispatch({
+          'type': 'Chan_Order',
+          'data': json.data.list
+        });
+        if (json.data.pages !== _this.pageNum && myfilter !== 'all') {
+          getOrderList(1, json.data.totalCount)
+          .then((json) => {
+            if (json.result == '0') {
+              _this.props.dispatch({
+                'type': 'Chan_Order',
+                'data': json.data.list
+              });
+            } else {
+              alert(`获取所有订单失败, 原因 ${json.message}`);
+            }
+          })
+        }
+      } else {
+        alert(`获取所有订单失败, 原因 ${json.message}`);
+      }
+    })
+
 
     if (myfilter === 'all') {
       this.setState({ 'defaultActiveKey': '1', 'filter': "all"});
@@ -31,6 +65,39 @@ class Order extends Component {
     } else if (myfilter === 'complete') {
       this.setState({ 'defaultActiveKey': '4', 'filter': "complete"});
     }
+
+    const bindScroll = () => {
+      let isLoding = false;
+      const ProductDOM = document.documentElement || window,
+        clientHeight = document.documentElement.clientHeight || document.body.clientHeight,
+        OrderAll = document.getElementById("OrderAll");
+
+      window.onscroll = (event) => {
+        const myScrollTop = ProductDOM.scrollTop + clientHeight,
+          OrderAlloffsetTop = OrderAll.offsetHeight + 160;
+
+        if (myScrollTop > OrderAlloffsetTop && isLoding === false && _this.props.Order.data.length !== _this.totalCount) {
+          isLoding = true;
+          Toast.loading('加载中...');
+          _this.pageNum++;
+
+          getOrderList(_this.pageNum)
+          .then((json) => {
+            if (json.result == '0') {
+
+              _this.props.dispatch({
+                'type': 'Chan_Order',
+                'data': _this.props.Order.data.concat(json.data.list)
+              });
+              isLoding = false;
+            } else {
+              alert(`获取所有订单失败, 原因 ${json.message}`);
+            }
+          })
+        }
+      }
+    }
+    bindScroll();
   }
 
   JumpToDetail(ref) {
@@ -67,21 +134,27 @@ class Order extends Component {
   }
   
   renderOrderOther(type) {
+    let orderCount = 0,
+      orderDomList = [];
     const _this = this,
       orderList = this.props.Order.data;
     
     if (orderList.length === 0) {
-      return <div style={{'position': 'absolute', 'textAlign': 'center', 'width': '100%', 'padding': '37px 0px 0px 0px'}}
-      >暂无数据</div>
+      return <div style={{'position': 'absolute', 'textAlign': 'center', 'width': '100%', 'padding': '37px 0px 0px 0px'}}>暂无数据</div>
     }
 
-    return orderList.map((val, key) => {
+    orderList.map((val, key) => {
       if (val.orderStatus === type) {
-        return <OrderItem data={val} JumpToDetail={() => {_this.JumpToDetail(key)}} /> 
-      } else {
-        return <div/> 
+        orderCount++;
+        orderDomList.push(<OrderItem data={val} JumpToDetail={() => {_this.JumpToDetail(key)}} />);
       }
-    })
+    });
+
+    if (orderCount === 0) {
+      return <div style={{'position': 'absolute', 'textAlign': 'center', 'width': '100%', 'padding': '37px 0px 0px 0px'}}>暂无数据</div>
+    } else {
+      return orderDomList
+    }
   }
 
   changeTab(key) {
@@ -112,7 +185,9 @@ class Order extends Component {
           activeKey={this.state.defaultActiveKey}
           onChange={this.changeTab.bind(this)}>
           <TabPane tab='所有订单' key='1'>
-            {this.renderOrderAll.call(this)}
+            <div id='OrderAll'>
+              {this.renderOrderAll.call(this)}
+            </div>
           </TabPane>
           <TabPane tab='预定中' key='2'>
             {this.renderOrderOther(1)}
@@ -124,6 +199,8 @@ class Order extends Component {
             {this.renderOrderOther(6)}
           </TabPane>
         </Tabs>
+        <WhiteSpace size="lg" />
+        <WhiteSpace size="lg" />
     </div>
   }    
 }
@@ -132,7 +209,20 @@ const Item = List.Item;
 const Brief = Item.Brief;
 const TabPane = Tabs.TabPane;
 
-const Line = () => (<div style={{height:"1px",background:"#ddd"}}></div>)
+const Line = () => (<div style={{height:"1px",background:"#ddd"}}></div>);
+
+const getOrderList = (pageNum, pageSize) => (
+  fetch(`${appConfig.URLversion}/order/${pageNum ? pageNum : 1}/${pageSize ? pageSize : 10}/list.do`, {
+    'method': "GET",
+    'contentType': "application/json; charset=utf-8",
+    'headers': {
+      'token': cookie.getItem('token'),
+      'digest': cookie.getItem('digest')
+  }}).then(
+     (response) => (response.json()),
+     (error) => ({'result': 1, 'message': error})
+  )
+);
 
 const OrderItem = ({data, JumpToDetail}) => (
   <div className={styles.orderItem} onClick={JumpToDetail}>

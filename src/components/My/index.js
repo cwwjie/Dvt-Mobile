@@ -146,8 +146,8 @@ class Foo extends Component {
                 _data.navtitle.push('全部订单');
                 _data.PreURL.push('/Cent/Order');
                 _data.leftContent = {
-                  return:'left',
-                  logo:false
+                  return: 'left',
+                  logo: false
                 };
 
                 _this.props.dispatch({

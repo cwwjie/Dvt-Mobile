@@ -29,6 +29,7 @@ class detail extends Component {
       OrderUserinfo:false
     };
   }
+
   componentDidMount() {
     const _this = this;
     // 过滤成功，这里为了保险起见、没什么卵用

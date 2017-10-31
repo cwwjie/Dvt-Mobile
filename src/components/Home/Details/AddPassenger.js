@@ -117,7 +117,7 @@ class AddPassenger extends Component {
               <List.Item arrow="horizontal">出生日期</List.Item>
             </DatePicker>
 
-            <InputItem
+            {/*<InputItem
               placeholder='年龄(必填)'
               value={this.state.age}
               onChange={function(val){
@@ -130,7 +130,7 @@ class AddPassenger extends Component {
                   Toast.info('年龄为必填', 1.2);
                 }
               }}
-            >年龄</InputItem>
+            >年龄</InputItem>*/}
 
             <InputItem
               placeholder='手机号码(必填)'
@@ -567,12 +567,6 @@ function JudgeAll(state) {
   // 判断生日
   if ( state.birthday == null ) {
     Toast.info('生日为必选', 1.2);
-    return false
-  }
-
-  // 判断年龄
-  if ( state.age == null || state.age == '' ) {
-    Toast.info('年龄为必填', 1.2);
     return false
   }
 

@@ -33,9 +33,12 @@ class Nav extends Component {
     _this.setState(_this.props.Nav)
     // 如果 URL 不是 '/' '/Cus' "/village" '/Cent' 隐藏       - 暂时过滤这几个
     if (_this.props.routing.pathname != '/' && _this.props.routing.pathname != '/Cus' && _this.props.routing.pathname != '/village' && _this.props.routing.pathname != '/Cent' ) {
-      _this.setState({
-        hidden:true
-      })
+      // 新加的过滤
+      if (this.props.routing.pathname === '/Cent/Order') {
+        this.setState({ hidden: false });
+      }else {
+        this.setState({ hidden:true })
+      }
     }else {
       if (_this.props.routing.pathname == '/Cus') {
         _data.navtitle = ['客服中心'];
@@ -70,9 +73,12 @@ class Nav extends Component {
     this.setState(nextProps.Nav)
     // 如果 URL 不是 '/' '/village' "/village" '/Cent' 隐藏       - 暂时过滤这几个
     if (this.props.routing.pathname != '/' && this.props.routing.pathname != '/Cus' && this.props.routing.pathname != '/village' && this.props.routing.pathname != '/Cent' ) {
-      this.setState({
-        hidden:true
-      })
+      // 新加的过滤
+      if (this.props.routing.pathname === '/Cent/Order') {
+        this.setState({ hidden: false });
+      }else {
+        this.setState({ hidden:true })
+      }
     }
     // 登录 特殊过滤
     if (_this.props.routing.pathname == '/Cent/login' ) {
