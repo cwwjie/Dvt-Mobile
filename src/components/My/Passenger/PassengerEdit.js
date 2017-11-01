@@ -26,7 +26,7 @@ class PassengerEdit extends Component {
       divingCount: null,
       type: false,
       birthday: null,//生日
-      sexList:[
+      sexList: [
         {
           label: '男',
           value: 'Boy',
@@ -37,7 +37,7 @@ class PassengerEdit extends Component {
         }
       ],
       sex: null,
-      divingList:[
+      divingList: [
         {
           label: '无',
           value: 'null',
@@ -53,32 +53,33 @@ class PassengerEdit extends Component {
       ],
       diving: null,
     };
+
+    this.repeatedSubmit = true;
+
+    this.RenderSubmit.bind(this);
   }
 
   componentWillMount() {
-    let _state = assign({},this.state);
+    const _this = this;
+    let _state = assign({}, this.state);
     if ( this.props.Passenger.select == false && this.props.Passenger.type == false ) {
       // 返回 Passenger
-      let _this = this
-      let _data = assign({},_this.props.Nav);
+      let navData = assign({}, this.props.Nav);
 
-      _data.navtitle.push('旅客信息');
-      _data.PreURL.push('/Cent/Passenger');
-      _data.leftContent = {
-        return:'left',
-        logo:false
-      };
+      navData.navtitle.push('旅客信息');
+      navData.PreURL.push('/Cent/Passenger');
+      navData.leftContent = { 'return': 'left', 'logo': false };
 
-      _this.props.dispatch({
-        type:'Chan_Nav',
-        data:_data
+      this.props.dispatch({
+        'type': 'Chan_Nav',
+        'data': navData
       });
-      _this.props.dispatch({
-        type:'filter_Order',
-        data:'complete'
+      this.props.dispatch({
+        'type': 'filter_Order',
+        'data': 'complete'
       });
 
-      _this.context.router.push('/Cent/Passenger');
+      this.context.router.push('/Cent/Passenger');
     }else if ( this.props.Passenger.type == 'edit' ) {
       // 表示 编辑旅客信息
         // 所有数据
@@ -325,9 +326,283 @@ class PassengerEdit extends Component {
           </List>
         <WhiteSpace size="lg" />
         <WhiteSpace size="lg" />
-          {RenderSubmit(this.state.type,this)}
+        {this.RenderSubmit()}
       </div>
     )
+  }
+
+  submitEdit() {
+    const _this = this;
+
+    if (JudgeAll(_this.state) == false) {
+      return
+    }
+    let _sex = 0,
+      _diving=0;
+
+    if (_this.state.sex[0] == 'Boy') {
+      _sex = 0
+    }else {
+      _sex = 1
+    }
+
+    if (_this.state.diving == null) {
+      _diving = null
+    }else {
+      if (_this.state.diving[0] == 'null') {
+        _diving = null
+      }else if (_this.state.diving[0] == '1') {
+        _diving = 1
+      }else if (_this.state.diving[0] == '2') {
+        _diving = 2
+      }
+    }
+
+    const _json = {
+      'userinfoId': _this.state.userinfoId,
+      'chineseName': _this.state.chineseName,
+      'pinyinName': _this.state.pinyinName,
+      'gender': _sex,
+      'birthday': dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
+      'age': '' + _this.state.age,
+      'mobile': _this.state.mobile,
+      'email': _this.state.email,
+      'passportNo': _this.state.passportNo,
+      'divingRank': _diving,
+      'divingCount': _this.state.divingCount || ""
+    }
+
+    Toast.loading('加载中...');
+    fetch( appConfig.userupdate, {
+      method: "POST",
+      contentType: "application/json; charset=utf-8",
+      headers: {
+        token: cookie.getItem('token'),
+        digest: cookie.getItem('digest')
+      },
+      body: JSON.stringify(_json)
+     }).then(
+      (response) => ( response.json() ),
+      (error) => ({'result': '1', 'message': error})
+    ).then((json) => {
+      if (json.result == "0" ) {
+        let navData = assign({}, _this.props.Nav);
+
+        navData.navtitle.push('旅客信息');
+        navData.PreURL.push('/Cent/Passenger');
+        navData.leftContent = { 'return': 'left', 'logo': false };
+
+        _this.props.dispatch({
+          'type': 'Chan_Nav',
+          'data': navData
+        });
+
+        _this.props.dispatch({
+          'type': 'filter_Order',
+          'data': 'complete'
+        });
+
+        _this.reloadPassenger()
+        .then((json) => {
+          if (json.result=="0") {
+            _this.props.dispatch({
+              'type': 'Chan_Passenger',
+              'data': json.data
+            })
+            _this.context.router.push('/Cent/Passenger');
+          }else {
+            alert(`加载旅客信息失败，原因: ${json.message}`);
+          }
+        });
+      }else {
+        alert(`提交旅客信息失败，原因: ${json.message}`);
+      }
+      Toast.hide();
+    })
+
+  }
+
+  deleteEdit() {
+    const _this = this;
+
+    alert('删除', '是否确定删除?', [
+      { text: '取消'},
+      { text: '确定', onPress: function(){
+        Toast.loading('加载中...');
+        fetch( appConfig.userinfoId + _this.state.userinfoId,{
+          'method': 'GET',
+          'contentType': 'application/json; charset=utf-8',
+          'headers': {
+            'token': cookie.getItem('token'),
+            'digest': cookie.getItem('digest')
+        }}).then(
+          (response) => ( response.json() ),
+          (error) => ({'result': '1', 'message': error})
+        ).then(function(json) {
+
+          if (json.result=='0') {
+            Toast.info('成功删除', 1.5);
+            // 返回 Passenger
+            let _data = assign({},_this.props.Nav);
+
+            _data.navtitle.push('旅客信息');
+            _data.PreURL.push('/Cent/Passenger');
+            _data.leftContent = {
+              return:'left',
+              logo:false
+            };
+
+            _this.props.dispatch({
+              type:'Chan_Nav',
+              data:_data
+            });
+            _this.props.dispatch({
+              type:'filter_Order',
+              data:'complete'
+            });
+
+            _this.reloadPassenger()
+            .then((json) => {
+              if (json.result=="0") {
+                _this.props.dispatch({
+                  'type': 'Chan_Passenger',
+                  'data': json.data
+                })
+                _this.context.router.push('/Cent/Passenger');
+              }else {
+                alert(`加载旅客信息失败，原因: ${json.message}`);
+              }
+            });
+          }else {
+            alert(`提交旅客信息失败，原因: ${json.message}`);
+          }
+          Toast.hide();
+        })
+      }.bind(_this), style: { fontWeight: 'bold' } },
+    ])
+  }
+
+  submitADD() {
+    const _this = this;
+
+    if (_this.repeatedSubmit == false) {
+      return
+    }
+    if (JudgeAll(_this.state) == false) {
+      return
+    }
+    let _sex = 0,
+      _diving=0;
+    if (_this.state.sex[0] == 'Boy') {
+      _sex = 0
+    }else {
+      _sex = 1
+    }
+    if (_this.state.diving == null) {
+      _diving = null
+    }else {
+      if (_this.state.diving[0] == 'null') {
+        _diving = null
+      }else if (_this.state.diving[0] == '1') {
+        _diving = 1
+      }else if (_this.state.diving[0] == '2') {
+        _diving = 2
+      }
+    }
+    const _json = {
+      "chineseName": _this.state.chineseName,
+      "pinyinName": _this.state.pinyinName,
+      "gender":  _sex,
+      "birthday":  dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
+      "age":  '' + _this.state.age,
+      "mobile": _this.state.mobile,
+      "email": _this.state.email,
+      "passportNo": _this.state.passportNo,
+      "divingRank": _diving,
+      "divingCount": _this.state.divingCount
+    }
+    repeatedSubmit = false;
+    Toast.loading('加载中...');
+    fetch( appConfig.userinfoAdd,{
+      method: "POST",
+      contentType: "application/json; charset=utf-8",
+      headers:{
+        token:cookie.getItem('token'),
+        digest:cookie.getItem('digest')
+      },
+      body:JSON.stringify(_json)
+    }).then(
+      (response) => ( response.json() ),
+      (error) => ({'result': '1', 'message': error})
+    ).then(function(json) {
+      if (json.result=="0") {
+        let _data = assign({},_this.props.Nav);
+
+        _data.navtitle.push('旅客信息');
+        _data.PreURL.push('/Cent/Passenger');
+        _data.leftContent = {
+          return:'left',
+          logo:false
+        };
+
+        _this.props.dispatch({
+          type:'Chan_Nav',
+          data:_data
+        });
+        _this.props.dispatch({
+          type:'filter_Order',
+          data:'complete'
+        });
+
+        _this.reloadPassenger()
+        .then((json) => {
+          if (json.result=="0") {
+            _this.props.dispatch({
+              'type': 'Chan_Passenger',
+              'data': json.data
+            })
+            _this.context.router.push('/Cent/Passenger');
+          }else {
+            alert(`加载旅客信息失败，原因: ${json.message}`);
+          }
+        });
+      }else {
+        alert(`提交旅客信息失败，原因: ${json.message}`);
+      }
+      Toast.hide();
+      _this.repeatedSubmit = true;
+    })
+
+  }
+
+  // 获取所有旅客信息
+  reloadPassenger() {
+    return fetch(appConfig.userinfoFindByUserId, {
+      'method': "GET",
+      'contentType': "application/json; charset=utf-8",
+      'headers':{
+        'token': cookie.getItem('token'),
+        'digest': cookie.getItem('digest')
+      }
+    }).then(
+      (response) => ( response.json() ),
+      (error) => ({'result': '1', 'message': error})
+    )
+  }
+
+  RenderSubmit() {
+    const type = this.state.type;
+
+    if (type == false) {
+      return <div className={styles.bottomPay}><div>正在加载...</div></div>
+    }else if (type == 'edit') {
+      return <div className={styles.bottomEdit}>
+        <div className={styles.Edit} onClick={this.submitEdit.bind(this)}>修改</div>
+        <div className={styles.Delete} onClick={this.deleteEdit.bind(this)}>删除</div>
+      </div>
+    }else if (type == 'add') {
+      return <div className={styles.bottomPay}><div onClick={this.submitADD.bind(this)}>添加</div></div>
+    }
   }
 }
 
@@ -360,213 +635,7 @@ PassengerEdit.contextTypes = {
 )(PassengerEdit)
 
 
-let repeatedSubmit = true;
-function RenderSubmit(type, _this) {
-  if (type == false) {
-    return <div className={styles.bottomPay}><div>正在加载...</div></div>
-  }else if (type == 'edit') {
-    return <div className={styles.bottomEdit}>
-      <div className={styles.Edit} onClick={function(){
-        if (JudgeAll(_this.state) == false) {
-          return
-        }
-        let _sex = 0,
-          _diving=0;
 
-        if (_this.state.sex[0] == 'Boy') {
-          _sex = 0
-        }else {
-          _sex = 1
-        }
-
-        if (_this.state.diving == null) {
-          _diving = null
-        }else {
-          if (_this.state.diving[0] == 'null') {
-            _diving = null
-          }else if (_this.state.diving[0] == '1') {
-            _diving = 1
-          }else if (_this.state.diving[0] == '2') {
-            _diving = 2
-          }
-        }
-
-        const _json = {
-          'userinfoId': _this.state.userinfoId,
-          'chineseName': _this.state.chineseName,
-          'pinyinName': _this.state.pinyinName,
-          'gender': _sex,
-          'birthday': dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
-          'age': '' + _this.state.age,
-          'mobile': _this.state.mobile,
-          'email': _this.state.email,
-          'passportNo': _this.state.passportNo,
-          'divingRank': _diving,
-          'divingCount': _this.state.divingCount || ""
-        }
-        fetch( appConfig.userupdate, {
-          method: "POST",
-          contentType: "application/json; charset=utf-8",
-          headers: {
-            token: cookie.getItem('token'),
-            digest: cookie.getItem('digest')
-          },
-          body: JSON.stringify(_json)
-         }).then(function(response) {
-          return response.json()
-         }).then(function(json) {
-          if (json.result=="0") {
-            let _data = assign({},_this.props.Nav);
-
-            _data.navtitle.push('旅客信息');
-            _data.PreURL.push('/Cent/Passenger');
-            _data.leftContent = {
-              return:'left',
-              logo:false
-            };
-
-            _this.props.dispatch({
-              type:'Chan_Nav',
-              data:_data
-            });
-            _this.props.dispatch({
-              type:'filter_Order',
-              data:'complete'
-            });
-
-            _this.context.router.push('/Cent/Passenger');
-            location.reload();
-          }else {
-            alert("未知错误，可能是输入参数有误，请重试");
-          }
-        })
-      }.bind(_this)}>修改</div>
-      <div className={styles.Delete} onClick={function(){
-        alert('删除', '是否确定删除?', [
-          { text: '取消'},
-          { text: '确定', onPress:function(){
-            fetch(
-              appConfig.userinfoId + _this.state.userinfoId,{
-              method: "GET",
-              contentType: "application/json; charset=utf-8",
-              headers:{
-                token:cookie.getItem('token'),
-                digest:cookie.getItem('digest')
-              }
-             }).then(function(response) {
-              return response.json()
-             }).then(function(json) {
-              if (json.result=="0") {
-                Toast.info('成功删除', 1.5);
-                // 返回 Passenger
-                let _data = assign({},_this.props.Nav);
-
-                _data.navtitle.push('旅客信息');
-                _data.PreURL.push('/Cent/Passenger');
-                _data.leftContent = {
-                  return:'left',
-                  logo:false
-                };
-
-                _this.props.dispatch({
-                  type:'Chan_Nav',
-                  data:_data
-                });
-                _this.props.dispatch({
-                  type:'filter_Order',
-                  data:'complete'
-                });
-
-                _this.context.router.push('/Cent/Passenger');
-                location.reload();
-              }else {
-                alert("删除失败");
-              }
-            })
-          }.bind(_this), style: { fontWeight: 'bold' } },
-        ])
-      }.bind(_this)}>删除</div>
-    </div>
-  }else if (type == 'add') {
-    return <div className={styles.bottomPay}><div onClick={function(){
-      if (repeatedSubmit == false) {
-        return
-      }
-      if (JudgeAll(_this.state) == false) {
-        return
-      }
-      let _sex = 0,
-        _diving=0;
-      if (_this.state.sex[0] == 'Boy') {
-        _sex = 0
-      }else {
-        _sex = 1
-      }
-      if (_this.state.diving == null) {
-        _diving = null
-      }else {
-        if (_this.state.diving[0] == 'null') {
-          _diving = null
-        }else if (_this.state.diving[0] == '1') {
-          _diving = 1
-        }else if (_this.state.diving[0] == '2') {
-          _diving = 2
-        }
-      }
-      const _json = {
-        "chineseName": _this.state.chineseName,
-        "pinyinName": _this.state.pinyinName,
-        "gender":  _sex,
-        "birthday":  dateToFormat(new Date(Date.parse(_this.state.birthday._d))),
-        "age":  '' + _this.state.age,
-        "mobile": _this.state.mobile,
-        "email": _this.state.email,
-        "passportNo": _this.state.passportNo,
-        "divingRank": _diving,
-        "divingCount": _this.state.divingCount
-      }
-      repeatedSubmit = false;
-      fetch(
-        appConfig.userinfoAdd,{
-        method: "POST",
-        contentType: "application/json; charset=utf-8",
-        headers:{
-          token:cookie.getItem('token'),
-          digest:cookie.getItem('digest')
-        },
-        body:JSON.stringify(_json)
-       }).then(function(response) {
-        return response.json()
-       }).then(function(json) {
-        if (json.result=="0") {
-          let _data = assign({},_this.props.Nav);
-
-          _data.navtitle.push('旅客信息');
-          _data.PreURL.push('/Cent/Passenger');
-          _data.leftContent = {
-            return:'left',
-            logo:false
-          };
-
-          _this.props.dispatch({
-            type:'Chan_Nav',
-            data:_data
-          });
-          _this.props.dispatch({
-            type:'filter_Order',
-            data:'complete'
-          });
-
-          _this.context.router.push('/Cent/Passenger');
-          location.reload();
-        }else {
-          alert("未知错误，可能是输入参数有误，请重试");
-        }
-        repeatedSubmit = true;
-      })
-    }.bind(_this)}>添加</div></div>
-  }
-}
 
 
 

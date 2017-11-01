@@ -20,27 +20,59 @@ class taobaoList extends Component {
     this.state = {
       List:[]
     };
+
+    this.pageNum = 1;
+    this.pages;
+    this.pagetotalCountNum;
   }
   componentWillMount(){
     let _this = this;
-    fetch(
-      appConfig.URLversion + "/gather/link/listOrder.do",{
-      method: "GET",
-      contentType: "application/json; charset=utf-8",
-      headers:{
-        token:cookie.getItem('token'),
-        digest:cookie.getItem('digest')
+
+    getTaobaoList()
+    .then(function(json) {
+      if (json.result == '0') {
+        _this.setState({'List': json.data.list});
+      } else {
+        alert(`获取所有订单失败, 原因 ${json.message}`);
       }
-     }).then(function(response) {
-      return response.json()
-     }).then(function(json) {
-      if (json.result=="0") {
-        console.log(json.data);
-        _this.setState({List:json.data});
+    });
+
+    const bindScroll = () => {
+      let isLoding = false;
+      const ProductDOM = document.documentElement || window,
+        clientHeight = document.documentElement.clientHeight || document.body.clientHeight,
+        OrderAll = document.getElementById("OrderAll");
+
+      window.onscroll = (event) => {
+        const documentScrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        const myScrollTop = documentScrollTop + clientHeight,
+          OrderAlloffsetTop = OrderAll.offsetHeight + 110;
+
+        if (myScrollTop > OrderAlloffsetTop && isLoding === false && _this.props.Order.data.length !== _this.totalCount) {
+          isLoding = true;
+          Toast.loading('加载中...');
+          _this.pageNum++;
+
+          getTaobaoList(_this.pageNum)
+          .then((json) => {
+            if (json.result == '0') {
+              _this.setState({'list': _this.state.list.concat(json.data.list)});
+              isLoding = false;
+            } else {
+              alert(`获取所有订单失败, 原因 ${json.message}`);
+            }
+          })
+        }
       }
-    })
+    }
+    bindScroll();
   }
-  render() {
+  
+  componentWillUnmount() {
+    window.onscroll = (event) => {};
+  }
+
+    render() {
     return (
       <div>
         <div style={{height:"1px",background:"#ddd"}}></div>
@@ -52,11 +84,11 @@ class taobaoList extends Component {
         </div>
         <div style={{
           position: 'absolute',
-          textAlign:'center',
-          width:'100%',
-          padding:'20px 0px 0px 0px'
+          textAlign: 'center',
+          width: '100%',
+          padding: '20px 0px 0px 0px'
         }}>暂无数据</div>
-        {this.state.List.map(function(index, elem) {
+        <div id='OrderAll'>{this.state.List.map(function(index, elem) {
           if (index.payStatus == 1) {
             return <div onClick={() => {
               localStorage.setItem('_token',cookie.getItem('token'));
@@ -136,14 +168,26 @@ class taobaoList extends Component {
 
             return year+"-"+month+"-"+date;
           }
-        })}
+        })}</div>
       </div>
     )
   }
 }
 
 
-
+const getTaobaoList = (pageNum, pageSize) => (
+  fetch( `${appConfig.URLversion}/gather/link/${pageNum ? pageNum : 1}/${pageSize ? pageSize : 10}/listOrder.do`, {
+    method: "GET",
+    contentType: "application/json; charset=utf-8",
+    headers:{
+      token:cookie.getItem('token'),
+      digest:cookie.getItem('digest')
+    }
+   }).then(
+    (response) => ( response.json() ),
+    (error) => ({'result': 1, 'message': error})
+  )
+)
 
 taobaoList.contextTypes = {
   router: Object

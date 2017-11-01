@@ -390,39 +390,39 @@ ReactDOM.render(
       <Route path="/" component={Nav}>
         <IndexRoute component={Home} onEnter={HomeFilter}/>
         <Route path="/Detail">
-          <IndexRoute getComponent={Detail}/>
-          <Route path="/Detail/travel" getComponent={travel}/>
-          <Route path="/Detail/submit" getComponent={submit} onEnter={SubmitFilter}/>
+          <IndexRoute component={require('./components/Home/Details/index').default}/>
+          <Route path="/Detail/travel" component={require('./components/Home/Details/travel').default}/>
+          <Route path="/Detail/submit" component={require('./components/Home/Details/submit').default} onEnter={SubmitFilter}/>
         </Route>
-        <Route path="/Cus" getComponent={Cus}/>
+        <Route path="/Cus" component={require('./components/Service/index').default}/>
         <Route path="/village">
-          <IndexRoute getComponent={village}/>
-          <Route path="/village/detail" getComponent={villageDetail}/>
-          <Route path="/village/submit" getComponent={villageSubmit} onEnter={SubmitFilter}/>
-          <Route path="/village/summary" getComponent={villageresult}/>
+          <IndexRoute component={require('./components/village/index').default}/>
+          <Route path="/village/detail" component={require('./components/village/detail').default}/>
+          <Route path="/village/submit" component={require('./components/village/submit').default} onEnter={SubmitFilter}/>
+          <Route path="/village/summary" component={require('./components/village/result').default}/>
         </Route>
         <Route path="/Cent">
-          <IndexRoute getComponent={Cent} onEnter={CentFilter}/>
-          <Route path="/Cent/forget" getComponent={forget}/>
-          <Route path="/Cent/signup" getComponent={signup}/>
-          <Route path="/Cent/personal" getComponent={personal}/>
-          <Route path="/Cent/password" getComponent={password}/>
-          <Route path="/Cent/phone" getComponent={phone}/>
-          <Route path="/Cent/mailbox" getComponent={mailbox}/>
+          <IndexRoute component={require('./components/My/index').default} onEnter={CentFilter}/>
+          <Route path="/Cent/forget" component={require('./components/My/login/forget').default}/>
+          <Route path="/Cent/signup" component={require('./components/My/login/signup').default}/>
+          <Route path="/Cent/personal" component={require('./components/My/personalCenter/personal').default}/>
+          <Route path="/Cent/password" component={require('./components/My/personalCenter/password').default}/>
+          <Route path="/Cent/phone" component={require('./components/My/personalCenter/phone').default}/>
+          <Route path="/Cent/mailbox" component={require('./components/My/personalCenter/mailbox').default}/>
 
           <Route path="/Cent/Order">
-            <IndexRoute getComponent={Order}/>
-            <Route path="/Cent/Order/detail" getComponent={detail} onEnter={DetailFilter}/>
+            <IndexRoute component={require('./components/My/Order/index').default}/>
+            <Route path="/Cent/Order/detail" component={require('./components/My/Order/detail').default} onEnter={DetailFilter}/>
           </Route>
-          <Route path="/Cent/taobao" getComponent={taobaoList}/>
+          <Route path="/Cent/taobao" component={require('./components/My/Order/taobaoList').default}/>
 
           <Route path="/Cent/Passenger" onEnter={PassengerFilter}>
-            <IndexRoute getComponent={Passenger}  onEnter={PassengerEditFilter}/>
-            <Route path="/Cent/Passenger/edit" getComponent={PassengerEdit}/>
+            <IndexRoute component={require('./components/My/Passenger/Passenger').default}  onEnter={PassengerEditFilter}/>
+            <Route path="/Cent/Passenger/edit" component={require('./components/My/Passenger/PassengerEdit').default}/>
           </Route>
 
         </Route>
-        <Route path="/Cent/login" getComponent={login}/>
+        <Route path="/Cent/login" component={require('./components/My/login/login').default}/>
       </Route>
     </Router>
   </Provider>,

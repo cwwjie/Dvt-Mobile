@@ -73,7 +73,8 @@ class Order extends Component {
         OrderAll = document.getElementById("OrderAll");
 
       window.onscroll = (event) => {
-        const myScrollTop = ProductDOM.scrollTop + clientHeight,
+        const documentScrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        const myScrollTop = documentScrollTop + clientHeight,
           OrderAlloffsetTop = OrderAll.offsetHeight + 160;
 
         if (myScrollTop > OrderAlloffsetTop && isLoding === false && _this.props.Order.data.length !== _this.totalCount) {
@@ -98,6 +99,10 @@ class Order extends Component {
       }
     }
     bindScroll();
+  }
+
+  componentWillUnmount() {
+    window.onscroll = (event) => {};
   }
 
   JumpToDetail(ref) {

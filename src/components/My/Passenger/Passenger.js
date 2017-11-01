@@ -8,95 +8,100 @@ import { WhiteSpace , List } from 'antd-mobile';
 
 import styles from './../index.scss';
 
-
 const Item = List.Item;
 const Brief = Item.Brief;
-
-
 
 class Passenger extends Component {
   constructor(props, context) {
     super(props,context);
     this.state = {
-      data:[]
+      'data': []
     };
+
+    this.jumpToEdit.bind(this);
   }
+
   componentWillMount(){
-    let _state = assign({},this.state);
-    _state.data = this.props.Passenger.data;
-    this.setState(_state)
+    this.setState({'data': this.props.Passenger.data})
   }
+
   componentWillReceiveProps(nextProps) {
-    let _state = assign({},this.state);
-    _state.data = nextProps.Passenger.data;
-    this.setState(_state);
+    this.setState({'data': nextProps.Passenger.data});
   }
+
+  jumpToADD() {
+    const _this = this;
+    // 页面跳转
+    let navData = assign({}, this.props.Nav);
+
+    navData.navtitle.push("编辑旅客信息");
+    navData.PreURL.push("/Cent/Passenger/edit");
+
+    this.props.dispatch({
+      'type': 'Chan_Nav',
+      'data': navData
+    });
+
+    this.props.dispatch({
+      'type': 'select_Passenger',
+      'data': {
+        'type': 'add',
+        'select': false
+      }
+    })
+
+    this.context.router.push('/Cent/Passenger/edit');
+  }
+
+  renderList() {
+    const _this = this;
+
+    return this.state.data.map((value, ref) => (
+      <div>
+        <WhiteSpace size="lg" />
+          <List>
+            <div onClick={() => { _this.jumpToEdit(ref) }}>
+              <Item extra={'编辑'} arrow="horizontal" multipleLine>
+                {value.chineseName}
+                <Brief>{value.pinyinName}</Brief>
+              </Item>
+            </div>
+          </List>
+      </div>
+    ))
+  }
+
+  jumpToEdit(ref) {
+    let navData = assign({}, this.props.Nav);
+
+    navData.navtitle.push("编辑旅客信息");
+    navData.PreURL.push("/Cent/Passenger/edit");
+
+    this.props.dispatch({
+      'type': 'Chan_Nav',
+      'data': navData
+    });
+
+    this.props.dispatch({
+      'type': 'select_Passenger',
+      'data': {
+        'type': 'edit',
+        'select': ref
+      }
+    })
+
+    this.context.router.push('/Cent/Passenger/edit');
+  }
+
   render() {
     return (
-      <div style={{position:'relative'}}>
-        <div style={{
-          width:'100%',
-          textAlign:'center',
-          position: 'absolute',
-          padding:'20px 0px 0px 0px'
-        }}>暂无数据</div>
-        {this.state.data.map(function(value, ref) {
-          return <div>
-            <WhiteSpace size="lg" />
-              <List>
-                <div onClick={function(){
-                  const _this = this;
-                  // 页面跳转
-                  let _data = assign({},_this.props.Nav);
-
-                  _data.navtitle.push("编辑旅客信息");
-                  _data.PreURL.push("/Cent/Passenger/edit");
-
-                  _this.props.dispatch({
-                    type:'Chan_Nav',
-                    data:_data
-                  });
-                  _this.props.dispatch({
-                    type:'select_Passenger',
-                    data:{
-                      type:'edit',
-                      select:ref
-                    }
-                  })
-
-                  _this.context.router.push('/Cent/Passenger/edit');
-                }.bind(this)}>
-                  <Item extra={'编辑'} arrow="horizontal" multipleLine>
-                    {value.chineseName}
-                    <Brief>{value.pinyinName}</Brief>
-                  </Item>
-                </div>
-              </List>
-          </div>
-        }.bind(this))}
+      <div style={{'position': 'relative'}}>
+        <div style={{'width': '100%', 'textAlign': 'center', 'position':  'absolute', 'padding': '20px 0px 0px 0px'}}>
+          暂无数据
+        </div>
+        {this.renderList.call(this)}
         <div className={styles.bottomPay}>
-          <div className={styles.bottomPay} onClick={function(){
-            const _this = this;
-            // 页面跳转
-            let _data = assign({},_this.props.Nav);
-
-            _data.navtitle.push("编辑旅客信息");
-            _data.PreURL.push("/Cent/Passenger/edit");
-
-            _this.props.dispatch({
-              type:'Chan_Nav',
-              data:_data
-            });
-            _this.props.dispatch({
-              type:'select_Passenger',
-              data:{
-                type:'add',
-                select:false
-              }
-            })
-
-            _this.context.router.push('/Cent/Passenger/edit');
-          }.bind(this)}>新增旅客信息</div>
+          <div className={styles.bottomPay} onClick={this.jumpToADD.bind(this)}>新增旅客信息</div>
         </div>
       </div>
     )
