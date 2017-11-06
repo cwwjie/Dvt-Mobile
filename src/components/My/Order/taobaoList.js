@@ -58,6 +58,7 @@ class taobaoList extends Component {
             if (json.result == '0') {
               _this.setState({'list': _this.state.list.concat(json.data.list)});
               isLoding = false;
+              Toast.hide();
             } else {
               alert(`获取所有订单失败, 原因 ${json.message}`);
             }
@@ -72,7 +73,7 @@ class taobaoList extends Component {
     window.onscroll = (event) => {};
   }
 
-    render() {
+  render() {
     return (
       <div>
         <div style={{height:"1px",background:"#ddd"}}></div>

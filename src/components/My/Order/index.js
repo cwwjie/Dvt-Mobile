@@ -91,6 +91,7 @@ class Order extends Component {
                 'data': _this.props.Order.data.concat(json.data.list)
               });
               isLoding = false;
+              Toast.hide();
             } else {
               alert(`获取所有订单失败, 原因 ${json.message}`);
             }
@@ -239,10 +240,12 @@ const OrderItem = ({data, JumpToDetail}) => (
       </div>
       <div className={styles.ContentRight}>
         <div className={styles.ContentTitle}>{data.orderName}</div>
-        <div className={styles.ContentNumber}>{data.orderSn}</div>
+        <div className={styles.ContentDesc}>{data.orderDesc}</div>
         <div className={styles.ContentBotton}>
           <div>{dateToFormat(new Date(data.orderTime))}</div>
-          <div className={styles.BottonState}>{renderOrderState(data.orderStatus, data.countDown)}</div>
+          <div className={styles.BottonState}>
+            {renderOrderState(data.orderStatus, data.countDown)}
+          </div>
         </div>
       </div>
     </div>

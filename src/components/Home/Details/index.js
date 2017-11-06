@@ -1,7 +1,7 @@
 import assign from 'lodash.assign'
 import { connect } from 'react-redux'
 import React, {Component} from 'react';
-import { Carousel , WhiteSpace , List , WingBlank , Steps , Modal } from 'antd-mobile';
+import { Carousel , WhiteSpace , List , WingBlank , Steps , Modal, Toast } from 'antd-mobile';
 
 import appConfig from './../../../config/index.js';
 import styles from './styles.scss';
@@ -41,106 +41,122 @@ class Detail extends Component {
     }
 
     // 请求(轮播图)
-    fetch(
-      appConfig.URLversion+"/product/relProductGallery/" + _this.props.product.productId + "/findByProductId.do",{
-      method: 'GET',
-      contentType: "application/json; charset=utf-8"
-     }).then(function(response) {
-      return response.json()
-     }).then(function(json) {
-      if (json.result=="0") {
-        let _W = document.body.clientWidth;
-        let _data = json.data,
-          _Array = [],
-          _Width =1200 * _W / 1680;
-        for (let i = 0; i < _data.length; i++) {
-          let obj = {
-            src:appConfig.URLbase + _data[i].gallery.thumbUrl,
-            width:_Width
+    let p1 = new Promise((resolve, reject) => {
+      fetch( `${appConfig.URLversion}/product/relProductGallery/${_this.props.product.productId}/findByProductId.do`, {
+        'method': 'GET',
+        'contentType': 'application/json; charset=utf-8'
+      })
+      .then(
+        (response) => ( response.json() ),
+        (error) => ({'result': '1', 'message': error})
+      ).then(function(json) {
+        if (json.result == '0') {
+          let _W = document.body.clientWidth;
+          let _data = json.data,
+            _Array = [],
+            _Width =1200 * _W / 1680;
+          for (let i = 0; i < _data.length; i++) {
+            let obj = {
+              src:appConfig.URLbase + _data[i].gallery.thumbUrl,
+              width:_Width
+            }
+            _Array.push(obj);
           }
-          _Array.push(obj);
+          _this.setState({
+            'carousel': _Array
+          });
+          resolve();
+        }else {
+          alert('轮播图加载失败，原因'+json.message)
         }
-        _this.setState({
-          carousel:_Array
-        });
-      }else {
-        alert("轮播图加载失败，原因"+json.message)
-      }
+      })
     })
 
     // 请求(内容) => product
       // 产品信息相关
-      fetch(
-        appConfig.URLversion+"/product/" + _this.props.product.productId + "/get.do",{
-        method: 'GET',
-        contentType: "application/json; charset=utf-8"
-       }).then(function(response) {
-        return response.json()
-       }).then(function(json) {
-        if (json.result=="0") {
-          _this.props.dispatch({
-            type:'product_Infor',
-            data:json.data
-          });
-          _this.setState({
-            productDetail:json.data
-          });
-          Rule(json.data.refundRuleId);
-        }else {
-          alert("标题&产品详情请求失败，原因"+json.message)
-        }
+      let p2 = new Promise((resolve, reject) => {
+        fetch(`${appConfig.URLversion}/product/${_this.props.product.productId}/get.do`, {
+          'method': 'GET',
+          'contentType': "application/json; charset=utf-8"
+        }).then(
+          (response) => ( response.json() ),
+          (error) => ({'result': '1', 'message': error})
+        ).then(function(json) {
+          if (json.result=="0") {
+            _this.props.dispatch({
+              type:'product_Infor',
+              data:json.data
+            });
+            _this.setState({
+              productDetail:json.data
+            });
+            Rule(json.data.refundRuleId);
+            resolve();
+          }else {
+            alert("标题&产品详情请求失败，原因"+json.message)
+          }
+        })
       })
       // 套餐说明，交通信息相关
-      fetch(
-        appConfig.URLversion+"/product/attribute/findByProductId.do?productId=" + _this.props.product.productId,{
-        method: 'GET',
-        contentType: "application/json; charset=utf-8"
-       }).then(function(response) {
-        return response.json()
-       }).then(function(json) {
-        if (json.result=="0") {
-          _this.setState({
-            productTravel:json.data
-          });
-        }else {
-          alert("套餐说明&交通信息请求失败，原因"+json.message)
-        }
+      let p3 = new Promise((resolve, reject) => {
+        fetch(`${appConfig.URLversion}/product/attribute/findByProductId.do?productId=${_this.props.product.productId}`, {
+          'method': 'GET',
+          'contentType': "application/json; charset=utf-8"
+        }).then(
+          (response) => ( response.json() ),
+          (error) => ({'result': '1', 'message': error})
+        ).then(function(json) {
+          if (json.result=="0") {
+            _this.setState({
+              'productTravel': json.data
+            });
+            resolve();
+          }else {
+            alert("套餐说明&交通信息请求失败，原因"+json.message)
+          }
+        })
       })
       // 套餐行程相关
-      fetch(
-        appConfig.URLversion+"/product/trip/findByProductId.do?productId=" + _this.props.product.productId,{
-        method: 'GET',
-        contentType: "application/json; charset=utf-8"
-       }).then(function(response) {
-        return response.json()
-       }).then(function(json) {
-        if (json.result=="0") {
-          _this.props.dispatch({
-            type:'product_travel',
-            data:json.data
-          })
-          _this.setState({
-            productRoute:json.data
-          });
-        }else {
-          alert("套餐行程请求失败，原因"+json.message)
-        }
+      let p4 = new Promise((resolve, reject) => {
+        fetch(`${appConfig.URLversion}/product/trip/findByProductId.do?productId=${_this.props.product.productId}`, {
+          'method': 'GET',
+          'contentType': "application/json; charset=utf-8"
+        }).then(
+          (response) => ( response.json() ),
+          (error) => ({'result': '1', 'message': error})
+        ).then(function(json) {
+          if (json.result=="0") {
+            _this.props.dispatch({
+              'type': 'product_travel',
+              'data': json.data
+            })
+            _this.setState({
+              'productRoute': json.data
+            });
+            resolve();
+          }else {
+            alert("套餐行程请求失败，原因"+json.message)
+          }
+        })
       })
       // 套餐包含相关
-      fetch(
-        appConfig.URLversion+"/product/costIncludes/findByProductId.do?productId=" + _this.props.product.productId,{
-        method: 'GET',
-        contentType: "application/json; charset=utf-8"
-       }).then(function(response) {
-        return response.json()
-       }).then(function(json) {
-        if (json.result=="0") {
-          _this.setState({
-            productInclude:json.data
-          });
-        }else {
-          alert("套餐包含请求失败，原因"+json.message)
-        }
+      let p5 = new Promise((resolve, reject) => {
+        fetch(`${appConfig.URLversion}/product/costIncludes/findByProductId.do?productId=${_this.props.product.productId}`, {
+          'method': 'GET',
+          'contentType': "application/json; charset=utf-8"
+        }).then(
+          (response) => ( response.json() ),
+          (error) => ({'result': '1', 'message': error})
+        ).then(function(json) {
+          if (json.result=="0") {
+            _this.setState({
+              'productInclude': json.data
+            });
+            resolve();
+          }else {
+            alert("套餐包含请求失败，原因"+json.message)
+          }
+        })
       })
       // 退款说明相关
       function Rule(refundRuleId) {
@@ -162,7 +178,9 @@ class Detail extends Component {
           }
         })
       }
-      
+    Promise.all([p1, p2, p3, p4, p5]).then(values => {
+      Toast.hide();
+    });
     const bindScroll = (() => {
       let myNavState = 'hide';
       const documentDOM = document || window.document,
@@ -440,7 +458,7 @@ class Detail extends Component {
           <div className={styles.botNavMid}>
             <div onClick={this.jumpToCustomer.bind(this)}>联系客服</div>
           </div>
-          <div className={styles.botNavRight}>
+          <div className={styles.botNavRight} style={{background: '#01b969'}}>
             <div onClick={this.jumpToSubmit.bind(this)}>预定套餐</div>
           </div>
         </div>

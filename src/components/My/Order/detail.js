@@ -256,7 +256,7 @@ function RenderSubmit(val,_this) {
   }
   if (val.orderStatus == 1) {
     return <div className={styles.bottomPay}>
-      <div id='BTN_Cancel' className={styles.bottomPay} onClick={function(){
+      <div id='BTN_Cancel' className={styles.bottomPay} style={{background: '#f7484f'}} onClick={function(){
         let r = confirm("确认取消订单?")
         if (r == true) {
           document.getElementById('BTN_Cancel').innerHTML = '正在取消'

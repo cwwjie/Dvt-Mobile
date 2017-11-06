@@ -264,6 +264,85 @@ class travel extends Component {
     );
   }
 
+  submitData() {
+    let _this = this;
+
+    if (this.state.date == null) {
+      Toast.info('请选择时间!!!', 2, null, false);
+      return
+    }
+
+    let _json = {'userInfoList': [], 'address': {}};
+    let _allow = false;
+    for (let i = 0; i < _this.state.passenger.length; i++) {
+      if (_this.state.passenger[i].select == true) {
+        _allow = true;
+        let tem_Obj = {};
+        tem_Obj.relId = null;
+        tem_Obj.orderId = null;
+        tem_Obj.chineseName =_this.state.passenger[i].chineseName;
+        tem_Obj.pinyinName =_this.state.passenger[i].pinyinName;
+        tem_Obj.gender =_this.state.passenger[i].gender;
+        tem_Obj.passportNo =_this.state.passenger[i].passportNo;
+        tem_Obj.email =_this.state.passenger[i].email;
+        tem_Obj.divingCount =_this.state.passenger[i].divingCount;
+        tem_Obj.divingRank =_this.state.passenger[i].divingRank;
+        tem_Obj.birthday =_this.state.passenger[i].birthday;
+        tem_Obj.age =_this.state.passenger[i].age;
+        tem_Obj.mobile =_this.state.passenger[i].mobile;
+        _json.userInfoList.push(tem_Obj);
+      }
+    }
+    if (_allow == false) {
+      Toast.info('请选旅客信息!!!', 2, null, false);
+      return
+    }
+    let _date = new Date(Date.parse(_this.state.date._d));
+    let _string = '';
+    _string += _date.getFullYear();
+    ( (_date.getMonth()+1)<10) ? (_string += "0" + (_date.getMonth()+1)) : (_string += (_date.getMonth()+1) );
+    ( (_date.getDate()<10) ? (_string += "0" + _date.getDate()) : (_string += _date.getDate()) );
+
+    // 进入提交阶段，进行阻塞
+    Toast.loading('正在提交!');
+    fetch(
+      `${appConfig.URLversion}/order/${_this.props.product.productId}/${_this.state.Num}/${_string}/reserve.do`, {
+      'method': 'POST',
+      'headers':{
+        'Content-Type': 'application/json; charset=utf-8',
+        'token': cookie.getItem('token'),
+        'digest': cookie.getItem('digest')
+      },
+      'body': JSON.stringify(_json)
+     }).then(function(response) {
+      return response.json()
+     }).then(function(json) {
+      if (json.result == "0") {
+        Toast.info('恭喜你提交成功!!!', 2, null, false);
+        let NavData = assign({}, _this.props.Nav);
+
+        NavData.navtitle.push('全部订单');
+        NavData.PreURL.push('/Cent/Order');
+        NavData.selectedTab = 'Me';
+        NavData.leftContent = { 'return': 'left', 'logo': false };
+        
+        _this.props.dispatch({
+          'type': 'Chan_Nav',
+          'data': NavData
+        });
+        _this.props.dispatch({
+          'type': 'filter_Order',
+          'data': 'all'
+        });
+
+        _this.context.router.push('/Cent/Order');
+      }else {
+        Toast.hide();
+        alert(`发生未知错误，错误代码: ${json.result}`);
+      }
+    })
+  }
+
   render() {
     const _this = this;
 
@@ -324,91 +403,7 @@ class travel extends Component {
         </div>
 
         <div className={styles.bottomPay} style={{display:this.state.switch.submit}}>
-          <div className={styles.bottomPay} onClick={function(){
-            let _this = this;
-            if (_this.state.date == null) {
-              Toast.info('请选择时间!!!', 2, null, false);
-              return
-            }
-            let _json = {
-              userInfoList:[],
-              address:{}
-            };
-            let _allow = false;
-            for (let i = 0; i < _this.state.passenger.length; i++) {
-              if (_this.state.passenger[i].select == true) {
-                _allow = true;
-                let tem_Obj = {};
-                tem_Obj.relId = null;
-                tem_Obj.orderId = null;
-                tem_Obj.chineseName =_this.state.passenger[i].chineseName;
-                tem_Obj.pinyinName =_this.state.passenger[i].pinyinName;
-                tem_Obj.gender =_this.state.passenger[i].gender;
-                tem_Obj.passportNo =_this.state.passenger[i].passportNo;
-                tem_Obj.email =_this.state.passenger[i].email;
-                tem_Obj.divingCount =_this.state.passenger[i].divingCount;
-                tem_Obj.divingRank =_this.state.passenger[i].divingRank;
-                tem_Obj.birthday =_this.state.passenger[i].birthday;
-                tem_Obj.age =_this.state.passenger[i].age;
-                tem_Obj.mobile =_this.state.passenger[i].mobile;
-                _json.userInfoList.push(tem_Obj);
-              }
-            }
-            if (_allow == false) {
-              Toast.info('请选旅客信息!!!', 2, null, false);
-              return
-            }
-            let _date = new Date(Date.parse(_this.state.date._d));
-            let _string = '';
-            _string += _date.getFullYear();
-            ( (_date.getMonth()+1)<10) ? (_string += "0" + (_date.getMonth()+1)) : (_string += (_date.getMonth()+1) );
-            ( (_date.getDate()<10) ? (_string += "0" + _date.getDate()) : (_string += _date.getDate()) );
-
-            // 进入提交阶段，进行阻塞
-            if (choke == true) {return}
-            choke = true;
-            fetch(
-              appConfig.URLversion+'/order/'//
-                + _this.props.product.productId + "/"//
-                + _this.state.Num + "/"//
-                + _string + "/reserve.do",{
-              method: "POST",
-              headers:{
-                "Content-Type": "application/json; charset=utf-8",
-                token:cookie.getItem('token'),
-                digest:cookie.getItem('digest')
-              },
-              body:JSON.stringify(_json)
-             }).then(function(response) {
-              return response.json()
-             }).then(function(json) {
-              if (json.result == "0") {
-                Toast.info('恭喜你提交成功!!!', 2, null, false);
-                let _data = assign({},_this.props.Nav);
-
-                _data.navtitle.push('全部订单');
-                _data.PreURL.push('/Cent/Order');
-                _data.leftContent = {
-                return:'left',
-                logo:false
-                };
-
-                _this.props.dispatch({
-                type:'Chan_Nav',
-                data:_data
-                });
-                _this.props.dispatch({
-                type:'filter_Order',
-                data:'all'
-                });
-
-                _this.context.router.push('/Cent/Order');
-              }else {
-                alert('发生未知错误，错误代码:'+json.result);
-              }
-              choke = false;
-            })
-          }.bind(this)}>预定套餐</div>
+          <div className={styles.bottomPay} onClick={this.submitData.bind(this)}>预定套餐</div>
         </div>
 
         <WhiteSpace size="lg" />
@@ -449,7 +444,6 @@ const alert = Modal.alert;
 const Item = List.Item;
 const Brief = Item.Brief;
 const CheckboxItem = Checkbox.CheckboxItem;
-let choke = false;
 
 
 let minDate = new Date(-1351929600000);

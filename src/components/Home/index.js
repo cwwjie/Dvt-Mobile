@@ -1,7 +1,7 @@
 import assign from 'lodash.assign';
 import { connect } from 'react-redux';
 import React, {Component} from 'react';
-import { Card, WhiteSpace } from 'antd-mobile';
+import { Card, WhiteSpace, Toast, Carousel } from 'antd-mobile';
 
 import appConfig from './../../config/index.js';
 
@@ -11,6 +11,8 @@ class Home extends Component {
   constructor(props, context) {
     super(props,context);
     this.state = {
+      'carousel': [{'src':null, 'onclick':null}],
+      'initialHeight':230,
       'selectNumber': 0,
       'dataList': [
         // {
@@ -65,16 +67,28 @@ class Home extends Component {
   componentDidMount() {
     const _this = this;
 
-    getProductData()
-    .then( (response) => (response.json()), (error) => (alert(`加载数据出错, 原因${error}`)) )
-    .then((val) => {
+    getProductData().then((val) => {
       if (val.result === '0') {
-        _this.setState({dataList: val.data}, () => {
-          return 
-          // bindScroll();
-        });
-      } else if (val.message) {
+        _this.setState({'dataList': val.data});
+      } else {
         alert(`加载的数据有误, 原因${val.message}`)
+      }
+    })
+
+    getCarousel().then((val) => {
+      if (val.result === '0') {
+        let carouselArray = [],
+          myWidth = 540 * document.body.clientWidth / 1680;
+
+        _this.setState({
+          'carousel': val.data.map((jsonItem, key) => ({
+            'src': appConfig.URLbase + jsonItem.carouselUrl,
+            'onclick': jsonItem.leadUrl,
+            'width': myWidth
+          }))
+        });
+      } else {
+        alert(`加载轮播图有误, 原因 ${val.message}`)
       }
     })
 
@@ -148,7 +162,8 @@ class Home extends Component {
     _this.props.dispatch({
       'type':  'product_Id',
       'data':  id
-    })
+    });
+    Toast.loading('加载中...');
     _this.context.router.push('/Detail');
   }
 
@@ -192,19 +207,52 @@ class Home extends Component {
   }
 
   render() {
+    const _this = this;
+
     return (
-      <div className={styles.content}>
-        {this.renderNavLeft.call(this)}
-        {this.renderProductMain.call(this)}
+      <div>
+        <div>
+        <Carousel
+          className={styles.Carousel} autoplay={true} infinite selectedIndex={0}>
+          {this.state.carousel.map(data => (
+            <a href={data.onclick} key={data}>
+              <img style={{ height: `${data.width}px`, width: '100%' }}
+                src={data.src}
+                onLoad={() => {
+                  window.dispatchEvent(new Event('resize'));
+                  _this.setState({ 'initialHeight': `${data.width}px`});
+                }}
+              />
+            </a>
+          ))}
+        </Carousel>
+        </div>
+        <div className={styles.content}>
+          {this.renderNavLeft.call(this)}
+          {this.renderProductMain.call(this)}
+        </div>
       </div>
     )
   }
 }
 
-const getProductData = () => (fetch( appConfig.listWithCat, {
-  method: 'GET',
-  contentType: "application/json; charset=utf-8"
-}));
+const getProductData = () => (
+  fetch( appConfig.listWithCat, {
+    method: 'GET',
+    contentType: "application/json; charset=utf-8"
+  }).then(
+    (response) => (response.json()),
+    (error) => ({'result':'1', 'message': error})
+));
+
+const getCarousel = () => (
+  fetch( appConfig.findByElement, {
+    method: 'GET',
+    contentType: "application/json; charset=utf-8"
+  }).then(
+    (response) => (response.json()),
+    (error) => ({'result':'1', 'message': error})
+));
 
 Home.contextTypes = { router: Object };
 
