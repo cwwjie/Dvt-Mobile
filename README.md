@@ -1,20 +1,17 @@
-## 潜游时光手机端
+### 部署生产环境
 
+1. 手机端控制台 隐藏
+src/entry.js
 
-## 关于初始化
+2. 请求的端口 修改成 生产环境端口
+src/config/index.js
 
-	有好几个模块很诡异，需要用cnpm进行安装，不然跑不起来
+3. 信息收集的跳转 修改成为 
 
-## 生产环境有问题
+src/components/My/Order
 
-	解决方案 将 bulid 改start
-	部署时候依然是需要修改多个地方
+"./../mobile/info/index.html";
 
-## 关于React
-
-	路由自带哈希，不知道是什么问题？
-
-	初步猜测是webpack配置的问题？？
 
 
 
