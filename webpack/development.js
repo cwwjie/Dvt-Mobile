@@ -12,11 +12,11 @@ module.exports = {
     inline: true,
     progress: true,
     contentBase: consts.SRC,
-    host:'192.168.2.105',
+    host:'localhost',
     port: consts.PORT
   },
   entry: [
-    'webpack-dev-server/client?http://192.168.2.105:80',
+    'webpack-dev-server/client?http://localhost:80',
     'whatwg-fetch',
     'webpack/hot/only-dev-server',
     path.resolve(consts.ENTRY)
@@ -56,7 +56,7 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new OpenBrowserPlugin({
-      url: `http://192.168.2.105:${consts.PORT}`
+      url: `http://localhost:${consts.PORT}`
     }),
     new webpack.DefinePlugin({
       __DEV__: JSON.stringify(JSON.parse(process.env.DEBUG || 'false'))

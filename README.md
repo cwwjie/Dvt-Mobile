@@ -1,17 +1,21 @@
-### 部署生产环境
-
-1. 手机端控制台 隐藏
-src/entry.js
-
-2. 请求的端口 修改成 生产环境端口
-src/config/index.js
-
-3. 信息收集的跳转 修改成为 
-
-src/components/My/Order
-
-"./../mobile/info/index.html";
+# 潜游时光手机端
 
 
+### 打包到实际环境! 
+src\components\My\Order\taobaoList.js  
+// 实际环境  
+window.location.href="./../info/gather.html";  
+// 测试环境
+window.location.href="./../Dvt-web/info/gather.html";  
 
+
+src\config\index.js
+const URLbase = "http://192.168.0.100:8080";
+const URLversion = "/Dvt-web";
+
+
+src\entry.js
+import vconsole from 'vconsole';
+new vconsole();
+window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
 
