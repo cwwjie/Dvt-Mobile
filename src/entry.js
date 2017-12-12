@@ -4,8 +4,6 @@ import assign from 'lodash.assign'
 import appConfig from './config/index.js';
 import cookie from './method/cookie.js';
 
-import vconsole from 'vconsole';
-new vconsole();
 
 // 引入React-Router模块
 import { Router, Route, hashHistory, IndexRoute} from 'react-router';
@@ -42,8 +40,7 @@ const store = createStore(
   combineReducers({
     reducer,
     routing: routerReducer
-  }),
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+  })
 );
 // Create an enhanced history that syncs navigation events with the store
 const history = syncHistoryWithStore(hashHistory, store);

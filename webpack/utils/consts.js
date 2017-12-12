@@ -1,4 +1,4 @@
-const PORT = 80
+const PORT = 8000
 const SRC = 'src'
 const DIST = 'dist'
 const ENTRY = 'src/entry.js'

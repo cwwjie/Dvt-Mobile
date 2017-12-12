@@ -8,6 +8,11 @@ import cookie from './../../../method/cookie.js';
 
 import styles from './styles.scss'
 
+// 实际环境  
+// window.location.href="./../info/gather.html";  
+// 测试环境
+// window.location.href="./../Dvt-web/info/gather.html";  
+const jumpURL = './../Dvt-web/info/gather.html';
 
 const TabPane = Tabs.TabPane;
 const Item = List.Item;
@@ -96,10 +101,7 @@ class taobaoList extends Component {
               localStorage.setItem('_digest',cookie.getItem('digest'));
               localStorage.setItem('_uniqueKey',index.uniqueKey);
               localStorage.setItem('loginSuccessful',JSON.stringify(index));
-              // 页面跳转
-              // window.open("./../info/gather.html");
-              // 手机端测试的
-              window.location.href="./../Dvt-web/info/gather.html";
+              window.location.href = jumpURL;
             }}>
              <List className="my-list">
                 <Item arrow="horizontal" multipleLine>
@@ -125,10 +127,7 @@ class taobaoList extends Component {
               localStorage.setItem('_digest',cookie.getItem('digest'));
               localStorage.setItem('_uniqueKey',index.uniqueKey);
               localStorage.setItem('loginSuccessful',JSON.stringify(index));
-              // 页面跳转
-              // window.open("./../info/gather.html");
-              // 手机端测试的
-              window.location.href="./../Dvt-web/info/gather.html"
+              window.location.href = jumpURL;
             }}>
              <List className="my-list">
                 <Item arrow="horizontal" multipleLine>

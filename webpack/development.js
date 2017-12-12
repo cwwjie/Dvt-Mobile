@@ -16,7 +16,7 @@ module.exports = {
     port: consts.PORT
   },
   entry: [
-    'webpack-dev-server/client?http://localhost:80',
+    'webpack-dev-server/client?http://localhost:' + consts.PORT,
     'whatwg-fetch',
     'webpack/hot/only-dev-server',
     path.resolve(consts.ENTRY)

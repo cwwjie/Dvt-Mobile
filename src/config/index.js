@@ -9,12 +9,18 @@ const URLbase = "http://192.168.0.100:8080";
  * 生产 /dvtweb
  */
 const URLversion = "/Dvt-web"
+/**
+ * 本地 /Dvt-reserve
+ * 生产 /dvtreserve
+ */
+var URLvillage = "/Dvt-reserve"
 const appConfig = {
-	URLbase:URLbase,
-	URLversion:URLbase+URLversion,
-	listWithCat:URLbase+URLversion+"/product/listWithCat.do",
-	findByElement:URLbase + URLversion+"/system/carousel/findByElement.do",
-	findByElement:URLbase + URLversion+"/system/carousel/findByElement.do",
+	URLbase: URLbase,
+	URLvillage: URLbase + URLvillage,
+	URLversion: URLbase + URLversion,
+	listWithCat: URLbase + URLversion+"/product/listWithCat.do",
+	findByElement: URLbase + URLversion+"/system/carousel/findByElement.do",
+	findByElement: URLbase + URLversion+"/system/carousel/findByElement.do",
 	logurl: URLbase + URLversion+"/user/login.do",
 	forgeturl: URLbase + URLversion+"/user/forgetPw.do",
 	sigupturl: URLbase + URLversion+"/user/register.do",

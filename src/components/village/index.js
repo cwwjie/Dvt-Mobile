@@ -110,7 +110,7 @@ class village extends Component {
               <img src={appConfig.URLbase + villageItemData.resortThumb} />
               <div>
                 <div className={styles.DivisionHead}>{villageItemData.resortName}</div>
-                <div className={styles.DivisionContent}>{villageItemData.resortDesc}</div>
+                <div className={styles.DivisionContent}></div>
                 <div className={styles.DivisionBottom}>
                   <div>{villageItemData.brandName}</div>
                   <div className={styles.DivisionPrice}>{villageItemData.earnest}RMB</div>
@@ -126,7 +126,7 @@ class village extends Component {
   }
 }
 
-let fetchProduct = () => (fetch(appConfig.URLbase + '/Dvt-reserve/product/resort/1/0/list.do', {
+let fetchProduct = () => (fetch(appConfig.URLvillage + '/product/resort/1/0/list.do', {
     method: 'GET',
     contentType: 'application/json; charset=utf-8'
 }));

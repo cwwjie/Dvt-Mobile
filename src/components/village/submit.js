@@ -76,13 +76,18 @@ class villageSubmit extends Component {
 
     // 加载旅客信息
     myState.passenger = _this.props.Passenger.data;
-    getUserInfo().then((val) => {
-      if (val.result === '0') {
-        _this.setState({passenger: val.data})
-      } else {
-        alert(`获取旅客信息出错, 原因：${val.message}`)
-      }
-    })
+    
+    if (_this.props.user) {
+      getUserInfo().then((val) => {
+        if (val.result === '0') {
+          _this.setState({passenger: val.data})
+        } else {
+          alert(`获取旅客信息出错, 原因：${val.message}`)
+        }
+      }).catch(function(error) {
+        alert(`获取旅客信息出错, 原因：${error}`)
+      });
+    }
 
     // 初始化入住日期
     myState.checkInDate = _this.props.village.villageSelected.villageTime;
@@ -592,6 +597,7 @@ villageSubmit.contextTypes = {
 const mapStateToProps = (state, ownProps) => ({
   'Nav': state.reducer.Nav,
   'village': state.reducer.village,
+  'user': state.reducer.user,
   'Passenger': state.reducer.Passenger,
   'routing': state.routing.locationBeforeTransitions
 })
@@ -599,24 +605,3 @@ const mapStateToProps = (state, ownProps) => ({
 export default villageSubmit = connect(
   mapStateToProps
 )(villageSubmit)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

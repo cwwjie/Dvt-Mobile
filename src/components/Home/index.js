@@ -190,7 +190,7 @@ class Home extends Component {
                       <div>
                         <div className={styles.productName}>{productItem.productName}</div>
                         <div className={styles.itemOther}>
-                          <div className={styles.itemapartment}>{productItem.apartment}</div>
+                          <div className={styles.itemapartment} dangerouslySetInnerHTML={{__html: (productItem.productType === 'package'? productItem.apartment : '&nbsp')}}></div>
                           <div className={styles.itemproductPrice}>￥{productItem.productPrice}</div>
                         </div>
                       </div>

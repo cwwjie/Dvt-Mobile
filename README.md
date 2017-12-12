@@ -2,11 +2,11 @@
 
 
 ### 打包到实际环境! 
-src\components\My\Order\taobaoList.js  
 // 实际环境  
-window.location.href="./../info/gather.html";  
+// window.location.href="./../info/gather.html";  
 // 测试环境
-window.location.href="./../Dvt-web/info/gather.html";  
+// window.location.href="./../Dvt-web/info/gather.html";  
+const jumpURL = './../info/gather.html';
 
 
 src\config\index.js
@@ -18,4 +18,9 @@ src\entry.js
 import vconsole from 'vconsole';
 new vconsole();
 window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+
+
+webpack\utils\consts.js
+
+localhost:8000 -> localhost:80
 

@@ -270,7 +270,7 @@ class villageDetail extends Component {
   showModal(value) {
     const _this = this;
 
-    fetch(appConfig.URLbase + '/Dvt-reserve/product/relApartmentGallery/' + value.apartmentId + '/findByApartmentId.do', {
+    fetch(appConfig.URLvillage + '/product/relApartmentGallery/' + value.apartmentId + '/findByApartmentId.do', {
       method: 'GET',
       contentType: 'application/json; charset=utf-8'
     })
@@ -322,7 +322,7 @@ class villageDetail extends Component {
     villageSelectedDate.villageTime = new Date(stampIn);
     villageSelectedDate.villageLeave = stampOut - stampIn;
   
-    fetch(`${appConfig.URLbase}/Dvt-reserve/product/apartment/1/0/searchSource.do?startDate=${timeConversion.timestampToxxxx(stampIn)}&endDate=${timeConversion.timestampToxxxx(stampOut)}&resortCode=${_this.props.village.villageSelected.resortCode}`, {
+    fetch(`${appConfig.URLvillage}/product/apartment/1/0/searchSource.do?startDate=${timeConversion.timestampToxxxx(stampIn)}&endDate=${timeConversion.timestampToxxxx(stampOut)}&resortCode=${_this.props.village.villageSelected.resortCode}`, {
       method: 'GET',
       contentType: 'application/json; charset=utf-8'
     }).then(function (response) {
@@ -535,14 +535,14 @@ class villageDetail extends Component {
 }
 
 const fetchImgByResortId = (resortId) => (
-  fetch(appConfig.URLbase + '/Dvt-reserve/product/relResortGallery/' + resortId + '/findByResortId.do',
+  fetch(appConfig.URLvillage + '/product/relResortGallery/' + resortId + '/findByResortId.do',
   {
     method: 'GET',
     contentType: 'application/json; charset=utf-8'
 }))
 
 const fetchApartmentByResortId = (myTimestamp, myStampLeave, resortCode) => (
-  fetch(`${appConfig.URLbase}/Dvt-reserve/product/apartment/1/0/searchSource.do?startDate=${timeConversion.timestampToxxxx(myTimestamp)}&endDate=${timeConversion.timestampToxxxx((myTimestamp + myStampLeave))}&resortCode=${resortCode}`, {
+  fetch(`${appConfig.URLvillage}/product/apartment/1/0/searchSource.do?startDate=${timeConversion.timestampToxxxx(myTimestamp)}&endDate=${timeConversion.timestampToxxxx((myTimestamp + myStampLeave))}&resortCode=${resortCode}`, {
     method: 'GET',
     contentType: 'application/json; charset=utf-8'
   })
