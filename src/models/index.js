@@ -1,45 +1,39 @@
 import config from './../config';
+import cookies from './../utils/cookies';
 
 export default {
   namespace: 'user',
 
   state: {
-    'isFirstVisit': true,
     'isLogin': false
   },
 
   reducers: {
-    visit(state) { return {...state, isFirstVisit: false} },
-    login(state) { return {...state, isLogin: true} }
+    tologin(state) { return {...state, isLogin: true} }
   },
 
   effects: {
     *checkLogin({}, { call, put }) {
-      let isLogin = false;
-      
-      yield fetch(`${config.basicUrl}/user/checkLogin`, {
-        mode: 'cors',
-        method: 'GET',
-        credentials: 'include'
+      let islogin = yield fetch(`${config.URLversion}/user/getUserInfo.do`, {
+        'method': 'GET',
+        'contentType': "application/json; charset=utf-8",
+        'headers': {
+          'token': cookies.getItem('token'),
+          'digest': cookies.getItem('digest')
+        }
       }).then(
-        function (response) {
-          return response.json()
-        }, function (error) {
-          return error
+        response => response.json(),
+        error => error
+      ).then((val) => {
+        if (val.result === "0") {
+          return true
         }
-      ).then(function (val) {
-      if (val.result === 1) {
-          isLogin = true;
-        } else {
-          isLogin = false;
-        }
-      });
+        return false
+      }).catch((error) => false);
 
-      if (isLogin === false) { return }
-
-      yield put({
-        type: 'login'
-      })
+      if (islogin) {
+        yield put({ type: 'tologin' });
+      }
     }
   }
 

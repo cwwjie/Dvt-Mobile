@@ -45,4 +45,3 @@ let docCookies = {
 };
 
 export default docCookies
-

@@ -9,11 +9,17 @@ function RouterConfig({ history, app }) {
     component: () => import('./Home/index'),
   });
 
+  const Homedetail = dynamic({
+    app,
+    component: () => import('./Home/Detail/index'),
+  });
+
   return (
     <Router history={history}>
       <Route>
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route path="/home/detail" component={Homedetail} />
         </Switch>
       </Route>
     </Router>

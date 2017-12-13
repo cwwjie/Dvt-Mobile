@@ -1,0 +1,121 @@
+.HomeDetail {
+  background-color: #f5f5f9;
+
+  .detail-navTop {
+    position: fixed;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    top: 0px;
+    left: 0px;
+    height: 50px;
+    width: 100%;
+    background: #fff;
+    z-index: 100;
+    border-bottom: 1PX solid #ddd;
+
+    
+      .navTop-content {
+        > div {
+          display: inline-block;
+          line-height: 50px;
+          font-size: 16px;
+          padding: 0px 10px;
+        }
+
+        .navTop-select {
+          color: #428bca;
+          border-bottom: 0.04rem solid #428bca;
+        }
+      }
+  }
+
+  .navTop-hidden {
+    display: none;
+  }
+  
+
+  .detail-main {
+
+    .main-list {
+      overflow: hidden;
+      padding: 8px 16px;
+    }
+
+    #Description {
+      border-bottom: 1PX solid #ddd;
+
+      .main-listTitle {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 24px;
+      }
+  
+      .main-listPrice {
+        font-size: 18px;
+        line-height: 27px;
+        font-weight: bold;
+        color: #f23030;
+        
+        span {
+          display: inline-block;
+          font-size: 16px;
+          line-height: 16px;
+        }
+      }
+  
+      .main-listAct {
+        font-size: 14px;
+        line-height: 21px;
+        text-align: justify;
+        color: #81838e;
+      }
+    }
+
+    #Travel {
+      border-bottom: 1PX solid #ddd;
+
+      .am-wingblank-md {
+        font-weight: bold;
+      }
+
+      .detail-attrValue {
+        p {
+          font-size: 14px;
+          line-height: 21px;
+          text-align: justify;
+        }
+      }
+    }
+
+    #Trip {
+      .am-list-item {
+        border-bottom: 1PX solid #ddd;
+      }
+    }
+
+    #Include {
+      .am-list {
+        border-bottom: 1PX solid #ddd;
+      }
+      
+      .detail-attrValue {
+        p {
+          font-size: 14px;
+          line-height: 21px;
+          text-align: justify;
+        }
+      }
+    }
+
+    #Refunds {
+      .Refunds-content {
+        overflow: hidden;
+        padding: 32px 16px;
+      }
+    }
+  }
+}
