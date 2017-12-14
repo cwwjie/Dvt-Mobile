@@ -37,8 +37,8 @@
     display: none;
   }
   
-
   .detail-main {
+    padding-bottom: 75px;
 
     .main-list {
       overflow: hidden;
@@ -115,6 +115,72 @@
       .Refunds-content {
         overflow: hidden;
         padding: 32px 16px;
+      }
+    }
+  }
+
+  .detail-bottom {
+    overflow: hidden;
+    position: fixed;
+    bottom: 0px;
+    height: 50px;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    z-index: 2;
+
+    > div {
+      float: left;
+    }
+    .bottom-left {
+      width: 50%;
+
+      > div {
+        padding-left: 20px;
+        font-size: 18px;
+        line-height: 50px;
+        font-weight: bold;
+        color: #f23030;
+      }
+      
+      span {
+        display: inline-block;
+        font-size: 16px;
+        line-height: 16px;
+      }
+    }
+    .bottom-mid {
+      background: #ffb03f;
+      color: #fff;
+      width: 25%;
+      line-height: 50px;
+      text-align: center;
+    }
+    .bottom-right {
+      background: rgb(1, 185, 105);
+      color: #fff;
+      width: 25%;
+      line-height: 50px;
+      text-align: center;
+    }
+  }
+
+  .detail-list {
+    overflow: hidden;
+    padding: 16px;
+
+    .list-attrValue {
+      width: 100%;
+      p {
+        font-size: 14px;
+        color: #81838e;
+        line-height: 24px;
+        text-align: justify;
+      }
+      img {
+        width: 100%;
+        padding: 16px 0px;
       }
     }
   }

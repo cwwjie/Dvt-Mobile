@@ -7,19 +7,11 @@ import taobao from './../../assets/taobao.png';
 import weibo from './../../assets/weibo.png';
 import weixin from './../../assets/weixin.png';
 
-import Homesvg from './../../assets/Home.svg';
-import Home_hover from './../../assets/Home_hover.svg';
-import Servicesvg from './../../assets/Service.svg';
-import Service_hover from './../../assets/Service_hover.svg';
-import Ordersvg from './../../assets/Order.svg';
-import Order_hover from './../../assets/Order_hover.svg';
-import Mesvg from './../../assets/Me.svg';
-import Me_hover from './../../assets/Me_hover.svg';
-
 import config from './../../config';
 import convertToPinyinLower from './../../utils/convertToPinyinLower';
 
 import MyNavBar from './../../components/MyNavBar/index';
+import MyTabBar from './../../components/MyTabBar/index';
 
 class Home extends Component {
   constructor(props) {
@@ -237,7 +229,7 @@ class Home extends Component {
     const _this = this,
       dataList = this.state.dataList;
 
-    return dataList.length === (<div id='Product-List'></div>) ? null : (
+    return dataList.length === 0 ? (<div id='Product-List'></div>) : (
       <div id='Product-List' className='Product-List'>{dataList.map((ListItem, Listkey) => (
         <div id={`list-position${Listkey}`} key={Listkey}>
           <div className='List-title'>
@@ -288,75 +280,9 @@ class Home extends Component {
         {this.renderHomeMain.call(this)}
 
         <Copyright/>
-        <MyTabBar/>
-      </div>
-    )
-  }
-}
-
-class MyTabBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isHidden: false,
-      selectedTab: 'Home'
-    }
-  }
-
-  render() {
-    const myIcon = (svg) => (
-      <div style={{
-        width: '23px',
-        height: '23px',
-        background: `url(${svg}) center center /  22px 22px no-repeat` }}
-      />
-    )
-
-    return (
-      <div className="TabBar">
-        <div style={{height:"49px"}}></div>
-        <div className="TabBar-content">
-          <TabBar
-            unselectedTintColor="#949494"
-            tintColor="#33A3F4"
-            barTintColor="white"
-            hidden={this.state.isHidden}
-          >
-            <TabBar.Item
-              icon={myIcon(Homesvg)}
-              selectedIcon={myIcon(Home_hover)}
-              title="首页"
-              key="首页"
-              selected={this.state.selectedTab === 'Home'}
-              onPress={() => {}}
-            />
-            <TabBar.Item
-              icon={myIcon(Ordersvg)}
-              selectedIcon={myIcon(Order_hover)}
-              title="度假村"
-              key="度假村"
-              selected={this.state.selectedTab === 'Order'}
-              onPress={() => {}}
-            />
-            <TabBar.Item
-              icon={myIcon(Servicesvg)}
-              selectedIcon={myIcon(Service_hover)}
-              title="客服"
-              key="客服"
-              selected={this.state.selectedTab === 'Service'}
-              onPress={() => {}}
-            />
-            <TabBar.Item
-              icon={myIcon(Mesvg)}
-              selectedIcon={myIcon(Me_hover)}
-              title="我的"
-              key="我的"
-              selected={this.state.selectedTab === 'Me'}
-              onPress={() => {}}
-              >
-            </TabBar.Item>
-          </TabBar>
-        </div>
+        <MyTabBar
+          selectedTab='Home'
+        />
       </div>
     )
   }
@@ -392,8 +318,4 @@ class Copyright extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  isFirstVisit: state.user.isFirstVisit
-})
-
-export default connect(mapStateToProps)(Home);
+export default connect()(Home);

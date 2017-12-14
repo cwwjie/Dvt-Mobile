@@ -1,20 +1,28 @@
 import config from './../config';
 import cookies from './../utils/cookies';
+import request from './../utils/request';
 
 export default {
   namespace: 'user',
 
   state: {
-    'isLogin': false
+    'isLogin': false,
+    'nickname': null
   },
 
   reducers: {
-    tologin(state) { return {...state, isLogin: true} }
+    tologin(state, data) {
+      return {
+        ...state,
+        isLogin: true,
+        nickname: data.getUserInfo.nickname
+      }
+    }
   },
 
   effects: {
     *checkLogin({}, { call, put }) {
-      let islogin = yield fetch(`${config.URLversion}/user/getUserInfo.do`, {
+      let getUserInfo = yield fetch(`${config.URLversion}/user/getUserInfo.do`, {
         'method': 'GET',
         'contentType': "application/json; charset=utf-8",
         'headers': {
@@ -26,13 +34,13 @@ export default {
         error => error
       ).then((val) => {
         if (val.result === "0") {
-          return true
+          return request.success(val.data);
         }
-        return false
-      }).catch((error) => false);
+        return request.error('请求数据有误')
+      }).catch((error) => request.error('请求出错'));
 
-      if (islogin) {
-        yield put({ type: 'tologin' });
+      if (getUserInfo.result === 1) {
+        yield put({ 'type': 'tologin', 'getUserInfo': getUserInfo.data });
       }
     }
   }

@@ -10,7 +10,7 @@ import { NavBar, Icon } from 'antd-mobile';
 // props: {
 //   isLogin: boolean
 //   navName: '标题名字'
-//   returnURL: 'Home'
+//   returnURL: '/user/login'
 // }
 
 class MyNavBar extends Component {
@@ -33,24 +33,34 @@ class MyNavBar extends Component {
     }
   }
 
+  onRightClick() {
+    if (window.location.hash !== '#/user/login') {
+      this.props.dispatch(routerRedux.push('/user/login'))
+    }
+  }
+
   render() {
     const _this = this;
 
     const logoIconNode = this.props.returnURL ? <Icon type="left" /> : (
-      <div style={{
-        width: '60px',
-        height: '23px',
-        background: `url(${logo}) center center /  60px 23px no-repeat` }}
+      <div
+        style={{
+          'width': '60px',
+          'height': '23px',
+          'background': `url(${logo}) center center /  60px 23px no-repeat`
+        }}
       />
     );
 
     const rightContentNode = this.props.isLogin ? (
-      <div style={{
-        width: '23px',
-        height: '23px',
-        background: `url(${Mesvg}) center center /  22px 22px no-repeat` }}
+      <div 
+        style={{
+          'width': '23px',
+          'height': '23px',
+          'background': `url(${Mesvg}) center center /  22px 22px no-repeat`
+        }}
       />
-    ) : (<div>登录</div>);
+    ) : (<div onClick={this.onRightClick.bind(this)}>登录</div>);
 
     return (
       <div className="NavBar">

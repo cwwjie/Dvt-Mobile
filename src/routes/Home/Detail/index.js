@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { connect } from 'dva';
+import { routerRedux } from 'dva/router';
 import { Toast, Carousel, WhiteSpace, List, WingBlank, Steps } from 'antd-mobile';
 
 import MyNavBar from './../../../components/MyNavBar/index';
@@ -9,7 +10,7 @@ const Item = List.Item;
 const Brief = Item.Brief;
 const Step = Steps.Step;
 
-class Home extends Component {
+class HomeDetail extends Component {
   constructor(props) {
     super(props);
 
@@ -301,6 +302,18 @@ class Home extends Component {
     </div>
   }
 
+  jumpToTravel() {
+    this.props.dispatch(routerRedux.push(`/home/detail-travel?productId=${this.productId}`));
+  }
+
+  jumpToSubmit() {
+    localStorage.setItem('product', JSON.stringify({
+      'productId': this.productId
+    }));
+
+    this.props.dispatch(routerRedux.push('/home/submit'));
+  }
+
   render() {
     const _this = this;
     const imgCarouselStyle = {
@@ -358,8 +371,8 @@ class Home extends Component {
             <WingBlank size="md">套餐行程</WingBlank>
             <WhiteSpace size="lg" />
             <List>
-              <Item arrow="horizontal" multipleLine>
-                <div style={{color:"#000"}}>查看行程详情</div>
+              <Item arrow="horizontal" onClick={this.jumpToTravel.bind(this)} multipleLine>
+                <div>查看行程详情</div>
               </Item>
               {this.state.productRoute.map((data, key) => (
                 <div key={key}>
@@ -416,13 +429,29 @@ class Home extends Component {
             </div>
           )}</div>
         </div>
+
+        <div className='detail-bottom'>
+          <div className='bottom-left'>
+            <div>
+              <span>¥ </span> {
+                this.state.productDetail.productPrice - this.state.productDetail.promotePrice
+              }<span>.00 起</span>
+            </div>
+          </div>
+          <div className='bottom-mid'>
+            联系客服
+          </div>
+          <div className='bottom-right' onClick={this.jumpToSubmit.bind(this)}>
+            预定套餐
+          </div>
+        </div>
+
       </div>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-  isFirstVisit: state.user.isFirstVisit
 })
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(HomeDetail);
