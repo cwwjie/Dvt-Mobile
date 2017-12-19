@@ -1,6 +1,6 @@
 .User-Login {
 
-  .login-input {
+  .User-input {
     position: relative;
     padding: 8px 16px;
 
@@ -14,6 +14,14 @@
       border-radius: 5px;
       border: 1px solid #dbdbdb;
     }
+
+    .input-verifi {
+      position: absolute;
+      top: 8px;
+      right: 36px;
+      font-size: 18px;
+      line-height: 46px;
+    }
     
     .Login-eye {
       position: absolute;
@@ -24,7 +32,7 @@
     }
   }
 
-  .login-submit {
+  .User-submit {
 
     .submit-btn {
       position: relative;
@@ -78,6 +86,43 @@
       position: absolute;
       top: 0px;
       right: 16px;
+    }
+  }
+}
+
+.User-Forget {
+  .Forget-select {
+    padding-top: 8px;
+
+    padding-left: 5%;
+
+    > div {
+      float: left;
+      margin-right: 5%;
+      width: 45%;
+      font-size: 18px;
+      line-height: 46px;
+      text-align: center;
+      border-radius: 5px;
+
+      > div {
+        border-radius: 5px;
+      }
+    }
+
+    .btn-primary {
+      background-color: rgb(238, 238, 238);
+      color: rgba(0, 0, 0, 0.58);
+    }
+
+    .btn-actived {
+      background-color: #1AAD19;
+      color: #fff;
+
+      > div {
+        border: 1px solid #1AAD19;
+      }
+      
     }
   }
 }
