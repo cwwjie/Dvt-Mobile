@@ -17,53 +17,73 @@ class UserForget extends Component {
     super(props);
 
     this.state = {
-      isFindByMail: true,
+      isSignUpByMail: true,
 
       mailBox: '',
       canMailSubmit: false,
 
+      password: '',
+      
       phone: '',
       code: '',
       VerifiCodeName: '获取验证码',
-      newPassword: '',
       passwordType: 'password',
       canPhoneSubmit: false,
     };
 
+    this.password = '';
+    
+    this.mailBox = '';
     this.phone = '';
     this.code = '';
     this.codeCount = 60;
-    this.newPassword = '';
 
-    this.switchForgetBy.bind(this);
+    this.switchSignupBy.bind(this);
     this.checkPhoneBase.bind(this);
     this.checkPhoneValue.bind(this);
   }
 
-  switchForgetBy(type) {
+  switchSignupBy(type) {
     if (type === 'mailBox') {
       this.setState({
-        'isFindByMail': true
+        'isSignUpByMail': true
       })
     } else {
       this.setState({
-        'isFindByMail': false
+        'isSignUpByMail': false
       })
     }
   }
 
-  mailBoxFilter(event) {
-    if (/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(event.target.value)) {
-      this.setState({
-        'mailBox': event.target.value,
-        'canMailSubmit': true
-      });
+  // 不验证 验证码之外的输入
+  checkMailBoxBase() {
+    if (
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(this.mailBox) && 
+      this.password.length >= 8 
+    ) {
+      this.setState({ 'canMailSubmit': true });
+      return request.success();
     } else {
-      this.setState({
-        'mailBox': event.target.value,
-        'canMailSubmit': false
-      });
+      this.setState({ 'canMailSubmit': false });
+      if (this.mailBox === '') {
+        return request.error('邮箱不能为空!');
+      }
+      if (this.password.length === 0) {
+        return request.error('密码不能为空!');
+      }
+      if (/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(this.mailBox) == false) {
+        return request.error('邮箱格式不正确!');
+      }
+      if (this.password.length < 8) {
+        return request.error('密码要大于8位!');
+      }
     }
+  }
+
+  mailBoxFilter(event) {
+    this.mailBox = event.target.value;
+    this.setState({'mailBox': event.target.value});
+    this.checkMailBoxBase.call(this)
   }
 
   // 不验证 验证码之外的输入
@@ -88,14 +108,14 @@ class UserForget extends Component {
     if (this.code === '') {
       return request.error('验证码不能为空!');
     }
-    if (this.newPassword === '') {
-      return request.error('新密码不能为空!');
+    if (this.password === '') {
+      return request.error('密码不能为空!');
     }
     if (this.code.length !== 6) {
       return request.error('验证码不正确!');
     }
-    if (this.newPassword.length  < 8) {
-      return request.error('新密码要大于8位!');
+    if (this.password.length  < 8) {
+      return request.error('密码要大于8位!');
     }
 
     return request.success();
@@ -109,6 +129,8 @@ class UserForget extends Component {
     } else {
       this.setState({'canPhoneSubmit': false});
     }
+
+    this.checkMailBoxBase.call(this);
   }
 
   phoneFilter(event) {
@@ -121,32 +143,39 @@ class UserForget extends Component {
     this.setState({'code': event.target.value}, this.setPhoneInputState.call(this));
   }
   
-  newPasswordFilter(event) {
-    this.newPassword = event.target.value;
-    this.setState({'newPassword': event.target.value}, this.setPhoneInputState.call(this));
+  passwordFilter(event) {
+    this.password = event.target.value;
+    this.setState({'password': event.target.value}, this.setPhoneInputState.call(this));
   }
 
-  findBackByMail() {
+  signupByMail() {
     const _this = this;
     
     Toast.loading('正在提交...');
-    fetch(`${config.URLversion}/user/forgetPw.do?email=${this.state.mailBox}`, {
-      method: 'GET',
-      contentType: 'application/json; charset=utf-8'
+    
+    fetch(`${config.URLversion}/user/register.do`, {
+      'method': 'POST',
+      'contentType': 'application/json; charset=utf-8',
+      'body': JSON.stringify({
+        'passwd': this.state.password,
+        'email': this.state.mailBox
+      })
     }).then(
       (response) => (response.json()),
       (error) => ({'result':'1', 'message': error})
     ).then((json) => {
       if (json.result === '0') {
-        Modal.alert('修改密码成功', '已将重置链接发至您的邮箱!!!', [{
+        Modal.alert('注册成功', '恭喜你注册成功，请马上登录你的邮箱进行激活!', [{
           text: '确定',
           onPress: () => {
             _this.props.dispatch(routerRedux.push('/user/login'));
           },
           style: 'default'
         }]);
+      } else if (json.result === '-7') {
+        Modal.alert('注册失败', '该邮箱已被占用!');
       } else {
-        Modal.alert('修改密码失败', `服务器发生错误, 原因: ${json.message}`);
+        Modal.alert('注册失败', `服务器发生错误, 原因: ${json.message}`);
       }
       Toast.hide();
     }).catch((error) => {
@@ -169,11 +198,11 @@ class UserForget extends Component {
       'contentType': 'application/json; charset=utf-8',
       'body': JSON.stringify({
         'mobile': this.state.phone,
-        'authAction': 'forgetPw'
+        'authAction': 'register'
       })
     }).then(
       (response) => (response.json()),
-      (error) => ({'result':'1', 'message': error})
+      (error) => ({'result': '1', 'message': error})
     ).then((json) => {
       if (json.result === '0') {
         for(let i = 0; i < 60; i++ ){
@@ -200,33 +229,38 @@ class UserForget extends Component {
 
   }
 
-  findBackByPhone() {
+  signupByPhone() {
     const _this = this;
 
     Toast.loading('正在提交...');
-    fetch(`${config.URLversion}/user/forgetPwtToMob.do`,{
+
+    fetch(`${config.URLversion}/user/registerMobile.do`,{
       'method': 'POST',
       'contentType': 'application/json; charset=utf-8',
       'body': JSON.stringify({
-        'authAction':'forgetPw',
+        'authAction':'register',
         'mobile': this.state.phone,
         'messageContent': this.state.code,
-        'passwd': this.state.newPassword
+        'passwd': this.state.password
       })
     }).then(
       (response) => (response.json()),
-      (error) => ({'result':'1', 'message': error})
+      (error) => ({'result': '1', 'message': error})
     ).then((json) => {
       if (json.result === '0') {
-        Modal.alert('重置密码成功', '恭喜你密码重置成功!!!', [{
-          text: '确定',
+        Modal.alert('注册成功', '恭喜你注册成功!!!', [{
+          text: '马上登录',
           onPress: () => {
             _this.props.dispatch(routerRedux.push('/user/login'));
           },
           style: 'default'
         }]);
+      } else if (json.result === '-1') {
+        Modal.alert('注册失败', '您输入的验证码有误!');
+      } else if (json.result === '100022') {
+        Modal.alert('注册失败', '该手机号已被占用!');
       }else {
-        Modal.alert('重置密码失败', `服务器发生错误, 原因: ${json.message}`);
+        Modal.alert('注册失败', `服务器发生错误, 原因: ${json.message}`);
       }
       Toast.hide();
     }).catch((error) => {
@@ -257,19 +291,22 @@ class UserForget extends Component {
   }
 
   render() {
-    const mailBoxStyle = this.state.isFindByMail ? { display: 'block' } : { display: 'none' };
-    const phoneStyle = this.state.isFindByMail ? { display: 'none' } : { display: 'block' };
+    const mailBoxStyle = this.state.isSignUpByMail ? { display: 'block' } : { display: 'none' };
+    const phoneStyle = this.state.isSignUpByMail ? { display: 'none' } : { display: 'block' };
 
     const mailBoxsubmitNode = this.state.canMailSubmit ? 
-      <div className="submit-btn btn-permit" onClick={this.findBackByMail.bind(this)}>找回密码</div> : 
-      <div className="submit-btn btn-primary" onClick={() => {Toast.info('请输入正确的邮箱!', 1.5)}}>找回密码</div>;
+      <div className="submit-btn btn-permit" onClick={this.signupByMail.bind(this)}>注册</div> : 
+      <div className="submit-btn btn-primary" onClick={() => {
+        let checkValue = this.checkMailBoxBase.call(this);
+        Toast.info(checkValue.message, 1.5)}
+      }>注册</div>;
 
     const phonesubmitNode = this.state.canPhoneSubmit ? 
-      <div className="submit-btn btn-permit" onClick={this.findBackByPhone.bind(this)}>重置密码</div> : 
+      <div className="submit-btn btn-permit" onClick={this.signupByPhone.bind(this)}>注册</div> : 
       <div className="submit-btn btn-primary" onClick={() => {
         let checkValue = this.checkPhoneValue();
         Toast.info(checkValue.message, 1.5);
-      }}>重置密码</div>;
+      }}>注册</div>;
 
     const VerifiCodeNode = this.state.VerifiCodeName === '获取验证码' ? 
       <div 
@@ -281,13 +318,14 @@ class UserForget extends Component {
     return (
       <div className="User-Login User-Forget">
         <MyNavBar
-          navName='忘记密码'
+          navName='注册账号'
           returnURL='/user/login'
         />
 
         <WhiteSpace size="lg" />
 
         <div style={mailBoxStyle}>
+
           <div className="User-input">
             <input 
               placeholder="请输入你的邮箱" 
@@ -295,9 +333,21 @@ class UserForget extends Component {
               onChange={this.mailBoxFilter.bind(this)}
             />
           </div>
+
+          <div className="User-input">
+            <input 
+              placeholder="你的密码" 
+              type={this.state.passwordType}
+              value={this.state.password} 
+              onChange={this.passwordFilter.bind(this)}
+            />
+            {this.renderEyeSvg()}
+          </div>
+
           <div className="User-submit">
             {mailBoxsubmitNode}
           </div>
+
         </div>
 
         <div style={phoneStyle}>
@@ -320,10 +370,10 @@ class UserForget extends Component {
 
           <div className="User-input">
             <input 
-              placeholder="你的新密码" 
+              placeholder="你的密码" 
               type={this.state.passwordType}
-              value={this.state.newPassword} 
-              onChange={this.newPasswordFilter.bind(this)}
+              value={this.state.password} 
+              onChange={this.passwordFilter.bind(this)}
             />
             {this.renderEyeSvg()}
           </div>
@@ -335,18 +385,43 @@ class UserForget extends Component {
 
         <div className="Forget-select">
           <div
-            className={this.state.isFindByMail ? "btn-primary" : "btn-actived"}
-            onClick={() => {this.switchForgetBy('mailBox')}}
-          ><div>邮箱找回</div></div>
+            className={this.state.isSignUpByMail ? "btn-primary" : "btn-actived"}
+            onClick={() => {this.switchSignupBy('mailBox')}}
+          ><div>邮箱注册</div></div>
           <div 
-            className={this.state.isFindByMail ? "btn-actived" : "btn-primary"}
-            onClick={() => {this.switchForgetBy('phone')}}
-          ><div>手机找回</div></div>
+            className={this.state.isSignUpByMail ? "btn-actived" : "btn-primary"}
+            onClick={() => {this.switchSignupBy('phone')}}
+          ><div>手机注册</div></div>
         </div>
 
       </div>
     )
   }
+}
+
+let emailHash = {
+  'qq.com': 'http://mail.qq.com',
+  'gmail.com': 'http://mail.google.com',
+  'sina.com': 'http://mail.sina.com.cn',
+  '163.com': 'http://mail.163.com',
+  '126.com': 'http://mail.126.com',
+  'yeah.net': 'http://www.yeah.net/',
+  'sohu.com': 'http://mail.sohu.com/',
+  'tom.com': 'http://mail.tom.com/',
+  'sogou.com': 'http://mail.sogou.com/',
+  '139.com': 'http://mail.10086.cn/',
+  'hotmail.com': 'http://www.hotmail.com',
+  'live.com': 'http://login.live.com/',
+  'live.cn': 'http://login.live.cn/',
+  'live.com.cn': 'http://login.live.com.cn',
+  '189.com': 'http://webmail16.189.cn/webmail/',
+  'yahoo.com.cn': 'http://mail.cn.yahoo.com/',
+  'yahoo.cn': 'http://mail.cn.yahoo.com/',
+  'eyou.com': 'http://www.eyou.com/',
+  '21cn.com': 'http://mail.21cn.com/',
+  '188.com': 'http://www.188.com/',
+  'foxmail.com': 'http://www.foxmail.com',
+  'outlook.com': 'http://www.outlook.com'
 }
 
 const mapStateToProps = (state) => ({

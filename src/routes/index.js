@@ -39,6 +39,11 @@ function RouterConfig({ history, app }) {
     component: () => import('./User/Login/forget'),
   });
 
+  const UserSignup = dynamic({
+    app,
+    component: () => import('./User/Login/signup'),
+  });
+
   return (
     <Router history={history}>
       <Route>
@@ -50,6 +55,7 @@ function RouterConfig({ history, app }) {
           <Route path="/user/index" component={User} />
           <Route path="/user/login" component={UserLogin} />
           <Route path="/user/forget" component={UserForget} />
+          <Route path="/user/signup" component={UserSignup} />
         </Switch>
       </Route>
     </Router>

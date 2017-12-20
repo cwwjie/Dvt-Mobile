@@ -39,6 +39,12 @@ class MyNavBar extends Component {
     }
   }
 
+  jumpToUser() {
+    if (window.location.hash !== '#/user/index') {
+      this.props.dispatch(routerRedux.push('/user/index'))
+    }
+  }
+
   render() {
     const _this = this;
 
@@ -54,6 +60,7 @@ class MyNavBar extends Component {
 
     const rightContentNode = this.props.isLogin ? (
       <div 
+        onClick={this.jumpToUser.bind(this)}
         style={{
           'width': '23px',
           'height': '23px',

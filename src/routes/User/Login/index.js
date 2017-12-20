@@ -178,6 +178,10 @@ class UserLogin extends Component {
     this.props.dispatch(routerRedux.push('/user/forget'));
   }
 
+  jumpTosignup() {
+    this.props.dispatch(routerRedux.push('/user/signup'));
+  }
+
   render() {
     let SubmitNode = ({
       'default': <div className="submit-btn btn-primary" onClick={this.alertdefault.bind(this)}>登录</div>,
@@ -238,7 +242,7 @@ class UserLogin extends Component {
             </div>
             <div className='link-signup'>
               <div style={this.Svgstyle(register)}/>
-              <span>注册账号</span>
+              <span onClick={this.jumpTosignup.bind(this)}>注册账号</span>
             </div>
           </div>
         </WingBlank>
