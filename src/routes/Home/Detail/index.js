@@ -307,11 +307,17 @@ class HomeDetail extends Component {
   }
 
   jumpToSubmit() {
-    localStorage.setItem('product', JSON.stringify({
-      'productId': this.productId
-    }));
+    localStorage.setItem('returnURL', window.location.hash.slice(1));
 
-    this.props.dispatch(routerRedux.push('/home/submit'));
+    if (this.props.isLogin) {
+      localStorage.setItem('product', JSON.stringify({
+        'productId': this.productId,
+        'productName': this.state.productDetail.productName
+      }));
+      return this.props.dispatch(routerRedux.push('/home/submit'));
+    }
+
+    return this.props.dispatch(routerRedux.push('/user/login'));
   }
 
   render() {
@@ -452,6 +458,7 @@ class HomeDetail extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  isLogin: state.user.isLogin
 })
 
 export default connect(mapStateToProps)(HomeDetail);
