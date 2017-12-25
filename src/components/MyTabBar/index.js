@@ -21,6 +21,11 @@ class MyTabBar extends Component {
   jumpToHome() {
     this.props.dispatch(routerRedux.push('/'));
   }
+
+  jumpToService() {
+    this.props.dispatch(routerRedux.push('/service'));
+  }
+
   jumpToUser() {
     if (this.props.isLogin) {
       this.props.dispatch(routerRedux.push('/user/index'));
@@ -70,7 +75,7 @@ class MyTabBar extends Component {
               title="客服"
               key="客服"
               selected={this.props.selectedTab === 'Service'}
-              onPress={() => {}}
+              onPress={this.jumpToService.bind(this)}
             />
             <TabBar.Item
               icon={myIcon(Mesvg)}

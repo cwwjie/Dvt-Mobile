@@ -49,3 +49,54 @@
 
   }
 }
+
+.User-SwitchBolck {
+  display: -webkit-box; /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+  display: -moz-box; /* 老版本语法: Firefox (buggy) */ 
+  display: -ms-flexbox; /* 混合版本语法: IE 10 */
+  display: -webkit-flex; /* 新版本语法： Chrome 21+ */
+  display: flex; /* 新版本语法： Opera 12.1, Firefox 22+ */
+  /*水平居中*/
+  -webkit-box-pack: center; /*老版本语法*/ 
+  -moz-box-pack: center; /*混合版本语法*/ 
+  -ms-flex-pack: center; /*新版本语法*/ 
+  -webkit-justify-content: center; 
+  justify-content: center;
+
+  .SwitchBolck-content {
+    overflow: hidden;
+    margin: 15px;
+    height: 30px;
+
+    > div {
+      padding: 0px 12px;
+      line-height: 28px;
+      font-size: 14px;
+      float: left;
+      text-align: center;
+      background: #fff;
+    }
+
+    .SwitchBolck-left-active
+     {
+      color: #108ee9;
+      border-left: 1px solid #108ee9;
+      border-top: 1px solid #108ee9;
+      border-bottom: 1px solid #108ee9;
+    }
+    
+    .SwitchBolck-right-active {
+      color: #108ee9;
+      border-right: 1px solid #108ee9;
+      border-top: 1px solid #108ee9;
+      border-bottom: 1px solid #108ee9;
+    }
+
+    .SwitchBolck-left,
+    .SwitchBolck-right
+     {
+      color: #888;
+      border: 1px solid #888;
+    }
+  }
+}

@@ -444,7 +444,9 @@ class HomeDetail extends Component {
               }<span>.00 起</span>
             </div>
           </div>
-          <div className='bottom-mid'>
+          <div className='bottom-mid'
+            onClick={() => this.props.dispatch(routerRedux.push('/service'))}
+          >
             联系客服
           </div>
           <div className='bottom-right' onClick={this.jumpToSubmit.bind(this)}>

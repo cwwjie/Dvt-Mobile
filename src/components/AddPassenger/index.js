@@ -37,7 +37,7 @@ class AddPassenger extends Component {
     if (JudgeAll(_this.state) == false) { return }
 
     let _sex = 0,
-      _diving=0;
+      _diving = 0;
 
     _this.isSubmiting = true;
       
@@ -72,7 +72,6 @@ class AddPassenger extends Component {
       "divingCount": _this.state.divingCount
     }
 
-    console.log(mySubmit)
 
     fetch( `${config.URLversion}/user/userinfo/add.do`, {
       method: "POST",
@@ -93,6 +92,7 @@ class AddPassenger extends Component {
       }
       _this.isSubmiting = false;
     }).catch(error => {
+      _this.isSubmiting = false;
       alert(`请求添加旅客信息发生错误, 原因: ${error}`);
     })
   }

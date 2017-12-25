@@ -6,7 +6,7 @@ import AddPassenger from './../../../components/AddPassenger/index';
 import config from './../../../config';
 import cookies from './../../../utils/cookies';
 
-import { WhiteSpace, WingBlank, List, DatePicker, Stepper, Modal, Checkbox } from 'antd-mobile';
+import { WhiteSpace, WingBlank, List, DatePicker, Stepper, Modal, Checkbox, Toast } from 'antd-mobile';
 
 const Item = List.Item;
 const Brief = Item.Brief;
@@ -27,6 +27,8 @@ class DetailTravel extends Component {
     this.product = {
       productId: '64',
       productName: '天然小岛邦邦 3天2晚蜜月/闺蜜行',
+      productPrice: 7450,
+      promotePrice: 0
     }
 
     this.state = {
@@ -61,30 +63,30 @@ class DetailTravel extends Component {
 
   getPassenger() {
     const _this = this;
-
-    fetch(`${config.URLversion}/user/userinfo/findByUserId.do`, {
-      'method': 'GET',
-      'contentType': 'application/json; charset=utf-8',
-      'headers':{
-        'token': cookies.getItem('token'),
-        'digest': cookies.getItem('digest')
-      }
-    }).then(
-      (response) => ( response.json() ),
-      (error) => ({'result': '1', 'message': error})
-    ).then((json) => {
-      if (json.result === '0') {
-        _this.setState({'passenger': json.data});
-      } else {
-        Modal.alert('获取旅客信息失败', `请求服务器成功, 但是返回的旅客信息有误! 原因: ${json.message}`);
-      }
-    }).catch((error) => {
-      Modal.alert('请求出错', `向服务器发起请求旅客信息失败, 原因: ${error}`);
+    return new Promise((resolve, reject) => {
+      fetch(`${config.URLversion}/user/userinfo/findByUserId.do`, {
+        'method': 'GET',
+        'contentType': 'application/json; charset=utf-8',
+        'headers':{
+          'token': cookies.getItem('token'),
+          'digest': cookies.getItem('digest')
+        }
+      }).then(
+        (response) => ( response.json() ),
+        (error) => ({'result': '1', 'message': error})
+      ).then((json) => {
+        if (json.result === '0') {
+          resolve(json.data);
+          _this.setState({'passenger': json.data});
+        } else {
+          reject('获取旅客信息失败', `请求服务器成功, 但是返回的旅客信息有误! 原因: ${json.message}`);
+          Modal.alert('获取旅客信息失败', `请求服务器成功, 但是返回的旅客信息有误! 原因: ${json.message}`);
+        }
+      }).catch((error) => {
+          reject('请求出错', `向服务器发起请求旅客信息失败, 原因: ${error}`);
+          Modal.alert('请求出错', `向服务器发起请求旅客信息失败, 原因: ${error}`);
+      })
     })
-  }
-
-  addPassenger() {
-    
   }
 
   onChangePassenger(isTrue, myKey) {
@@ -142,8 +144,92 @@ class DetailTravel extends Component {
     }
   }
 
+  submitData() {
+    if (this.state.departureDate === null) {
+      Toast.info('请选择出发日期!', 2);
+      return
+    }
+
+    let passengerNum = 0;
+
+    let Mypassenge = this.state.passenger.map((val, key) => {
+      if (val.select) {
+        passengerNum++
+        return {
+          'relId':  null,
+          'orderId':  null,
+          'chineseName': val.chineseName,
+          'pinyinName': val.pinyinName,
+          'gender': val.gender,
+          'passportNo': val.passportNo,
+          'email': val.email,
+          'divingCount': val.divingCount,
+          'divingRank': val.divingRank,
+          'birthday': val.birthday,
+          'age': val.age,
+          'mobile': val.mobile
+        }
+      }
+    })
+
+    if (passengerNum === 0) {
+      Toast.info('请选旅客信息!!!', 2);
+      return
+    }
+
+    let fetchbody = JSON.stringify({
+      userInfoList: Mypassenge,
+      address: {}
+    })
+
+    fetch(`${config.URLversion}/order/${this.product.productId}/${this.state.productNum}/${DateToYYYYDDMM(this.state.departureDate)}/reserve.do`, {
+      'method': 'POST',
+      'headers':{
+        'Content-Type': 'application/json; charset=utf-8',
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+      },
+      'body': fetchbody
+    }).then(
+      (response) => ( response.json() ),
+      (error) => ({'result': '1', 'message': error})
+    ).then((json) => {
+      if (json.result === '0') {
+        Modal.alert('恭喜你提交成功!', '你已成功预订套餐, 请在30分钟内付定金!', [{
+          text: '确定',
+          onPress: () => {
+            // 跳转到个人中心
+            _this.props.dispatch(routerRedux.push('/user/index'));
+          },
+          style: 'default'
+        }]);
+      } else {
+        Modal.alert('预订套餐失败', `请求服务器成功, 但是返回的预订信息有误! 原因: ${json.message}`);
+      }
+    }).catch((error) => {
+        Modal.alert('请求出错', `向服务器发起请求预订信息失败, 原因: ${error}`);
+    })
+  }
+
   render() {
     const _this = this;
+
+    const passengerNode = this.state.passenger.map((val, key) => {
+      if (val.select === true) {
+        return <div key={key}
+          onClick={() => {
+            if ( confirm('确认要删除吗?') ) {
+              let myState =  _this.state.passenger.concat([])
+              myState[key].select = false;
+              _this.setState({'passenger': myState});
+            }
+          }}>
+          <Item extra="删除" align="top" multipleLine>
+            {val.chineseName}<Brief>{val.mobile}</Brief>
+          </Item>
+        </div>
+      }
+    });
 
     return (
       <div className="Home-Submit">
@@ -184,6 +270,18 @@ class DetailTravel extends Component {
             onClick={() => this.setState({ 'popSelectPassenger': true})}
           >选择旅客信息</List.Item>
         </List>
+
+        {passengerNode}
+
+        <List renderHeader={() => '合计'} className="my-list">
+          <List.Item extra={this.product.productPrice.toFixed(2)}>单价</List.Item>
+          <List.Item extra={this.product.promotePrice.toFixed(2)}>优惠</List.Item>
+          <List.Item extra={((this.product.productPrice - this.product.promotePrice) * this.state.productNum).toFixed(2)}>总价</List.Item>
+        </List>
+
+        <div className='submit-bottom'>
+          <div className='submit-btn' onClick={this.submitData.bind(this)}>预定套餐</div>
+        </div>
 
         <Modal
           maskClosable={false}
@@ -229,17 +327,10 @@ class DetailTravel extends Component {
             <WhiteSpace size="lg" />
             <AddPassenger
               close={() => {
-                return 
-                getUserInfo().then((val) => {
-                  if (val.result === '0') {
-                    _this.onClosePopup('cancel');
-                    _this.setState({passenger: val.data});
-                    _this.popupShowPassenger.call(_this);
-                  } else {
-                    alert(`获取旅客信息出错, 原因：${val.message}`)
-                  }
-                })
-              }} 
+                _this.getPassenger().then((val) => {
+                  _this.setState({ 'popAddPassenger': false})
+                });
+              }}
             />
             </List>
           </div>
@@ -253,3 +344,13 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect()(DetailTravel);
+
+const DateToYYYYDDMM = (data) => {
+  let _date = new Date(data);
+  let _string = '';
+  _string += _date.getFullYear();
+  ( (_date.getMonth()+1)<10) ? (_string += "0" + (_date.getMonth()+1)) : (_string += (_date.getMonth()+1) );
+  ( (_date.getDate()<10) ? (_string += "0" + _date.getDate()) : (_string += _date.getDate()) );
+
+  return _string
+}
