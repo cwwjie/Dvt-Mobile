@@ -45,6 +45,25 @@ class MyUser extends Component {
     this.props.dispatch(routerRedux.push('/user/login'));
   }
 
+  jumpToPassword() {
+    localStorage.setItem('returnURL', '/user/index');
+    this.props.dispatch(routerRedux.push('/user/account/password'));
+  }
+
+  jumpToMailbox() {
+    localStorage.setItem('returnURL', '/user/index');
+    this.props.dispatch(routerRedux.push('/user/account/mailbox'));
+  }
+
+  jumpToMobile() {
+    localStorage.setItem('returnURL', '/user/index');
+    this.props.dispatch(routerRedux.push('/user/account/mobile'));
+  }
+
+  jumpToOrder() {
+    this.props.dispatch(routerRedux.push('/user/order/index'));
+  }
+
   render() {
     return (
       <div className="User">
@@ -58,7 +77,7 @@ class MyUser extends Component {
             <Item multipleLine
               extra={'个人中心'}
               arrow="horizontal"
-              onClick={() => {}}
+              onClick={() => this.props.dispatch(routerRedux.push('/user/personal/index'))}
             >
               <div>
                 {this.props.nickname}
@@ -67,9 +86,17 @@ class MyUser extends Component {
           </List>
           <List>
             <div className='User-center'>
-              <div className='User-passWord'><div>修改密码</div></div>
-              <div className='User-mailbox'><div>修改邮箱</div></div>
-              <div><div>修改手机</div></div>
+              <div 
+                className='User-passWord' 
+                onClick={this.jumpToPassword.bind(this)}
+              ><div>修改密码</div></div>
+              <div 
+                className='User-mailbox'
+                onClick={this.jumpToMailbox.bind(this)}
+                ><div>修改邮箱</div></div>
+              <div
+                onClick={this.jumpToMobile.bind(this)}
+              ><div>修改手机</div></div>
             </div>
           </List>
 
@@ -78,7 +105,7 @@ class MyUser extends Component {
             <Item multipleLine
               extra={'全部订单'}
               arrow="horizontal"
-              onClick={() => {}}
+              onClick={this.jumpToOrder.bind(this)}
             >
               <div>我的订单</div>
             </Item>

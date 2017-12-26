@@ -226,7 +226,6 @@ class UserForget extends Component {
     }).catch((error) => {
       Modal.alert('请求出错', `向服务器发起请求失败, 原因: ${error}`);
     });
-
   }
 
   signupByPhone() {

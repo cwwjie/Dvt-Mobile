@@ -56,6 +56,31 @@ function RouterConfig({ history, app }) {
     component: () => import('./User/Personal/index'),
   });
 
+  const AccountInfor = dynamic({
+    app,
+    component: () => import('./User/Personal/AccountInfor'),
+  });
+  
+  const Password = dynamic({
+    app,
+    component: () => import('./User/Account/Password'),
+  });
+  
+  const Mailbox = dynamic({
+    app,
+    component: () => import('./User/Account/Mailbox'),
+  });
+  
+  const Mobile = dynamic({
+    app,
+    component: () => import('./User/Account/Mobile'),
+  });
+  
+  const Order = dynamic({
+    app,
+    component: () => import('./User/Order/index'),
+  });
+
   return (
     <Router history={history}>
       <Route>
@@ -73,6 +98,11 @@ function RouterConfig({ history, app }) {
           <Route path="/user/forget" component={UserForget} />
           <Route path="/user/signup" component={UserSignup} />
           <Route path="/user/personal/index" component={Personal} />
+          <Route path="/user/personal/account" component={AccountInfor} />
+          <Route path="/user/account/password" component={Password} />
+          <Route path="/user/account/mailbox" component={Mailbox} />
+          <Route path="/user/account/mobile" component={Mobile} />
+          <Route path="/user/order/index" component={Order} />
 
         </Switch>
       </Route>

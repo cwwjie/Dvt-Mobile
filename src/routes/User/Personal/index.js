@@ -3,10 +3,10 @@ import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 
 import MyNavBar from './../../../components/MyNavBar/index';
-import MyTabBar from './../../../components/MyTabBar/index';
 import SwitchBolck from './../../../components/UserSame/SwitchBolck';
 import config from './../../../config';
 import cookies from './../../../utils/cookies';
+import convertDate from './../../../utils/convertDate';
 
 import { Toast, WhiteSpace, List, InputItem, Picker, DatePicker, Modal } from 'antd-mobile';
 
@@ -18,7 +18,7 @@ class Personal extends Component {
     this.state = {
       nickname: null,
       sex: ['boy'],
-      birthday:  null, //生日
+      birthday: new Date(), //生日
       telephone: null,
       webchat: null,
       qq: null,
@@ -35,16 +35,16 @@ class Personal extends Component {
     this.getUserInfo()
     .then((val) => {
       this.setState({
-        nickname: val.nickname,
-        sex: val.gender === 1 ? ['boy'] : ['girl'],
-        birthday:  val.birthday ? new Date(val.birthday) : null, //生日
-        telephone: val.telephone,
-        webchat: val.webchat,
-        qq: val.qq,
+        'nickname': val.nickname,
+        'sex': val.gender === 1 ? ['boy'] : ['girl'],
+        'birthday':  val.birthday ? new Date(val.birthday) : null, //生日
+        'telephone': val.telephone,
+        'webchat': val.webchat,
+        'qq': val.qq,
   
-        userName: val.userName,
-        mobile: val.mobile,
-        email: val.email,
+        'userName': val.userName,
+        'mobile': val.mobile,
+        'email': val.email,
       })
     })
   }
@@ -77,7 +77,47 @@ class Personal extends Component {
   }
 
   submitData() {
+    const _this = this;
 
+    const fetchBody = JSON.stringify({
+      'userName': this.state.userName,
+      'nickname': this.state.nickname,
+      'gender': this.state.sex[0] === 'boy' ? 1 : 2,
+      'birthday': convertDate.dateToFormat(this.state.birthday),
+      'telephone': this.state.telephone,
+      'webchat': this.state.webchat,
+      'qq': this.state.qq
+    })
+
+    Toast.loading('正在提交..');
+    fetch(`${config.URLversion}/user/update.do`, {
+      'method': 'POST',
+      'contentType': 'application/json; charset=utf-8',
+      'headers':{
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+      },
+      body: fetchBody
+    }).then(
+      (response) => ( response.json() ),
+      (error) => ({'result': '1', 'message': error})
+    ).then((json) => {
+      Toast.hide();
+      if (json.result === '0') {
+        Modal.alert('修改基本信息成功', '恭喜你已成功修改您的基本信息!!!', [{
+          text: '确定',
+          onPress: () => {
+            _this.props.dispatch(routerRedux.push('/user/index'));
+          },
+          style: 'default'
+        }]);
+      } else {
+        Modal.alert('修改基本信息失败', `请求服务器成功, 但是请求数据有误! 原因: ${json.message}`);
+      }
+    }).catch((error) => {
+      Toast.hide();
+      Modal.alert('请求出错', `向服务器发起请求修改基本信息失败, 原因: ${error}`);
+    })
   }
 
   render() {
@@ -92,7 +132,7 @@ class Personal extends Component {
           isFirstActive={true}
           firstName='基本信息'
           otherName='账号信息'
-          jumpToUrl='/user/index'
+          jumpToUrl='/user/personal/account'
         />
 
         <List renderHeader={() => '基本信息'}>

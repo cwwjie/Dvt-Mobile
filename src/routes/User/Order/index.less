@@ -1,0 +1,67 @@
+.Order {
+
+  .Order-Nodata {
+    text-align: center;
+    width: 100%;
+    padding: 50px 0px;
+  }
+
+  .order-Item {
+    padding: 17px 17px 0 17px;
+
+    .item-content {
+      position: relative;
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .Content-Img {
+			width: 35%;
+
+			>div {
+				padding: 5px;
+
+				>img {
+					width: 100%;
+					min-height: 100px;
+				}
+			}
+    }
+
+    .Content-Right {
+			position: absolute;
+			left: 35%;
+			width: 65%;
+			top: 0px;
+			height: 100%;
+      padding: 5px;
+
+      .Content-Title {
+        font-size: 16px;
+        padding-bottom: 5px;
+      }
+
+      .Content-Desc {
+				color: #888;
+				overflow: hidden; 
+				text-overflow: ellipsis;
+				display: -webkit-box; 
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 2; 
+      }
+
+      .Content-Botton {
+				position: absolute;
+        bottom: 5px;
+				width: 100%;
+
+        .Botton-State {
+					position: absolute;
+					top: 0px;
+					right: 15px;
+        }
+      }
+    }
+  }
+
+}
