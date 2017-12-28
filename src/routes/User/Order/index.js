@@ -81,14 +81,17 @@ class Order extends Component {
   constructor(props) {
     super(props);
 
-    this.initialPage = 0;
+    this.initialPage = localStorage.getItem('defaultActiveKey') ? 
+    parseInt(localStorage.getItem('defaultActiveKey')) :
+    0 ;
+    localStorage.removeItem('defaultActiveKey');
     this.state = {
-      orderList: [],
-      defaultActiveKey: 1
+      orderList: []
     };
 
     this.getOrderList.bind(this);
     this.renderOrderBy.bind(this);
+    this.JumpToDetail.bind(this);
   }
 
   componentDidMount() {
@@ -118,6 +121,11 @@ class Order extends Component {
     })
   }
 
+  JumpToDetail(key) {
+    localStorage.setItem('order-detail', JSON.stringify(this.state.orderList[key]) );
+    this.props.dispatch(routerRedux.push('/user/order/detail'));
+  }
+
   renderOrderBy(type) {
     const _this = this;
     let countNum = 0;
@@ -125,14 +133,15 @@ class Order extends Component {
 
     if (type === 'all') {
       return this.state.orderList.length === 0 ?  <div className='Order-Nodata'>暂无数据</div> : this.state.orderList.map((val, key) => (
-        <OrderItem key={key} data={val} JumpToDetail={() => {_this.JumpToDetail(key)}} />
+        <OrderItem key={key} data={val} JumpToDetail={() => _this.JumpToDetail(key)} />
       ));
     }
+
     for (let i = 0; i < this.state.orderList.length; i++) {
       if (this.state.orderList[i].orderStatus === type) {
         countNum++;
         OrdeNode.push(
-          <OrderItem key={i} data={this.state.orderList[i]} JumpToDetail={() => {_this.JumpToDetail(key)}} />
+          <OrderItem key={i} data={this.state.orderList[i]} JumpToDetail={() => _this.JumpToDetail(key)} />
         );
       }
     }
@@ -142,10 +151,6 @@ class Order extends Component {
     } else {
       return OrdeNode;
     }
-  }
-
-  changeTab(key) {
-    this.setState({ 'defaultActiveKey': key });
   }
 
   render() {

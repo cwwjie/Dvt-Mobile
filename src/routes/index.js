@@ -80,6 +80,16 @@ function RouterConfig({ history, app }) {
     app,
     component: () => import('./User/Order/index'),
   });
+  
+  const Taobao = dynamic({
+    app,
+    component: () => import('./User/Order/Taobao'),
+  });
+  
+  const OrderDetail = dynamic({
+    app,
+    component: () => import('./User/Order/Detail'),
+  });
 
   return (
     <Router history={history}>
@@ -103,6 +113,8 @@ function RouterConfig({ history, app }) {
           <Route path="/user/account/mailbox" component={Mailbox} />
           <Route path="/user/account/mobile" component={Mobile} />
           <Route path="/user/order/index" component={Order} />
+          <Route path="/user/order/taobao" component={Taobao} />
+          <Route path="/user/order/detail" component={OrderDetail} />
 
         </Switch>
       </Route>

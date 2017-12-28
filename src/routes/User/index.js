@@ -15,6 +15,8 @@ const Item = List.Item;
 class MyUser extends Component {
   constructor(props) {
     super(props);
+
+    this.jumpToOrder.bind(this);
   }
 
   componentDidMount() {
@@ -60,7 +62,8 @@ class MyUser extends Component {
     this.props.dispatch(routerRedux.push('/user/account/mobile'));
   }
 
-  jumpToOrder() {
+  jumpToOrder(index) {
+    localStorage.setItem('defaultActiveKey', index);
     this.props.dispatch(routerRedux.push('/user/order/index'));
   }
 
@@ -105,16 +108,22 @@ class MyUser extends Component {
             <Item multipleLine
               extra={'全部订单'}
               arrow="horizontal"
-              onClick={this.jumpToOrder.bind(this)}
+              onClick={() => this.jumpToOrder(0)}
             >
               <div>我的订单</div>
             </Item>
           </List>
           <List>
             <div className='User-order'>
-              <div className='order-ing'><div>预定中</div></div>
-              <div className='order-till'><div>待付款</div></div>
-              <div><div>成功/退款</div></div>
+              <div className='order-ing'
+                onClick={() => this.jumpToOrder(1)}
+              ><div>预定中</div></div>
+              <div className='order-till'
+                onClick={() => this.jumpToOrder(2)}
+              ><div>待付款</div></div>
+              <div
+                onClick={() => this.jumpToOrder(3)}
+              ><div>成功/退款</div></div>
             </div>
           </List>
 
