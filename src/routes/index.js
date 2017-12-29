@@ -90,6 +90,16 @@ function RouterConfig({ history, app }) {
     app,
     component: () => import('./User/Order/Detail'),
   });
+  
+  const TravellerInfor = dynamic({
+    app,
+    component: () => import('./User/Traveller-Infor/index'),
+  });
+  
+  const EditTraveller = dynamic({
+    app,
+    component: () => import('./User/Traveller-Infor/edit'),
+  });
 
   return (
     <Router history={history}>
@@ -115,6 +125,8 @@ function RouterConfig({ history, app }) {
           <Route path="/user/order/index" component={Order} />
           <Route path="/user/order/taobao" component={Taobao} />
           <Route path="/user/order/detail" component={OrderDetail} />
+          <Route path="/user/traveller/index" component={TravellerInfor} />
+          <Route path="/user/traveller/edit" component={EditTraveller} />
 
         </Switch>
       </Route>

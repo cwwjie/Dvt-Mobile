@@ -242,7 +242,9 @@ class Home extends Component {
               <div className="Item-content"
                 onClick={() => { _this.jumpToDetail(productItem.productId) }}
               >
-                <img src={`${config.URLbase}${productItem.productThumb}`} />
+                <div className="Item-img">
+                  <img src={`${config.URLbase}${productItem.productThumb}`} />
+                </div>
                 <div className="Item-description">
                   <div className="description-tiltle">{productItem.productName}</div>
                   <div className="description-caption">

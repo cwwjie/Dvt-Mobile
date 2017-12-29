@@ -42,9 +42,9 @@ class AddPassenger extends Component {
     _this.isSubmiting = true;
       
     if (_this.state.sex[0] == 'Boy') {
-      _sex = 0
-    }else {
       _sex = 1
+    }else {
+      _sex = 2
     }
 
     if (_this.state.diving == null) {

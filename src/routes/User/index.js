@@ -132,7 +132,7 @@ class MyUser extends Component {
             <List>
               <Item
                 arrow="horizontal"
-                onClick={() => {}} multipleLine>
+                onClick={() => this.props.dispatch(routerRedux.push('/user/traveller/index'))} multipleLine>
                 <div>常用旅客信息</div>
               </Item>
             </List>
