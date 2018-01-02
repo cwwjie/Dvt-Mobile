@@ -34,6 +34,10 @@ class MyTabBar extends Component {
     }
   }
 
+  jumpToVillage() {
+    this.props.dispatch(routerRedux.push('/village/index'));
+  }
+
   render() {
     const myIcon = (svg) => (
       <div style={{
@@ -66,8 +70,8 @@ class MyTabBar extends Component {
               selectedIcon={myIcon(Order_hover)}
               title="度假村"
               key="度假村"
-              selected={this.props.selectedTab === 'Order'}
-              onPress={() => {}}
+              selected={this.props.selectedTab === 'Village'}
+              onPress={this.jumpToVillage.bind(this)}
             />
             <TabBar.Item
               icon={myIcon(Servicesvg)}

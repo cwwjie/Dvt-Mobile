@@ -101,6 +101,22 @@ function RouterConfig({ history, app }) {
     component: () => import('./User/Traveller-Infor/edit'),
   });
 
+  
+  const Village = dynamic({
+    app,
+    component: () => import('./Village/index'),
+  });
+  
+  const VillageDetail = dynamic({
+    app,
+    component: () => import('./Village/Detail/index'),
+  });
+  
+  const VillageSubmit = dynamic({
+    app,
+    component: () => import('./Village/Submit/index'),
+  });
+
   return (
     <Router history={history}>
       <Route>
@@ -128,6 +144,9 @@ function RouterConfig({ history, app }) {
           <Route path="/user/traveller/index" component={TravellerInfor} />
           <Route path="/user/traveller/edit" component={EditTraveller} />
 
+          <Route path="/village/index" component={Village} />
+          <Route path="/village/detail" component={VillageDetail} />
+          <Route path="/village/submit" component={VillageSubmit} />
         </Switch>
       </Route>
     </Router>

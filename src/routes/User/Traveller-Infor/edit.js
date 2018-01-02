@@ -34,7 +34,7 @@ class EditTraveller extends Component {
     super(props);
 
     let EmptyUserinfo = {
-      'age': null,
+      'age': 1,
       'birthday': new Date(),
       'chineseName': null,
       'divingCount': null,
