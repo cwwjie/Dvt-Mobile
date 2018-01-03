@@ -74,7 +74,7 @@ class DetailTravel extends Component {
         />
 
         {this.state.productRoute.map((product, key) => (
-          <div>
+          <div key={key}>
             <WhiteSpace size="lg" />
             <WingBlank size="md">第{(key+1)}天 {product.tripBrief}</WingBlank>
             <WhiteSpace size="lg" />

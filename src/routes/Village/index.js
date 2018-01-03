@@ -67,9 +67,8 @@ class Village extends Component {
     })
   }
 
-  jumpToVillageDetail(product) {
-    localStorage.setItem('VillageProduct', JSON.stringify(product));
-    this.props.dispatch(routerRedux.push('/village/detail'))
+  jumpToVillageDetail(id) {
+    this.props.dispatch(routerRedux.push(`/village/detail?productId=${id}`))
   }
 
   render() {
@@ -80,7 +79,7 @@ class Village extends Component {
         />
 
         {this.state.village.map((val, key) => (
-          <div className='Village-List' key={key} onClick={() => this.jumpToVillageDetail(val)}>
+          <div className='Village-List' key={key} onClick={() => this.jumpToVillageDetail(key)}>
             <img className='List-img' src={`${config.URLbase}${val.resortThumb}`} />
             <div className='List-Main'>
               <div className='List-head'>{val.resortName}</div>

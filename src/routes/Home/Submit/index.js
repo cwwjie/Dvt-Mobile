@@ -10,13 +10,6 @@ import { WhiteSpace, WingBlank, List, DatePicker, Stepper, Modal, Checkbox, Toas
 
 const Item = List.Item;
 const Brief = Item.Brief;
-let maskProps;
-if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
-  // Note: the popup content will not scroll.
-  maskProps = {
-    onTouchStart: e => e.preventDefault(),
-  };
-}
 const CheckboxItem = Checkbox.CheckboxItem;
 
 class DetailTravel extends Component {
@@ -145,17 +138,19 @@ class DetailTravel extends Component {
   }
 
   submitData() {
+    const _this = this;
+
     if (this.state.departureDate === null) {
       Toast.info('请选择出发日期!', 2);
       return
     }
 
     let passengerNum = 0;
-
-    let Mypassenge = this.state.passenger.map((val, key) => {
+    let Mypassenge = [];
+    this.state.passenger.map((val, key) => {
       if (val.select) {
         passengerNum++
-        return {
+        Mypassenge.push({
           'relId':  null,
           'orderId':  null,
           'chineseName': val.chineseName,
@@ -168,7 +163,7 @@ class DetailTravel extends Component {
           'birthday': val.birthday,
           'age': val.age,
           'mobile': val.mobile
-        }
+        })
       }
     })
 

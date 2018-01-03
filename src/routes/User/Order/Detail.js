@@ -203,8 +203,16 @@ class Order extends Component {
   payPackageOrders() {
 
     Toast.loading('正在提交...');
-    this.request(`${config.URLversion}/payment/alipayMob.do?orderId=${this.orderItem.orderId}`)
-    .then((val) => {
+    fetch(`${config.URLversion}/payment/alipayMob.do?orderId=${this.orderItem.orderId}`, {
+      'method': "GET",
+      'contentType': "application/json; charset=utf-8",
+      'headers': {
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+    }}).then(
+      response => response.text(),
+      error => `FAILED: ${error}`
+    ).then(val => {
       Toast.hide();
       if (val.indexOf("FAILED") !== -1) {
         Modal.alert('支付失败', `服务器发起成功, 但是订单有误, 原因: ${val.slice(val.indexOf(':'))}`);
@@ -212,14 +220,22 @@ class Order extends Component {
         document.getElementById('root').innerHTML = val;
         document.getElementById('alipaysubmit').submit();
       }
-    });
+    }).catch(error => Modal.alert('请求支付出错', `向服务器发起请求订单支付失败, 原因: ${error}`));
   }
 
   paycCustomizeBy(Type) { // Type F:全款，E:定金，R:余款
 
     Toast.loading('正在提交...');
-    this.request(`${config.URLversion}/payment/${this.orderItem.orderSn}/${Type}/alipay4Custom.do?dev=Mobile`)
-    .then((val) => {
+    fetch(`${config.URLversion}/payment/${this.orderItem.orderSn}/${Type}/alipay4Custom.do?dev=Mobile`, {
+      'method': "GET",
+      'contentType': "application/json; charset=utf-8",
+      'headers': {
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+    }}).then(
+      response => response.text(),
+      error => `FAILED: ${error}`
+    ).then(val => {
       Toast.hide();
       if (val.indexOf("FAILED") !== -1) {
         Modal.alert('支付失败', `服务器发起成功, 但是订单有误, 原因: ${val.slice(val.indexOf(':'))}`);
@@ -227,7 +243,7 @@ class Order extends Component {
         document.getElementById('root').innerHTML = val;
         document.getElementById('alipaysubmit').submit();
       }
-    });
+    }).catch(error => Modal.alert('请求支付出错', `向服务器发起请求订单支付失败, 原因: ${error}`));
   }
 
   refundOrders() {
