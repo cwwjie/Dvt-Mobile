@@ -7,6 +7,7 @@ import CustomerNode from './../../../components/CustomerNode/index';
 
 import config from './../../../config';
 import convertDate from './../../../utils/convertDate';
+import onMenuShare from './../../../utils/weixin-onMenuShare';
 
 import less from './../../../assets/less.png';
 import plus from './../../../assets/plus.png';
@@ -100,6 +101,7 @@ class VillageDetail extends Component {
     this.getResortImg.bind(this);
     this.renderClickPriceNode.bind(this);
     this.ApartmentSelected.bind(this);
+    this.onMenuShare.bind(this);
   }
 
   componentDidMount() {
@@ -118,6 +120,7 @@ class VillageDetail extends Component {
           _this.getResortImg()
           .then(json => {
             if (json.result === '0') {
+              _this.onMenuShare(`${config.URLbase}${json.data[0].gallery.thumbUrl}`);
               _this.setState({
                 'carousel': json.data.map((val) => `${config.URLbase}${val.gallery.thumbUrl}`)
               })
@@ -147,6 +150,14 @@ class VillageDetail extends Component {
         Modal.alert('获取度假村直定信息失败', `请求服务器成功, 但是返回的度假村直定信息有误! 原因: ${json.message}`);
       }
     })
+  }
+
+  onMenuShare(imgUrl) {
+    onMenuShare(
+      this.product.resortName,
+      this.product.resortDesc,
+      window.location.href
+    ).then({}, (error) => console.log(error));
   }
 
   getVillageProduct() {

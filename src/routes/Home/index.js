@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Carousel, Toast, List, TabBar } from 'antd-mobile';
+import { Carousel, Toast, List, TabBar, Tabs } from 'antd-mobile';
 
 import taobao from './../../assets/taobao.png';
 import weibo from './../../assets/weibo.png';
@@ -9,6 +9,7 @@ import weixin from './../../assets/weixin.png';
 
 import config from './../../config';
 import convertToPinyinLower from './../../utils/convertToPinyinLower';
+import onMenuShare from './../../utils/weixin-onMenuShare';
 
 import MyNavBar from './../../components/MyNavBar/index';
 import MyTabBar from './../../components/MyTabBar/index';
@@ -69,6 +70,9 @@ class Home extends Component {
         //   ]
         // }
       ],
+      'tabs': [{
+        'title': '正在加载...'
+      }],
       'activeNav': 0,
       'isNavFixed': false
     }
@@ -80,52 +84,21 @@ class Home extends Component {
   componentDidMount() {
     let _this = this;
 
-    Promise.all([
-      this.getProductData(),
-      this.getCarousel()
-    ]).then(() => {
-      _this.bindScroll()
-    });
+    this.getProductData()
+    this.getCarousel()
+    // Promise.all([
+    //   this.getProductData(),
+    //   this.getCarousel()
+    // ]).then(() => {
+    //   _this.bindScroll()
+    // });
+    onMenuShare().then({}, (error) => console.log(error));
   }
 
   componentWillUnmount() {
     const documentDOM = document || window.document;
     documentDOM.onscroll = null;
     this.hasCanceled = true;
-  }
-
-  bindScroll() {
-    const _this = this;
-    const ProductList = [].slice.call(document.getElementById('Product-List').childNodes);
-
-    const navHight = document.body.clientWidth * 540 / 1680 + 50;
-
-    const documentDOM = document || window.document;
-    documentDOM.onscroll = () => {
-      // 滚动的距离
-      const myScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      let mySelectNumber = 0;
-
-      if (myScrollTop > navHight) {
-        if (_this.state.isNavFixed === false) {
-          _this.setState({isNavFixed: true});
-        }
-      } else {
-        if (_this.state.isNavFixed) {
-          _this.setState({isNavFixed: false});
-        }
-      }
-        
-      ProductList.map((val, key) => {
-        if (myScrollTop > (val.offsetTop - 70) ) {
-          mySelectNumber = key;
-        }
-      });
-
-      if (_this.state.activeNav !== mySelectNumber) {
-        _this.setState({ 'activeNav': mySelectNumber});
-      }
-    }
   }
 
   getProductData() {
@@ -145,7 +118,14 @@ class Home extends Component {
         }
 
         if (val.result === '0') {
-          _this.setState({'dataList': val.data});
+          let tabs = val.data.map(
+            val => ({'title': val.catName.replace(/套餐/g, '')})
+          )
+          tabs.unshift({'title': '所有套餐'})
+          _this.setState({
+              'dataList': val.data,
+              'tabs': tabs
+          });
           resolve();
         } else {
           Toast.fail(`加载产品数据有误, 原因 ${val.message}`, 3);
@@ -196,35 +176,112 @@ class Home extends Component {
     });
   }
 
-  renderHomeNav() {
-    const _this = this,
-      dataList = this.state.dataList,
-      navClassName = this.state.isNavFixed ? 'Home-nav Home-Fixed' : 'Home-nav';
-
-    const changeNav = (key) => {
-      _this.setState({activeNav: key});
-      window.scrollTo(0, document.getElementById(`list-position${key}`).offsetTop);
-    }
-
-    return dataList.length === 0 ? (<div id='Home-nav'></div>) : (
-      <div id='Home-nav' className={navClassName}>{dataList.map((val, key) => {
-        if (_this.state.activeNav === key) {
-          return <div className='Home-nav-active' key={key}>
-            {val.catName}
-          </div>
-        } else {
-          return <div key={key} onClick={() => {changeNav(key)}}>
-            {val.catName}
-          </div>
-        }
-      })}</div>
-    )
-  }
-
   jumpToDetail(id) {
     this.props.dispatch(routerRedux.push(`/home/detail?productId=${id}`));
   }
 
+  rendertabs() {
+    const _this = this,
+      dataList = this.state.dataList;
+
+    if (dataList.length === 0) {
+      return <div>正在加载...</div>
+    } else {
+      let dataListNode = dataList.map((val, key) => (
+        <div id='Product-List' className='Product-List' key={key}>
+          <div id={`list-position${key}`}>
+            <div className='List-title'>
+              <div className='title-name'>{val.catName}</div>
+              <div className='title-name-ping'>{convertToPinyinLower.getFullChars(val.catName)}</div>
+              <img src={`${config.URLbase}${val.productList[val.productList.length - 1].productThumb}`} />
+            </div>
+            {val.productList.map((productItem, productItemKey) => (
+              <div className="List-Item" key={productItemKey}>
+                <div className="Item-content"
+                  onClick={() => { _this.jumpToDetail(productItem.productId) }}
+                >
+                  <div className="Item-img">
+                    <img src={`${config.URLbase}${productItem.productThumb}`} />
+                  </div>
+                  <div className="Item-description">
+                    <div className="description-tiltle">{productItem.productName}</div>
+                    <div className="description-caption">
+                      <div className="description-price">￥{productItem.productPrice} 起</div>
+                      <div className="description-opera">预定</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ));
+      dataListNode.unshift(
+        <div id='Product-List' className='Product-List' key={Math.random()}>{dataList.map((ListItem, Listkey) => (
+          <div id={`list-position${Listkey}`} key={Listkey}>
+            <div className='List-title'>
+              <div className='title-name'>{ListItem.catName}</div>
+              <div className='title-name-ping'>{convertToPinyinLower.getFullChars(ListItem.catName)}</div>
+              <img src={`${config.URLbase}${ListItem.productList[ListItem.productList.length - 1].productThumb}`} />
+            </div>
+            {ListItem.productList.map((productItem, productItemKey) => (
+              <div className="List-Item" key={productItemKey}>
+                <div className="Item-content"
+                  onClick={() => { _this.jumpToDetail(productItem.productId) }}
+                >
+                  <div className="Item-img">
+                    <img src={`${config.URLbase}${productItem.productThumb}`} />
+                  </div>
+                  <div className="Item-description">
+                    <div className="description-tiltle">{productItem.productName}</div>
+                    <div className="description-caption">
+                      <div className="description-price">￥{productItem.productPrice} 起</div>
+                      <div className="description-opera">预定</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}</div>);
+      return dataListNode;
+    }
+  }
+
+  render() {
+
+    return (
+      <div className='Home'>
+        <MyNavBar
+          navName='潜游时光'
+        />
+
+        <Carousel autoplay={true} infinite selectedIndex={0}>{this.state.carousel.map(data => (
+          <a href={data.onclick} key={data}>
+            <img
+              style={{ width: '100%', verticalAlign: 'top' }}
+              src={data.src}
+              onLoad={() => { window.dispatchEvent(new Event('resize')); this.setState({ imgHeight: 'auto' }); }}
+            />
+          </a> 
+        ))}</Carousel>
+
+        <Tabs tabs={this.state.tabs}>
+          {this.rendertabs.call(this)}
+        </Tabs>
+
+        {/* {this.renderHomeNav.call(this)}
+        {this.renderHomeMain.call(this)} */}
+
+        <Copyright/>
+        <MyTabBar
+          selectedTab='Home'
+        />
+      </div>
+    )
+  }
+
+  /* 用不上的方法放到 render 后面 */
   renderHomeMain() {
     const _this = this,
       dataList = this.state.dataList;
@@ -260,34 +317,65 @@ class Home extends Component {
     )
   }
 
-  render() {
+  renderHomeNav() {
+    const _this = this,
+      dataList = this.state.dataList,
+      navClassName = this.state.isNavFixed ? 'Home-nav Home-Fixed' : 'Home-nav';
 
-    return (
-      <div className='Home'>
-        <MyNavBar
-          navName='潜游时光'
-        />
+    const changeNav = (key) => {
+      _this.setState({activeNav: key});
+      window.scrollTo(0, document.getElementById(`list-position${key}`).offsetTop);
+    }
 
-        <Carousel autoplay={true} infinite selectedIndex={0}>{this.state.carousel.map(data => (
-          <a href={data.onclick} key={data}>
-            <img
-              style={{ width: '100%', verticalAlign: 'top' }}
-              src={data.src}
-              onLoad={() => { window.dispatchEvent(new Event('resize')); this.setState({ imgHeight: 'auto' }); }}
-            />
-          </a> 
-        ))}</Carousel>
-
-        {this.renderHomeNav.call(this)}
-        {this.renderHomeMain.call(this)}
-
-        <Copyright/>
-        <MyTabBar
-          selectedTab='Home'
-        />
-      </div>
+    return dataList.length === 0 ? (<div id='Home-nav'></div>) : (
+      <div id='Home-nav' className={navClassName}>{dataList.map((val, key) => {
+        if (_this.state.activeNav === key) {
+          return <div className='Home-nav-active' key={key}>
+            {val.catName}
+          </div>
+        } else {
+          return <div key={key} onClick={() => {changeNav(key)}}>
+            {val.catName}
+          </div>
+        }
+      })}</div>
     )
   }
+
+  bindScroll() {
+    const _this = this;
+    const ProductList = [].slice.call(document.getElementById('Product-List').childNodes);
+
+    const navHight = document.body.clientWidth * 540 / 1680 + 50;
+
+    const documentDOM = document || window.document;
+    documentDOM.onscroll = () => {
+      // 滚动的距离
+      const myScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      let mySelectNumber = 0;
+
+      if (myScrollTop > navHight) {
+        if (_this.state.isNavFixed === false) {
+          _this.setState({isNavFixed: true});
+        }
+      } else {
+        if (_this.state.isNavFixed) {
+          _this.setState({isNavFixed: false});
+        }
+      }
+        
+      ProductList.map((val, key) => {
+        if (myScrollTop > (val.offsetTop - 70) ) {
+          mySelectNumber = key;
+        }
+      });
+
+      if (_this.state.activeNav !== mySelectNumber) {
+        _this.setState({ 'activeNav': mySelectNumber});
+      }
+    }
+  }
+
 }
 
 class Copyright extends Component {

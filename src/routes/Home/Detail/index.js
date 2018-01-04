@@ -5,6 +5,7 @@ import { Toast, Carousel, WhiteSpace, List, WingBlank, Steps } from 'antd-mobile
 
 import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
+import onMenuShare from './../../../utils/weixin-onMenuShare';
 
 const Item = List.Item;
 const Brief = Item.Brief;
@@ -35,6 +36,7 @@ class HomeDetail extends Component {
 
     this.productId;
     this.refundRule.bind(this);
+    this.onMenuShare.bind(this);
   }
 
   componentDidMount() {
@@ -50,7 +52,16 @@ class HomeDetail extends Component {
       this.getCostIncludes.call(this) // 套餐包含相关
     ]).then(values => {
       _this.bindScroll()
+      _this.onMenuShare()
     });
+  }
+
+  onMenuShare() {
+    onMenuShare(
+      this.state.productDetail.productName,
+      this.state.productDetail.productDesc,
+      window.location.href
+    ).then({}, (error) => console.log(error));
   }
   
   componentWillUnmount() {
@@ -338,13 +349,13 @@ class HomeDetail extends Component {
         {this.renderNav.call(this)}
 
         <Carousel autoplay={true} infinite selectedIndex={0}>{this.state.carousel.map(data => (
-          <a href={data.onclick} key={data}>
+          <div key={data}>
             <img
               style={imgCarouselStyle}
               src={data.src}
               onLoad={() => { window.dispatchEvent(new Event('resize')); this.setState({ imgHeight: 'auto' }); }}
             />
-          </a> 
+          </div>
         ))}</Carousel>
 
         <div className='detail-main'>

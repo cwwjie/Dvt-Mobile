@@ -6,7 +6,6 @@ import React from 'react';
 import index from './index.less';
 import 'antd-mobile/dist/antd-mobile.less';
 
-
 import models from './models';
 import routes from './routes';
 
