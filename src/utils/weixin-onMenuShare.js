@@ -24,13 +24,13 @@ const onMenuShare = (title, desc, link) => new Promise((resolve, reject) => {
       wx.onMenuShareTimeline({
         title: title || '潜游时光', // 分享标题
         link: link || window.location.href, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-        imgUrl: 'http://www.divingtime.asia/dist/img/logo.jpg', // 分享图标
+        imgUrl: 'http://112.74.92.97:80/dist/img/logo.jpg', // 分享图标
       });
       wx.onMenuShareAppMessage({
         title: title || '潜游时光', // 分享标题
         desc: desc || '欢迎来到潜游时光!', // 分享描述
         link: link || window.location.href, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-        imgUrl: 'http://www.divingtime.asia/dist/img/logo.jpg', // 分享图标
+        imgUrl: 'http://112.74.92.97:80/dist/img/logo.jpg', // 分享图标
       });
       resolve();
     })

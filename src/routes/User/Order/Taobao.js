@@ -98,16 +98,12 @@ class Order extends Component {
   }
 
   jumpTotaobaoInfor(taobaoItem) {
-    let NODE_ENV = process.env.NODE_ENV || '';
-
     localStorage.setItem('_token', cookies.getItem('token'));
     localStorage.setItem('_digest', cookies.getItem('digest'));
     localStorage.setItem('_uniqueKey', taobaoItem.uniqueKey);
     localStorage.setItem('loginSuccessful', JSON.stringify(taobaoItem));
 
-    NODE_ENV === 'development' ?
-      window.location.href = './../Dvt-web/info/gather.html' : 
-      window.location.href = './../info/gather.html' ;
+    window.location.href = './../info/mobile/index.html' ;
   }
 
   render() {
@@ -149,14 +145,15 @@ class Order extends Component {
               <div>产品总金额: {val.productAmount}RMB</div>
               <div className='List-span'>优惠金额: {val.discount}RMB<span>订单总金额: {val.orderAmount}RMB</span></div>
             </div>
+            <div className='item-btn'>
+              {val.infoId ? <div className='btn-normal'>查看信息</div> : <div className='btn-primary'>填写出行信息</div>}
+            </div>
           </div>
         ))}
       </div>
     )
   }
 }
-
-
 
 const mapStateToProps = (state) => ({
 })
