@@ -1,0 +1,42 @@
+.Equipment {
+  position: relative;
+
+  .Equipment-navigation {
+    border-top: 1px solid #ddd;
+
+    .Equipment-item {
+      position: relative;
+
+      .item-content {
+        padding: 15px;
+
+        .item-img {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          height: 100px;
+          width: 100px;
+  
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        .item-description {
+          height: 100px;
+          padding-left: 130px;
+        }
+      }
+
+      .item-line {
+        position: absolute;
+        right: 0;
+        bottom: 1px;
+        height: 1px;
+        width: 95%;
+        background: #ddd;
+      }
+    }
+  }
+}

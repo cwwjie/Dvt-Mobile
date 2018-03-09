@@ -10,6 +10,8 @@ import Ordersvg from './../../assets/Order.svg';
 import Order_hover from './../../assets/Order_hover.svg';
 import Mesvg from './../../assets/Me.svg';
 import Me_hover from './../../assets/Me_hover.svg';
+import rentsvg from './../../assets/rent.svg';
+import rent_hover from './../../assets/rent_hover.svg';
 
 import { TabBar } from 'antd-mobile';
 
@@ -19,23 +21,42 @@ class MyTabBar extends Component {
   }
 
   jumpToHome() {
-    this.props.dispatch(routerRedux.push('/'));
+    if ('/' !== localStorage.getItem('MyTabBar-router')) {
+      this.props.dispatch(routerRedux.push('/'));
+      localStorage.setItem('MyTabBar-router', '/');
+    }
   }
 
   jumpToService() {
-    this.props.dispatch(routerRedux.push('/service'));
+    if ('/service' !== localStorage.getItem('MyTabBar-router')) {
+      this.props.dispatch(routerRedux.push('/service'));
+      localStorage.setItem('MyTabBar-router', '/service');
+    }
   }
 
   jumpToUser() {
     if (this.props.isLogin) {
-      this.props.dispatch(routerRedux.push('/user/index'));
+      if ('/user/index' !== localStorage.getItem('MyTabBar-router')) {
+        this.props.dispatch(routerRedux.push('/user/index'));
+        localStorage.setItem('MyTabBar-router', '/user/index');
+      }
     } else {
       this.props.dispatch(routerRedux.push('/user/login'));
     }
   }
 
   jumpToVillage() {
-    this.props.dispatch(routerRedux.push('/village/index'));
+    if ('/village/index' !== localStorage.getItem('MyTabBar-router')) {
+      this.props.dispatch(routerRedux.push('/village/index'));
+      localStorage.setItem('MyTabBar-router', '/village/index');
+    }
+  }
+
+  jumpEquipment() {
+    if ('/equipment/index' !== localStorage.getItem('MyTabBar-router')) {
+      this.props.dispatch(routerRedux.push('/equipment/index'));
+      localStorage.setItem('MyTabBar-router', '/equipment/index');
+    }
   }
 
   render() {
@@ -74,6 +95,22 @@ class MyTabBar extends Component {
               onPress={this.jumpToVillage.bind(this)}
             />
             <TabBar.Item
+              icon={myIcon(Mesvg)}
+              selectedIcon={myIcon(Me_hover)}
+              title="我的"
+              key="我的"
+              selected={this.props.selectedTab === 'User'}
+              onPress={this.jumpToUser.bind(this)}
+            />
+            <TabBar.Item
+              icon={myIcon(rentsvg)}
+              selectedIcon={myIcon(rent_hover)}
+              title="设备"
+              key="设备"
+              selected={this.props.selectedTab === 'Equipment'}
+              onPress={this.jumpEquipment.bind(this)}
+            />
+            <TabBar.Item
               icon={myIcon(Servicesvg)}
               selectedIcon={myIcon(Service_hover)}
               title="客服"
@@ -81,15 +118,6 @@ class MyTabBar extends Component {
               selected={this.props.selectedTab === 'Service'}
               onPress={this.jumpToService.bind(this)}
             />
-            <TabBar.Item
-              icon={myIcon(Mesvg)}
-              selectedIcon={myIcon(Me_hover)}
-              title="我的"
-              key="我的"
-              selected={this.props.selectedTab === 'User'}
-              onPress={this.jumpToUser.bind(this)}
-              >
-            </TabBar.Item>
           </TabBar>
         </div>
       </div>

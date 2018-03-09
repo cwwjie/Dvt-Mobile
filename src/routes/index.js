@@ -4,118 +4,33 @@ import { connect } from 'dva';
 import dynamic from 'dva/dynamic';
 
 function RouterConfig({ history, app }) {
-  const Home = dynamic({
-    app,
-    component: () => import('./Home/index'),
-  });
-
-  const Homedetail = dynamic({
-    app,
-    component: () => import('./Home/Detail/index'),
-  });
-
-  const DetailTravel = dynamic({
-    app,
-    component: () => import('./Home/Detail-Travel/index'),
-  });
-
-  const HomeSubmit = dynamic({
-    app,
-    component: () => import('./Home/Submit/index'),
-  });
-
-
-  const CustomerService = dynamic({
-    app,
-    component: () => import('./Service/index'),
-  });
-
+  const Home = dynamic({ app, component: () => import('./Home/index') });
+  const Homedetail = dynamic({ app, component: () => import('./Home/Detail/index') });
+  const DetailTravel = dynamic({ app, component: () => import('./Home/Detail-Travel/index') });
+  const HomeSubmit = dynamic({ app, component: () => import('./Home/Submit/index') });
   
-  const User = dynamic({
-    app,
-    component: () => import('./User/index'),
-  });
+  const Village = dynamic({ app, component: () => import('./Village/index') });
+  const VillageDetail = dynamic({ app, component: () => import('./Village/Detail/index') });
+  const VillageSubmit = dynamic({ app, component: () => import('./Village/Submit/index') });
 
-  const UserLogin = dynamic({
-    app,
-    component: () => import('./User/Login/index'),
-  });
+  const Equipment = dynamic({ app, component: () => import('./Equipment/index') });
 
-  const UserForget = dynamic({
-    app,
-    component: () => import('./User/Login/forget'),
-  });
-
-  const UserSignup = dynamic({
-    app,
-    component: () => import('./User/Login/signup'),
-  });
-
-  const Personal = dynamic({
-    app,
-    component: () => import('./User/Personal/index'),
-  });
-
-  const AccountInfor = dynamic({
-    app,
-    component: () => import('./User/Personal/AccountInfor'),
-  });
+  const CustomerService = dynamic({ app, component: () => import('./Service/index') });
   
-  const Password = dynamic({
-    app,
-    component: () => import('./User/Account/Password'),
-  });
-  
-  const Mailbox = dynamic({
-    app,
-    component: () => import('./User/Account/Mailbox'),
-  });
-  
-  const Mobile = dynamic({
-    app,
-    component: () => import('./User/Account/Mobile'),
-  });
-  
-  const Order = dynamic({
-    app,
-    component: () => import('./User/Order/index'),
-  });
-  
-  const Taobao = dynamic({
-    app,
-    component: () => import('./User/Order/Taobao'),
-  });
-  
-  const OrderDetail = dynamic({
-    app,
-    component: () => import('./User/Order/Detail'),
-  });
-  
-  const TravellerInfor = dynamic({
-    app,
-    component: () => import('./User/Traveller-Infor/index'),
-  });
-  
-  const EditTraveller = dynamic({
-    app,
-    component: () => import('./User/Traveller-Infor/edit'),
-  });
-
-  
-  const Village = dynamic({
-    app,
-    component: () => import('./Village/index'),
-  });
-  
-  const VillageDetail = dynamic({
-    app,
-    component: () => import('./Village/Detail/index'),
-  });
-  
-  const VillageSubmit = dynamic({
-    app,
-    component: () => import('./Village/Submit/index'),
-  });
+  const User = dynamic({ app, component: () => import('./User/index') });
+  const UserLogin = dynamic({ app, component: () => import('./User/Login/index') });
+  const UserForget = dynamic({ app, component: () => import('./User/Login/forget') });
+  const UserSignup = dynamic({ app, component: () => import('./User/Login/signup') });
+  const Personal = dynamic({ app, component: () => import('./User/Personal/index') });
+  const AccountInfor = dynamic({ app, component: () => import('./User/Personal/AccountInfor') });
+  const Password = dynamic({ app, component: () => import('./User/Account/Password') });
+  const Mailbox = dynamic({ app, component: () => import('./User/Account/Mailbox') });
+  const Mobile = dynamic({ app, component: () => import('./User/Account/Mobile') });
+  const Order = dynamic({ app, component: () => import('./User/Order/index') });
+  const Taobao = dynamic({ app, component: () => import('./User/Order/Taobao') });
+  const OrderDetail = dynamic({ app, component: () => import('./User/Order/Detail') });
+  const TravellerInfor = dynamic({ app, component: () => import('./User/Traveller-Infor/index') });
+  const EditTraveller = dynamic({ app, component: () => import('./User/Traveller-Infor/edit') });
 
   return (
     <Router history={history}>
@@ -126,6 +41,12 @@ function RouterConfig({ history, app }) {
           <Route path="/home/detail" component={Homedetail} />
           <Route path="/home/detail-travel" component={DetailTravel} />
           <Route path="/home/submit" component={HomeSubmit} />
+
+          <Route path="/village/index" component={Village} />
+          <Route path="/village/detail" component={VillageDetail} />
+          <Route path="/village/submit" component={VillageSubmit} />
+
+          <Route path="/equipment/index" component={Equipment} />
 
           <Route path="/service" component={CustomerService} />
 
@@ -143,10 +64,6 @@ function RouterConfig({ history, app }) {
           <Route path="/user/order/detail" component={OrderDetail} />
           <Route path="/user/traveller/index" component={TravellerInfor} />
           <Route path="/user/traveller/edit" component={EditTraveller} />
-
-          <Route path="/village/index" component={Village} />
-          <Route path="/village/detail" component={VillageDetail} />
-          <Route path="/village/submit" component={VillageSubmit} />
         </Switch>
       </Route>
     </Router>
