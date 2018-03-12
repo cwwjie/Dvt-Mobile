@@ -58,7 +58,7 @@ import { Toast, Modal } from 'antd-mobile';
 //   'userId': 106,
 // }]
 
-class Order extends Component {
+class Taobao extends Component {
   constructor(props) {
     super(props);
 
@@ -155,7 +155,4 @@ class Order extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-})
-
-export default connect()(Order);
+export default Taobao;

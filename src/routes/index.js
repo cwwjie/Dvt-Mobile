@@ -14,7 +14,8 @@ function RouterConfig({ history, app }) {
   const VillageSubmit = dynamic({ app, component: () => import('./Village/Submit/index') });
 
   const Equipment = dynamic({ app, component: () => import('./Equipment/index') });
-
+  const EquipmentDetail = dynamic({ app, component: () => import('./Equipment/Detail/index') });
+  
   const CustomerService = dynamic({ app, component: () => import('./Service/index') });
   
   const User = dynamic({ app, component: () => import('./User/index') });
@@ -27,10 +28,12 @@ function RouterConfig({ history, app }) {
   const Mailbox = dynamic({ app, component: () => import('./User/Account/Mailbox') });
   const Mobile = dynamic({ app, component: () => import('./User/Account/Mobile') });
   const Order = dynamic({ app, component: () => import('./User/Order/index') });
-  const Taobao = dynamic({ app, component: () => import('./User/Order/Taobao') });
   const OrderDetail = dynamic({ app, component: () => import('./User/Order/Detail') });
+  const Taobao = dynamic({ app, component: () => import('./User/Order/Taobao') });
   const TravellerInfor = dynamic({ app, component: () => import('./User/Traveller-Infor/index') });
   const EditTraveller = dynamic({ app, component: () => import('./User/Traveller-Infor/edit') });
+  const ShoppingCart = dynamic({ app, component: () => import('./User/Shopping-Cart/index') });
+  const ShoppingConfirm = dynamic({ app, component: () => import('./User/Shopping-Cart/Confirm/index') });
 
   return (
     <Router history={history}>
@@ -47,6 +50,7 @@ function RouterConfig({ history, app }) {
           <Route path="/village/submit" component={VillageSubmit} />
 
           <Route path="/equipment/index" component={Equipment} />
+          <Route path="/equipment/detail" component={EquipmentDetail} />
 
           <Route path="/service" component={CustomerService} />
 
@@ -64,6 +68,8 @@ function RouterConfig({ history, app }) {
           <Route path="/user/order/detail" component={OrderDetail} />
           <Route path="/user/traveller/index" component={TravellerInfor} />
           <Route path="/user/traveller/edit" component={EditTraveller} />
+          <Route path="/user/cart/index" component={ShoppingCart} />
+          <Route path="/user/cart/confirm" component={ShoppingConfirm} />
         </Switch>
       </Route>
     </Router>

@@ -18,6 +18,10 @@ class Equipment extends Component {
     ];
   }
 
+  jumpToDetail() {
+    this.props.dispatch(routerRedux.push('/equipment/detail'));
+  }
+
   render() {
     return (
       <div className="Equipment">
@@ -26,7 +30,7 @@ class Equipment extends Component {
         <div className="Equipment-navigation">
           <Tabs tabs={this.tabs} initialPage={0} animated={false} useOnPan={false}>
             <div>
-              <div className="Equipment-item">
+              <div className="Equipment-item" onClick={this.jumpToDetail.bind(this)}>
                 <div className="item-content">
                   <div className="item-img"><img src="null"/></div>
                   <div className="item-description">
@@ -35,7 +39,7 @@ class Equipment extends Component {
                 </div>
                 <div className="item-line" />
               </div>
-              <div className="Equipment-item">
+              <div className="Equipment-item" onClick={this.jumpToDetail.bind(this)}>
                 <div className="item-content">
                   <div className="item-img"><img src="null"/></div>
                   <div className="item-description">

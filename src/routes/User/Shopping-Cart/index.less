@@ -1,0 +1,87 @@
+.ShoppingCart {
+
+  .ShoppingCart-bottom {
+    overflow: hidden;
+    position: fixed;
+    bottom: 0px;
+    height: 50px;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    z-index: 2;
+
+    .bottom-select {
+      position: absolute;
+      left: 0px;
+      width: 10%;
+      color: #888;
+      text-align: center;
+
+      .select-SVG {
+        padding-top: 7px;
+
+        > div {
+          margin: 0px auto;
+        }
+      }
+
+    }
+
+    .bottom-description {
+      position: absolute;
+      height: 50px;
+      width: 65%;
+      right: 25%;
+      text-align: right;
+
+      .description-content {
+        padding-top: 5px;
+        padding-right: 10px;
+
+        .description-main {
+          font-weight: bold;
+          font-size: 16px;
+
+          span {
+            color: #F56C6C;
+          }
+        }
+
+        .description-deputy {
+          font-size: 14px;
+          color: #909399;
+        }
+      }
+    }
+
+    .bottom-submit {
+      position: absolute;
+      right: 0px;
+      background: rgb(1, 185, 105);
+      color: #fff;
+      width: 25%;
+      line-height: 50px;
+      text-align: center;
+    }
+  }
+
+  .checkboxSVG {
+    display: block;
+    width: 20px;
+    height: 20px;
+
+    .checkboxSVG-content {
+      border-radius: 12px;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #9e9e9e;
+    }
+
+    img {
+      position: relative;
+      top: -1px;
+      left: -1px;
+    }
+  }
+}

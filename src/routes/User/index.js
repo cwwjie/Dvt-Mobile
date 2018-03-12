@@ -132,6 +132,17 @@ class MyUser extends Component {
             <List>
               <Item
                 arrow="horizontal"
+                onClick={() => this.props.dispatch(routerRedux.push('/user/cart/index'))} multipleLine>
+                <div>我的购物车</div>
+              </Item>
+            </List>
+          </div>
+
+          <WhiteSpace size="lg" />
+          <div className='User-info'>
+            <List>
+              <Item
+                arrow="horizontal"
                 onClick={() => this.props.dispatch(routerRedux.push('/user/traveller/index'))} multipleLine>
                 <div>常用旅客信息</div>
               </Item>
