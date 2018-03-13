@@ -5,7 +5,7 @@ import { routerRedux } from 'dva/router';
 import MyNavBar from './../../../components/MyNavBar/index';
 import checkboxMarked from './../../../assets/checkbox-marked-circle.svg';
 
-import { Toast, WhiteSpace, List, Modal } from 'antd-mobile';
+import { Stepper } from 'antd-mobile';
 
 class ShoppingCart extends Component {
   constructor(props) {
@@ -14,6 +14,101 @@ class ShoppingCart extends Component {
     this.state = {
       'selectAll': false
     }
+  }
+
+  jumpToConfirm() {
+    this.props.dispatch(routerRedux.push('/user/cart/confirm'));
+  }
+
+  renderShoppingCartItem() {
+    return (
+      <div className="ShoppingCart-list">
+        <div className="ShoppingCart-item">
+          <div className="item-select">
+            <CheckboxSVG isChecked={this.state.selectAll} />
+          </div>
+
+          <div className="item-info">
+            <div className="item-description">
+              <div className="description-picture">
+                <img src='' />
+              </div>
+              <div className="description-main">
+                <div className="description-main-content">
+                  <div className="description-title">GoPro运动摄像机遥控器Smart Remote</div>
+                  <div className="description-date">收寄日期：2018-03-19,2018-03-28</div>
+                  <div className="description-other">
+                    <div className="description-deposit">押金: ￥50.00</div>
+                    <div className="description-logistic">物流至北京 ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="item-operate">
+              <div className="operate-stepper">
+                <div className="stepper-price">￥89<span>.00</span></div>
+                <div className="stepper-operate">
+                  <Stepper
+                    style={{ width: '100%', minWidth: '100px' }}
+                    showNumber
+                    max={10}
+                    min={1}
+                    value={1}
+                    onChange={() => console.log(1)}
+                  />
+                </div>
+              </div>
+              <div className="operate-delete">删除</div>
+            </div>
+          </div>
+
+
+        </div>
+
+        <div className="ShoppingCart-item">
+          <div className="item-select">
+            <CheckboxSVG isChecked={this.state.selectAll} />
+          </div>
+
+          <div className="item-info">
+            <div className="item-description">
+              <div className="description-picture">
+                <img src='' />
+              </div>
+              <div className="description-main">
+                <div className="description-main-content">
+                  <div className="description-title">GoPro运动摄像机遥控器Smart Remote</div>
+                  <div className="description-date">收寄日期：2018-03-19,2018-03-28</div>
+                  <div className="description-other">
+                    <div className="description-deposit">押金: ￥50.00</div>
+                    <div className="description-logistic">物流至北京 ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="item-operate">
+              <div className="operate-stepper">
+                <div className="stepper-price">￥89<span>.00</span></div>
+                <div className="stepper-operate">
+                  <Stepper
+                    style={{ width: '100%', minWidth: '100px' }}
+                    showNumber
+                    max={10}
+                    min={1}
+                    value={1}
+                    onChange={() => console.log(1)}
+                  />
+                </div>
+              </div>
+              <div className="operate-delete">删除</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    )
   }
   
   render() {
@@ -24,8 +119,7 @@ class ShoppingCart extends Component {
           returnURL={'/user/index'}
         />
 
-        <div>
-        </div>
+        {this.renderShoppingCartItem()}
 
         <div className="ShoppingCart-bottom">
           <div className="bottom-select">
@@ -43,7 +137,7 @@ class ShoppingCart extends Component {
             </div>
           </div>
 
-          <div className="bottom-submit">结算</div>
+          <div className="bottom-submit" onClick={this.jumpToConfirm.bind(this)}>结算</div>
         </div>
       </div>
     )
@@ -64,4 +158,4 @@ class CheckboxSVG extends Component {
   }
 }
 
-export default ShoppingCart;
+export default connect()(ShoppingCart);
