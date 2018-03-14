@@ -150,6 +150,17 @@ class MyUser extends Component {
           </div>
 
           <WhiteSpace size="lg" />
+          <div className='User-info'>
+            <List>
+              <Item
+                arrow="horizontal"
+                onClick={() => this.props.dispatch(routerRedux.push('/user/address/index'))} multipleLine>
+                <div>收货地址</div>
+              </Item>
+            </List>
+          </div>
+
+          <WhiteSpace size="lg" />
           <div className='User-SignOut' onClick={this.signOut.bind(this)}>
             <div>账号退出</div>
           </div>

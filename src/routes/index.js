@@ -34,40 +34,56 @@ function RouterConfig({ history, app }) {
   const EditTraveller = dynamic({ app, component: () => import('./User/Traveller-Infor/edit') });
   const ShoppingCart = dynamic({ app, component: () => import('./User/Shopping-Cart/index') });
   const ShoppingConfirm = dynamic({ app, component: () => import('./User/Shopping-Cart/Confirm/index') });
+  const Address = dynamic({ app, component: () => import('./User/Address/index') });
+  const EditAddress = dynamic({ app, component: () => import('./User/Address/edit') });
 
   return (
     <Router history={history}>
       <Route>
         <Switch>
 
+          {/* 首页 */}
           <Route exact path="/" component={Home} />
           <Route path="/home/detail" component={Homedetail} />
           <Route path="/home/detail-travel" component={DetailTravel} />
           <Route path="/home/submit" component={HomeSubmit} />
 
+          {/* 度假村直定 */}
           <Route path="/village/index" component={Village} />
           <Route path="/village/detail" component={VillageDetail} />
           <Route path="/village/submit" component={VillageSubmit} />
 
+          {/* 装备租赁 */}
           <Route path="/equipment/index" component={Equipment} />
           <Route path="/equipment/detail" component={EquipmentDetail} />
 
+          {/* 客服 */}
           <Route path="/service" component={CustomerService} />
 
+          {/* 用户中心 */}
           <Route path="/user/index" component={User} />
+
           <Route path="/user/login" component={UserLogin} />
           <Route path="/user/forget" component={UserForget} />
           <Route path="/user/signup" component={UserSignup} />
+
           <Route path="/user/personal/index" component={Personal} />
           <Route path="/user/personal/account" component={AccountInfor} />
+
           <Route path="/user/account/password" component={Password} />
           <Route path="/user/account/mailbox" component={Mailbox} />
           <Route path="/user/account/mobile" component={Mobile} />
+
           <Route path="/user/order/index" component={Order} />
           <Route path="/user/order/taobao" component={Taobao} />
           <Route path="/user/order/detail" component={OrderDetail} />
+
+          <Route path="/user/address/index" component={Address} />
+          <Route path="/user/address/edit" component={EditAddress} />
+
           <Route path="/user/traveller/index" component={TravellerInfor} />
           <Route path="/user/traveller/edit" component={EditTraveller} />
+
           <Route path="/user/cart/index" component={ShoppingCart} />
           <Route path="/user/cart/confirm" component={ShoppingConfirm} />
         </Switch>

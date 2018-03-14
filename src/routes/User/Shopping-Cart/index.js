@@ -17,6 +17,7 @@ class ShoppingCart extends Component {
   }
 
   jumpToConfirm() {
+    localStorage.setItem('returnURL', '/user/cart/index'); 
     this.props.dispatch(routerRedux.push('/user/cart/confirm'));
   }
 
