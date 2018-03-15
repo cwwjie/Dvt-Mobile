@@ -81,7 +81,7 @@ class Mailbox extends Component {
         'token': cookies.getItem('token'),
         'digest': cookies.getItem('digest')
       },
-      body: fetchBody
+      'body': fetchBody
     }).then(
       (response) => ( response.json() ),
       (error) => ({'result': '1', 'message': error})

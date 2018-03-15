@@ -67,6 +67,11 @@ class MyUser extends Component {
     this.props.dispatch(routerRedux.push('/user/order/index'));
   }
 
+  jumpToCart() {
+    localStorage.setItem('EquipmentDetailURL', '/user/index'); 
+    this.props.dispatch(routerRedux.push('/user/cart/index'));
+  }
+
   render() {
     return (
       <div className="User">
@@ -132,7 +137,7 @@ class MyUser extends Component {
             <List>
               <Item
                 arrow="horizontal"
-                onClick={() => this.props.dispatch(routerRedux.push('/user/cart/index'))} multipleLine>
+                onClick={this.jumpToCart.bind(this)} multipleLine>
                 <div>我的购物车</div>
               </Item>
             </List>

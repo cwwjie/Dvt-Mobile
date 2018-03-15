@@ -7,6 +7,10 @@ import SwitchBolck from './../../../components/UserSame/SwitchBolck';
 import config from './../../../config';
 import cookies from './../../../utils/cookies';
 
+import { Toast, Modal, List } from 'antd-mobile';
+const Item = List.Item;
+const Brief = Item.Brief;
+
 class Address extends Component {
   constructor(props) {
     super(props);
@@ -53,24 +57,46 @@ class Address extends Component {
     })
   }
 
-  jumpToAddAddress(data) {
+  jumpToAddAddress() {
     localStorage.setItem('Address-Type', 'add');
     this.props.dispatch(routerRedux.push('/user/address/edit'));
   }
 
-  jumpToEditAddress() {
+  jumpToEditAddress(data) {
     localStorage.setItem('Address-Type', 'edit');
     localStorage.setItem('Address-Info', JSON.stringify({
-
+      'addressId': data.addressId,
+      'consignee': data.consignee,
+      'province': data.province,
+      'city': data.city,
+      'district': data.district,
+      'street': data.street,
+      'mobile': data.mobile,
+      'zipcode': data.zipcode,
+      'telephone': data.telephone
     }));
     this.props.dispatch(routerRedux.push('/user/address/edit'));
   }
 
   renderAddressList() {
+    const _this = this;
+
     if (this.state.address) {
       return (
         <div className='address-list'>
-      
+          {this.state.address.map((val, key) => (
+            <div className='address-Item' key={key}>
+              <List>
+                <Item 
+                  extra={<div>编辑</div>} 
+                  arrow="horizontal" 
+                  multipleLine 
+                  onClick={() => _this.jumpToEditAddress(val)}
+                >{val.consignee} <Brief>{val.street}</Brief>
+                </Item>
+              </List>
+            </div>
+          ))}
         </div>
       );
 

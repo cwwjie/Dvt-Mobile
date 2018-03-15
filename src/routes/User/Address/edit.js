@@ -7,73 +7,29 @@ import config from './../../../config';
 import cookies from './../../../utils/cookies';
 import request from './../../../utils/request';
 
-import { createForm } from 'rc-form';
 import { Toast, Modal, List, InputItem, TextareaItem, Picker } from 'antd-mobile';
 
 class EditAddress extends Component {
   constructor(props) {
     super(props);
 
-    let myState;
-    let initAddress = {
-      'addressId': null, // number
-      'consignee': null, // 收货人 string
+    addressState.init();
 
-      'region': [{ 'value': '1', 'label': '省', 'children': [{ 'value': '2', 'label': '市', 'children': [{ 'value': '3', 'label': '区', }] }] }],
-      'regionPicker': null,
-
-      // 'province': null, // 省 number
-      // 'city': null, // 市 number
-      // 'district': null, // 区 number
-      'street': null, // 街道 string
-      'mobile': null, // 手机 string or number
-      'zipcode': null, // 邮政编码 string or number
-      'telephone': null, // 电话 string or number
-    }
-
-    this.AddressType = localStorage.getItem('Address-Type') ? localStorage.getItem('Address-Type') : 'add';
-
-    if (this.AddressType === 'add') {
-      myState = initAddress;
-      myState.error = false;
-      myState.type = 'add';
-
-    } else {
-      let addressInfo = localStorage.getItem('Address-Info') ? JSON.parse(localStorage.getItem('Address-Info')): false;
-
-      if (addressInfo === false) {
-        myState = initAddress;
-        myState.error = true;
-      } else {
-        myState = {
-          'error': false, 
-          'type': 'edit', 
-          'region': initAddress.region, 
-          'regionPicker': [
-            addressInfo.province,
-            addressInfo.city,
-            addressInfo.district,
-          ], 
-          'addressId': addressInfo.addressId, 
-          'consignee': addressInfo.consignee, 
-          'street': addressInfo.street, 
-          'mobile': addressInfo.mobile, 
-          'zipcode': addressInfo.zipcode, 
-          'telephone': addressInfo.telephone, 
-        };
-      }
-    }
-
-    this.state = myState;
+    this.isRegionExist = addressState.isRegionExist;
+    this.AddressType = addressState.AddressType;
+    this.state = addressState.state;
   }
 
   componentDidMount() {
     const _this = this;
 
-    this.getRegion()
-    .then((val) => {
-      _this.setState({'region': val});
-    });
+    if (!this.isRegionExist) {
+      this.getRegion()
+      .then((val) => {
+        _this.setState({'region': val});
+        localStorage.setItem('region', JSON.stringify(val));
+      });
+    }
   }
 
   getRegion() {
@@ -153,27 +109,99 @@ class EditAddress extends Component {
     });
   }
 
-  submitAdd() {
+  submitInputBy(type) {
+    const operationMethod = type === 'add' ? '添加' : '修改';
+    const _this = this;
 
-  }
+    if ( !this.verifyInput() ) {
+      return Toast.info('请补充相关信息!');
+    }
 
-  submitEdit() {
+    Toast.loading('正在提交...');
+
+    let myBody = type === 'add' ? {
+      'consignee': this.state.consignee,
+      'province': this.state.regionPicker[0],
+      'city': this.state.regionPicker[1],
+      'district': this.state.regionPicker[2],
+      'street': this.state.street,
+      'mobile': parseInt(this.state.mobile), 
+      'zipcode': parseInt(this.state.zipcode), 
+      'telephone': parseInt(this.state.telephone)
+    } : {
+      'addressId': this.state.addressId,
+      'consignee': this.state.consignee,
+      'province': this.state.regionPicker[0],
+      'city': this.state.regionPicker[1],
+      'district': this.state.regionPicker[2],
+      'street': this.state.street,
+      'mobile': parseInt(this.state.mobile), 
+      'zipcode': parseInt(this.state.zipcode), 
+      'telephone': parseInt(this.state.telephone)
+    };
     
+    fetch(`${config.URLversion}/user/address/${type}.do`, {
+      'method': 'POST',
+      'contentType': 'application/json; charset=utf-8',
+      'body': JSON.stringify(myBody),
+      'headers': {
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+      }
+    }).then(
+      response => response.json(),
+      error => ({'result': '1', 'message': error})
+    ).then((json) => {
+      if (json.result === '0') {
+        Modal.alert(`${operationMethod}收货地址成功`, `已成功${operationMethod}新的收货地址!`, [{
+          text: '确定',
+          onPress: () => {
+            _this.props.dispatch(routerRedux.push('/user/address/index'));
+          },
+          style: 'default'
+        }]);
+      } else {
+        Modal.alert(`${operationMethod}收货地址失败`, `请求成功，但是服务器返回数据有误, 原因: ${json.message}`);
+      }
+      Toast.hide();
+    }).catch(error => {
+      Toast.hide();
+      Modal.alert('请求出错', `向服务器发起请求失败, 原因: ${error}`);
+    });
   }
 
   submitDelete() {
+    const _this = this;
     
-  }
+    Modal.alert('请确认', '你确认删除收货地址?', [{
+      'text': '确定',
+      'style': 'default',
+      onPress: () => {
+        fetch(`${config.URLversion}/user/address/delete.do?addressId=${_this.state.addressId}`, {
+          'method': 'GET',
+          'contentType': 'application/json; charset=utf-8',
+          'headers': {
+            'token': cookies.getItem('token'),
+            'digest': cookies.getItem('digest')
+          }
+        }).then(
+          (response) => (response.json()),
+          (error) => ({'result': 1, 'message': error})
+        ).then(val => {
+          if (val.result === '0') {
 
-  renderSubmit() {
-    return this.AddressType === 'add' ?
-    <div className='submit-btn' 
-      onClick={this.submitAdd.bind(this)}
-    >新增</div> :
-    <div className='submit-Content'>
-      <div className='submit-Edit' onClick={this.submitEdit.bind(this)}>编辑</div>
-      <div className='submit-Delete' onClick={this.submitDelete.bind(this)}>删除</div>
-    </div> 
+            Modal.alert('成功', '收货地址成功删除', [{
+              'text': '确定',
+              'style': 'default',
+              onPress: () => _this.props.dispatch(routerRedux.push('/user/address/index')),
+            }]);
+          } else {
+
+            Modal.alert('收货地址删除失败', `请求服务器成功发起, 但是旅客信息删除失败, 原因: ${val.message}`);
+          }
+        }).catch(error => Modal.alert('请求出错', `向服务器发起请求失败, 原因: ${error}`));
+      }
+    }, { 'text': '取消', 'style': 'default' }]);
   }
 
   consigneeHandle() {
@@ -200,14 +228,52 @@ class EditAddress extends Component {
     const mobile = this.state.mobile;
 
     if (mobile === '' || mobile === null) {
-      return request.error('收货人不能为空');
+      return request.error('手机不能为空');
+    } else if (/^1[34578]\d{9}$/.test(mobile) === false ) {
+      return request.error('手机号码格式不正确!');
     } else {
       return request.success();
     }
   }
 
+  zipcodeHandle() {
+    const zipcode = this.state.zipcode;
+    
+    if (zipcode === '' || zipcode === null) {
+      return request.error('邮政编码不能为空!');
+    } else if (/^[1-9][0-9]{5}$/.test(zipcode) === false) {
+      return request.error('邮政编码格式不正确(六位数)');
+    } else {
+      return request.success();
+    }
+  }
+
+  verifyInput() {
+    if (
+      this.state.regionPicker !== null &&
+      this.consigneeHandle().result === 1 &&
+      this.streetHandle().result === 1 &&
+      this.mobileHandle().result === 1 &&
+      this.zipcodeHandle().result === 1
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  renderSubmit() {
+    return this.AddressType === 'add' ?
+    <div className='submit-btn' 
+      onClick={() => this.submitInputBy('add')}
+    >新增</div> :
+    <div className='submit-Content'>
+      <div className='submit-Edit' onClick={() => this.submitInputBy('update')}>编辑</div>
+      <div className='submit-Delete' onClick={this.submitDelete.bind(this)}>删除</div>
+    </div> 
+  }
+
   render() {
-    const { getFieldProps } = this.props.form;
     return (
       <div className="address-edit">
         <MyNavBar
@@ -246,7 +312,7 @@ class EditAddress extends Component {
 
             <InputItem
               placeholder="请输入手机号码"
-              type="phone"
+              type="number"
               error={this.mobileHandle().result !== 1}
               onErrorClick={()=> Toast.info(this.mobileHandle().message)}
               onChange={(val) => this.setState({'mobile': val})}
@@ -256,14 +322,16 @@ class EditAddress extends Component {
             <InputItem
               placeholder="请输入邮政编码"
               type="number"
-              onChange={(val) => this.setState({'mobile': val})}
+              error={this.zipcodeHandle().result !== 1}
+              onErrorClick={()=> Toast.info(this.zipcodeHandle().message)}
+              onChange={(val) => this.setState({'zipcode': val})}
               value={this.state.zipcode}
             >邮政编码</InputItem>
 
             <InputItem
               placeholder="请输入电话号码"
               type="number"
-              onChange={(val) => this.setState({'mobile': val})}
+              onChange={(val) => this.setState({'telephone': val})}
               value={this.state.telephone}
             >电话号码</InputItem>
           </List>
@@ -277,9 +345,88 @@ class EditAddress extends Component {
   }
 }
 
+let addressState = {
+  'state': null, 
+  // {
+  //   'error': false, 
+  //   'type': 'edit', 
+  //   'addressId': null, // number
+  //   'region':  [{ 'value': '1', 'label': '省', 'children': [{ 'value': '2', 'label': '市', 'children': [{ 'value': '3', 'label': '区', }] }] }],
+
+  //   'consignee': null, // 收货人 string
+  //   'regionPicker': [1, 1, 1],
+  //   'street': null, // 街道 string
+  //   'mobile': null, // 手机 string or number
+  //   'zipcode': null, // 邮政编码 string or number
+  //   'telephone': null, // 电话 string or number
+  // }
+  'AddressType': 'add',
+  'isRegionExist': false,
+
+  init() {
+    let myAddress = {
+      'addressId': null, // number
+      'consignee': null, // 收货人 string
+  
+      'region': this.initRegion(),
+      'regionPicker': null,
+  
+      // 'province': null, // 省 number
+      // 'city': null, // 市 number
+      // 'district': null, // 区 number
+      'street': null, // 街道 string
+      'mobile': null, // 手机 string or number
+      'zipcode': null, // 邮政编码 string or number
+      'telephone': null, // 电话 string or number
+    }
+  
+    this.AddressType = localStorage.getItem('Address-Type') ? localStorage.getItem('Address-Type') : 'add';
+  
+    if (this.AddressType === 'add') {
+      this.state = myAddress;
+      this.state.error = false;
+      this.state.type = 'add';
+  
+    } else {
+      let addressInfo = localStorage.getItem('Address-Info') ? JSON.parse(localStorage.getItem('Address-Info')): false;
+  
+      if (addressInfo === false) {
+        this.state = myAddress;
+        this.state.error = true;
+      } else {
+        this.state = {
+          'error': false, 
+          'type': 'edit', 
+          'region': myAddress.region, 
+          'regionPicker': [
+            addressInfo.province,
+            addressInfo.city,
+            addressInfo.district,
+          ], 
+          'addressId': addressInfo.addressId, 
+          'consignee': addressInfo.consignee, 
+          'street': addressInfo.street, 
+          'mobile': addressInfo.mobile, 
+          'zipcode': addressInfo.zipcode, 
+          'telephone': addressInfo.telephone 
+        };
+      }
+    }
+  },
+
+  initRegion() {
+    let myRegion = localStorage.getItem('region');
+
+    if (myRegion) {
+      this.isRegionExist = true;
+      return JSON.parse(myRegion);
+    }
+
+    return [{ 'value': '1', 'label': '省', 'children': [{ 'value': '2', 'label': '市', 'children': [{ 'value': '3', 'label': '区', }] }] }]
+  }
+} 
+
 const mapStateToProps = (state) => ({
 })
 
-export default createForm()(EditAddress);
-
-// export default connect()(EditAddress);
+export default connect()(EditAddress);

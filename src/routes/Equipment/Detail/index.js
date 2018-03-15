@@ -17,6 +17,7 @@ class EquipmentDetail extends Component {
   }
 
   jumpToShoppingCart() {
+    localStorage.setItem('EquipmentDetailURL', '/equipment/detail'); 
     this.props.dispatch(routerRedux.push('/user/cart/index'));
   }
 
@@ -61,7 +62,8 @@ class EquipmentDetail extends Component {
           <div className='bottom-mid'
           >加入购物车</div>
           <div className='bottom-right'
-          >立即购买</div>
+            onClick={this.jumpToShoppingCart.bind(this)}
+          >我的购物车</div>
         </div>
       </div>
     )

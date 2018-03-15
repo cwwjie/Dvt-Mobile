@@ -14,6 +14,13 @@ class ShoppingCart extends Component {
     this.state = {
       'selectAll': false
     }
+
+    this.returnedUrl = this.initReturnedURL();
+  }
+
+  initReturnedURL() {
+    let returnedUrl = localStorage.getItem('EquipmentDetailURL');
+    return returnedUrl ? returnedUrl : '/user/index';
   }
 
   jumpToConfirm() {
@@ -117,7 +124,7 @@ class ShoppingCart extends Component {
       <div className="ShoppingCart">
         <MyNavBar
           navName='我的购物车'
-          returnURL={'/user/index'}
+          returnURL={this.returnedUrl}
         />
 
         {this.renderShoppingCartItem()}

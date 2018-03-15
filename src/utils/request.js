@@ -2,7 +2,7 @@ module.exports = {
   success: (data, message) => ({
       'result': 1,
       'data': data || null,
-      'message': message || 'Request is success'
+      'message': message || 'Request was successful'
   }),
 
   error: (message, result, data) => ({
