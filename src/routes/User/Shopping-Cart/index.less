@@ -26,6 +26,15 @@
       .item-description {
         padding: 10px 5px 5px 5px;
 
+        .description-soldout {
+          position: absolute;
+          top: 10px;
+          left: 5px;
+          height: 100px;
+          width: 100px;
+          z-index: 2;
+        }
+
         .description-picture {
           position: absolute;
           height: 100px;
@@ -72,48 +81,70 @@
         }
       }
 
-      .item-operate .operate-stepper {
-        position: relative;
-        
-        .stepper-price {
-          padding-left: 110px;
-          line-height: 32px;
-          font-size: 16px;
-          color: #F56C6C;
+      .item-operate {
+        overflow: hidden;
 
-          span {
-            font-size: 14px;
+        .operate-stepper {
+          position: relative;
+          
+          .stepper-price {
+            padding-left: 110px;
+            line-height: 32px;
+            font-size: 16px;
+            color: #F56C6C;
+  
+            span {
+              font-size: 14px;
+            }
+          }
+          
+          .stepper-operate {
+            position: absolute;
+            top: 0px;
+            right: 10px;
+            width: 30%;
+  
+            input {
+              position: relative;
+              top: -2px;
+            }
+  
+            .am-stepper-handler {
+              width: 25px;
+              height: 25px;
+              line-height: 23px;
+            }
           }
         }
-        
-        .stepper-operate {
-          position: absolute;
-          top: 0px;
-          right: 10px;
-          width: 30%;
 
-          input {
-            position: relative;
-            top: -2px;
-          }
+        .operate-delete {
+          float: right;
+          padding: 2px 5px;
+          margin-top: 5px;
+          margin-right: 10px;
+          text-align: right;
 
-          .am-stepper-handler {
-            width: 25px;
-            height: 25px;
-            line-height: 23px;
-          }
+          color: #888;
         }
       }
-
-      .item-operate .operate-delete {
-        padding-top: 5px;
-        padding-right: 10px;
-        color: #888;
-        text-align: right;
-      }      
     }
   }
 
+  .ShoppingCart-list .ShoppingCart-isSoldOut {
+    .item-info {
+      .description-title,
+      .description-date,
+      .description-other,
+      .item-operate .operate-stepper .stepper-price {
+        color: #888;
+      }
+
+      .item-operate .operate-delete {
+        border: 1px solid #F56C6C;
+        color: #F56C6C;
+      }
+    }
+  }
 
   .ShoppingCart-bottom {
     overflow: hidden;

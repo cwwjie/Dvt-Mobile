@@ -113,8 +113,8 @@ class VillageDetail extends Component {
         _this.product = json.data.list[_this.productId];
         if (_this.product) {
           _this.setState({
-            resortName: _this.product.resortName,
-            resortDesc: _this.product.resortDesc
+            'resortName': _this.product.resortName,
+            'resortDesc': _this.product.resortDesc
           });
 
           _this.getResortImg()

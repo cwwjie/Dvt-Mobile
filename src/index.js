@@ -6,13 +6,13 @@ import React from 'react';
 import index from './index.less';
 import 'antd-mobile/dist/antd-mobile.less';
 
-import models from './models';
+import userModels from './models/user';
 import cartModels from './models/cart';
 import routes from './routes';
 
 const app = dva();
 
-app.model(models);
+app.model(userModels);
 app.model(cartModels);
 
 app.router(routes);
