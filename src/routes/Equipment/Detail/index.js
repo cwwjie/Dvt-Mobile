@@ -7,9 +7,8 @@ import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
 import onMenuShare from './../../../utils/weixin-onMenuShare';
 
-const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
 let wrapProps;
-if (isIPhone) {
+if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
   wrapProps = {
     onTouchStart: e => e.preventDefault(),
   };
@@ -32,9 +31,6 @@ class EquipmentDetail extends Component {
   jumpToShoppingCart() {
     localStorage.setItem('EquipmentDetailURL', '/equipment/detail'); 
     this.props.dispatch(routerRedux.push('/user/cart/index'));
-  }
-
-  componentDidMount() {
   }
 
   addToShoppingCartAction() {

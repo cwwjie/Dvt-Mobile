@@ -18,6 +18,8 @@ class EditAddress extends Component {
     this.isRegionExist = addressState.isRegionExist;
     this.AddressType = addressState.AddressType;
     this.state = addressState.state;
+
+    this.returnedUrl = this.initReturnedURL();
   }
 
   componentDidMount() {
@@ -30,6 +32,11 @@ class EditAddress extends Component {
         localStorage.setItem('region', JSON.stringify(val));
       });
     }
+  }
+
+  initReturnedURL() {
+    let returnedUrl = localStorage.getItem('Address-edit-returnedUrl');
+    return returnedUrl ? returnedUrl : '/user/index';
   }
 
   getRegion() {
@@ -278,7 +285,7 @@ class EditAddress extends Component {
       <div className="address-edit">
         <MyNavBar
           navName={this.EditAddressType === 'Edit' ? '编辑收货地址' : '添加收货地址'}
-          returnURL='/user/address/index'
+          returnURL={this.returnedUrl}
         />
 
         <div className="address-main">

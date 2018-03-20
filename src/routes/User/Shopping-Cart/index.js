@@ -3,20 +3,97 @@ import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 
 import MyNavBar from './../../../components/MyNavBar/index';
+
+import config from './../../../config';
+import cookies from './../../../utils/cookies';
+
 import SoldOut from './../../../assets/SoldOut.png';
 import checkboxMarked from './../../../assets/checkbox-marked-circle.svg';
 
-import { Stepper, Modal } from 'antd-mobile';
+import { Stepper, Modal, List, ActionSheet, CheckboxItem, WingBlank, WhiteSpace } from 'antd-mobile';
+
+let wrapProps;
+if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
+  wrapProps = {
+    onTouchStart: e => e.preventDefault(),
+  };
+}
 
 class ShoppingCart extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      'selectAll': false,
+      'popSelectAddress': false,
+      'addressList': [
+        // {
+        //   'addressId': 1,
+        //   'city': 85,
+        //   'consignee': "曾杰",
+        //   'district': 908,
+        //   'mobile': "15976713287",
+        //   'province': 7,
+        //   'street': "收货地址一",
+        //   'telephone': null,
+        //   'userId': null,
+        //   'zipcode': "123456",
+        // }
+      ],
+      'addressSheetList': [
+        // "收货地址一",
+      ],
     }
 
     this.returnedUrl = this.initReturnedURL();
+  }
+
+  componentDidMount() {
+    const _this = this;
+
+    this.getAddressInfo()
+    .then(val => {
+      let addressSheetList = [];
+      
+      if (val) { // 如果 Address 存在
+        if (val.length > 0) {
+          addressSheetList = val.map(val => val.street);
+        }
+      }
+
+      addressSheetList.push('新增收货地址');
+      addressSheetList.push('取消');
+
+      _this.setState({
+        'addressList': val,
+        'addressSheetList': addressSheetList,
+      });
+    });
+  }
+
+  getAddressInfo() {
+    const _this = this;
+
+    return new Promise((resolve, reject) => {
+      fetch(`${config.URLversion}/user/address/findByUserId.do`, {
+        'method': 'GET',
+        'contentType': 'application/json; charset=utf-8',
+        'headers': {
+          'token': cookies.getItem('token'),
+          'digest': cookies.getItem('digest')
+        }
+      }).then(
+        response => response.json(),
+        error => ({'result': '1', 'message': error})
+      ).then((json) => {
+        if (json.result === '0') {
+          resolve(json.data);
+        } else {
+          reject(Modal.alert('获取旅客信息失败', `请求服务器成功, 但是返回的旅客信息有误! 原因: ${json.message}`));
+        }
+      }).catch(error => {
+        reject(Modal.alert('请求出错', `向服务器发起请求旅客信息失败, 原因: ${error}`));
+      });
+    });
   }
 
   initReturnedURL() {
@@ -27,6 +104,12 @@ class ShoppingCart extends Component {
   jumpToConfirm() {
     localStorage.setItem('returnURL', '/user/cart/index'); 
     this.props.dispatch(routerRedux.push('/user/cart/confirm'));
+  }
+
+  jumpToEditAddress() {
+    localStorage.setItem('Address-Type', 'add');
+    localStorage.setItem('Address-edit-returnedUrl', '/user/cart/index'); 
+    this.props.dispatch(routerRedux.push('/user/address/edit'));
   }
 
   selectItem(id) {
@@ -54,12 +137,79 @@ class ShoppingCart extends Component {
     ]);
   }
 
+  changeItemCount(count, id) {
+    this.props.dispatch({
+      'type': 'cart/changeEquipmentCount',
+      'count': count,
+      'id': id,
+    });
+  }
+
+  selectAddress(data) {
+    this.props.dispatch({ 
+      'type': 'cart/changeAddress', 
+      'address': data
+    });
+  }
+
+  showrAddressSheet() {
+    const _this = this;
+    const addButtonIndex = this.state.addressSheetList.length - 2;
+    const cancelButtonIndex = this.state.addressSheetList.length - 1;
+
+    ActionSheet.showActionSheetWithOptions({
+      'options': this.state.addressSheetList,
+      'cancelButtonIndex': cancelButtonIndex,
+      'title': '请选择地址',
+      'maskClosable': true,
+      'data-seed': 'logId',
+      wrapProps,
+    }, buttonIndex => {
+      if ( buttonIndex === addButtonIndex) {
+        _this.jumpToEditAddress();
+      }
+
+      if (
+        buttonIndex !== addButtonIndex && 
+        buttonIndex !== cancelButtonIndex
+      ) {
+        _this.selectAddress(this.state.addressList[buttonIndex]);
+      }
+    });
+
+  }
+
+  renderAddress() {
+    const _this = this;
+
+    return this.props.buyWay === '快递' ? (
+      <div className="ShoppingCart-address">
+
+        <List renderHeader={() => '快递地址(必须提供相应地址)'} className="my-list">
+          <List.Item arrow="horizontal"
+            extra="选择"
+            onClick={this.showrAddressSheet.bind(this)}
+          >选择快递信息</List.Item>
+          {this.props.address ? (
+            <div>
+              <List.Item extra={this.props.address.consignee}>收货姓名</List.Item>
+              <List.Item extra={this.props.address.street}>详细地址</List.Item>
+              <List.Item extra={this.props.address.mobile}>手机号码</List.Item>
+            </div>
+          ) : null}
+        </List>
+
+      </div>
+    ) : null;
+  }
+
   renderShoppingCartItem() {
     const _this = this;
+    let shoppingCartList = this.props.shoppingCartList ? this.props.shoppingCartList : [];
 
     return (
       <div className="ShoppingCart-list"> 
-        {this.props.shoppingCartList.map((val, key) => (
+        {shoppingCartList.map((val, key) => (
           <div className={ val.inventory ? "ShoppingCart-item" : "ShoppingCart-item ShoppingCart-isSoldOut"} key={key}>
 
             <div className="item-select">
@@ -104,8 +254,9 @@ class ShoppingCart extends Component {
                       showNumber
                       max={val.inventory ? val.inventory : 1}
                       min={1}
+                      defaultValue={val.count}
                       value={val.count}
-                      onChange={() => console.log(1)}
+                      onChange={count => _this.changeItemCount(count, key)}
                     />
                   </div>
                 </div>
@@ -128,7 +279,9 @@ class ShoppingCart extends Component {
           returnURL={this.returnedUrl}
         />
 
-        {this.renderShoppingCartItem()}
+        {this.renderShoppingCartItem.call(this)}
+
+        {this.renderAddress.call(this)}
 
         <div style={{'height': '75px'}}/>
         <div className="ShoppingCart-bottom">
@@ -176,6 +329,7 @@ class CheckboxSVG extends Component {
 
 const mapStateToProps = (state) => ({
   'buyWay': state.cart.buyWay,
+  'address': state.cart.address,
   'startLease': state.cart.startLease,
   'returnLease': state.cart.returnLease,
   'isSelectAll': state.cart.isSelectAll,

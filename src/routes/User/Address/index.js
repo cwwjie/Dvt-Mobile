@@ -43,8 +43,8 @@ class Address extends Component {
           'digest': cookies.getItem('digest')
         }
       }).then(
-        (response) => ( response.json() ),
-        (error) => ({'result': '1', 'message': error})
+        response => ( response.json() ),
+        error => ({'result': '1', 'message': error})
       ).then((json) => {
         if (json.result === '0') {
           resolve(json.data);
@@ -59,11 +59,13 @@ class Address extends Component {
 
   jumpToAddAddress() {
     localStorage.setItem('Address-Type', 'add');
+    localStorage.setItem('Address-edit-returnedUrl', '/user/address/index'); 
     this.props.dispatch(routerRedux.push('/user/address/edit'));
   }
 
   jumpToEditAddress(data) {
     localStorage.setItem('Address-Type', 'edit');
+    localStorage.setItem('Address-edit-returnedUrl', '/user/address/index'); 
     localStorage.setItem('Address-Info', JSON.stringify({
       'addressId': data.addressId,
       'consignee': data.consignee,

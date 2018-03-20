@@ -60,14 +60,14 @@ class DetailTravel extends Component {
       fetch(`${config.URLversion}/user/userinfo/findByUserId.do`, {
         'method': 'GET',
         'contentType': 'application/json; charset=utf-8',
-        'headers':{
+        'headers': {
           'token': cookies.getItem('token'),
           'digest': cookies.getItem('digest')
         }
       }).then(
-        (response) => ( response.json() ),
-        (error) => ({'result': '1', 'message': error})
-      ).then((json) => {
+        response => response.json(),
+        error => ({'result': '1', 'message': error})
+      ).then(json => {
         if (json.result === '0') {
           resolve(json.data);
           _this.setState({'passenger': json.data});
