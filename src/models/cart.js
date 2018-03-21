@@ -1,11 +1,15 @@
+import config from './../config';
+import cookies from './../utils/cookies';
+import request from './../utils/request';
+
 let ShoppingCart = {
   'data': {
     'namespace': 'cart',
   
     'state': {
-      'buyWay': '快递', // 购买方式 度假村自取 快递 潜游时光公司自取
-      'startLease': '', // 租赁的开始时间
-      'returnLease': '', // 租赁的结束时间
+      'buyWay': '潜游时光公司自取', // 购买方式 度假村自取 快递 潜游时光公司自取
+      'startLease': new Date(), // 租赁的开始时间
+      'returnLease': new Date(Date.parse(new Date()) + 86400000 ), // 租赁的结束时间
       'isSelectAll': false,
       'address': false, // 收货地址
       // { 
@@ -20,6 +24,10 @@ let ShoppingCart = {
       //   'userId': null,
       //   'zipcode': "123456",
       // },
+      'selfGet': { // 潜游时光公司自取
+        'consignee': "",
+        'mobile': "", 
+      },
       'shoppingCartList': [ // 购物车列表
         {
           'id': 1, // 产品标示的ID
@@ -43,7 +51,27 @@ let ShoppingCart = {
           'inventory': 2, // 库存量 false 或者 0 表示无, null 表示暂未查询
           'count': 1, // 购买的数量
         }
-      ]
+      ],
+      // 地区代码列表
+      'region': {
+        'result': false,
+        'message': '正在加载...',
+        'provinceList': [
+          // {
+          //   'regionId': 1,
+          //   'parentId': 0,
+          //   'regionName': "北京市",
+          //   'regionType': 1,
+          //   'createBy': null,
+          //   'createTime': null,
+          //   'updateBy': null,
+          //   'updateTime': null,
+          //   'isDelete': null,
+          // }
+        ],
+        'cityList': [],
+        'districtList': [],
+      },
     },
 
     'reducers': {
@@ -161,6 +189,49 @@ let ShoppingCart = {
           'address': data.address
         });
       },
+
+      changeSelfGet(state, data) {
+        let MyselfGet = JSON.parse(JSON.stringify(state.selfGet));
+
+        if (data.consignee) {
+          MyselfGet.consignee = data.consignee;
+        }
+
+        if (data.mobile) {
+          MyselfGet.mobile = data.mobile;
+        }
+
+        return {
+          ...state,
+          'selfGet': MyselfGet
+        }
+      },
+
+      changeLease(state, data) {
+        let startLease = state.startLease;
+        let returnLease = state.returnLease;
+
+        if (data.startLease) {
+          startLease = data.startLease;
+        }
+
+        if (data.returnLease) {
+          returnLease = data.returnLease;
+        }
+
+        return {
+          ...state,
+          'startLease': startLease,
+          'returnLease': returnLease
+        }
+      },
+
+      initRegion(state, data) {
+        return {
+          ...state,
+          'region': data.region
+        }
+      },
     },
   },
 
@@ -178,7 +249,76 @@ let ShoppingCart = {
     }
 
     return this.data;
+  },
+
+  initAddress(app) {
+    let myRegion = this.getRegionBylocalStorage();
+
+    if (myRegion) {
+
+      app._store.dispatch({
+        'type': 'cart/initRegion',
+        'region': myRegion
+      });
+    } else {
+
+      Promise.all([
+        this.getRegionByType(1),
+        this.getRegionByType(2),
+        this.getRegionByType(3)
+      ]).then(values => {
+        let region = {
+          'result': true,
+          'message': '成功',
+          'provinceList': values[0],
+          'cityList': values[1],
+          'districtList': values[2],
+        }
+
+        localStorage.setItem('address-region', JSON.stringify(region));
+        app._store.dispatch({
+          'type': 'cart/initRegion',
+          'region': region
+        });
+      }, error => {
+        app._store.dispatch({
+          'type': 'cart/initRegion',
+          'region': {
+            'result': false,
+            'message': error,
+            'provinceList': [],
+            'cityList': [],
+            'districtList': [],
+          }
+        });
+      });
+    }
+  },
+
+  getRegionBylocalStorage() {
+    let region = localStorage.getItem('address-region');
+    return region ? JSON.parse(region) : false;
+  },
+
+  getRegionByType(type) {
+    return new Promise((resolve, reject) => {
+      fetch(`${config.URLversion}/system/region/regiontype/${type}/list.do`, {
+        'method': 'GET',
+        'contentType': 'application/json; charset=utf-8'
+      }).then(
+        response => response.json(),
+        error => ({'result': '1', 'message': error})
+      ).then((json) => {
+        if (json.result === '0') {
+          resolve(json.data.regionList);
+        } else {
+          reject('获取地区列表信息失败', `请求服务器成功, 但是返回的地区列表序列号${type} 有误! 原因: ${json.message}`);
+        }
+      }).catch((error) => {
+        reject(`请求出错, 向服务器发起请求地区列表序列号${type} 失败, 原因: ${error}`);
+      })
+    })
   }
 }
 
-export default ShoppingCart.init();
+export default ShoppingCart;

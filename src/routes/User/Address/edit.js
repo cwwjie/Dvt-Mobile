@@ -27,7 +27,7 @@ class EditAddress extends Component {
 
     if (!this.isRegionExist) {
       this.getRegion()
-      .then((val) => {
+      .then(val => {
         _this.setState({'region': val});
         localStorage.setItem('region', JSON.stringify(val));
       });
@@ -43,19 +43,26 @@ class EditAddress extends Component {
     const _this = this;
 
     return new Promise((resolve, reject) => {
-      Promise.all([
-        _this.getRegionByType(1),
-        _this.getRegionByType(2),
-        _this.getRegionByType(3)
-      ]).then((values) => {
-        let provinceList = values[0];
-        let cityList = values[1];
-        let districtList = values[2];
-
-        resolve(_this.dealWithRegion(provinceList, cityList, districtList));
-      }, error => reject(Modal.alert(error)));
+      if (_this.props.region.result) {
+        resolve(_this.dealWithRegion(
+          _this.props.region.provinceList, 
+          _this.props.region.cityList, 
+          _this.props.region.districtList
+        ));
+      } else {
+        Promise.all([
+          _this.getRegionByType(1),
+          _this.getRegionByType(2),
+          _this.getRegionByType(3)
+        ]).then((values) => {
+          let provinceList = values[0];
+          let cityList = values[1];
+          let districtList = values[2];
+  
+          resolve(_this.dealWithRegion(provinceList, cityList, districtList));
+        }, error => reject(Modal.alert(error)));
+      }
     })
-
   }
 
   getRegionByType(type) {
@@ -434,6 +441,7 @@ let addressState = {
 } 
 
 const mapStateToProps = (state) => ({
+  'region': state.cart.region,
 })
 
-export default connect()(EditAddress);
+export default connect(mapStateToProps)(EditAddress);

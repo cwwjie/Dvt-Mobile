@@ -3,7 +3,13 @@ import { Router, Switch, Route } from 'dva/router';
 import { connect } from 'dva';
 import dynamic from 'dva/dynamic';
 
+import cartModel from './../models/cart';
+
 function RouterConfig({ history, app }) {
+
+  // 初始化地址
+  cartModel.initAddress(app);
+
   const Home = dynamic({ app, component: () => import('./Home/index') });
   const Homedetail = dynamic({ app, component: () => import('./Home/Detail/index') });
   const DetailTravel = dynamic({ app, component: () => import('./Home/Detail-Travel/index') });
