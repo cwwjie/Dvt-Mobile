@@ -78,10 +78,6 @@ class EquipmentDetail extends Component {
     });
   }
 
-  hiddenBuyWaySheet() {
-    this.setState({'isBuyWaySheetShow': false});
-  }
-
   render() {
     const _this = this;
     const imgCarouselStyle = {

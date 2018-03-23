@@ -46,6 +46,7 @@ class ShoppingCart extends Component {
     }
 
     this.returnedUrl = this.initReturnedURL();
+    this.buyWaySheetList = ['快递', '度假村自取', '潜游时光公司自取', '取消'];
     this.region = {
       'provinceList': [
         // {
@@ -396,6 +397,27 @@ class ShoppingCart extends Component {
     }
   }
 
+  showBuyWaySheet() {
+    const _this = this;
+    const cancelButtonIndex = this.buyWaySheetList.length - 1;
+
+    ActionSheet.showActionSheetWithOptions({
+      'options': this.buyWaySheetList,
+      'cancelButtonIndex': cancelButtonIndex,
+      'title': '请选择收货方式',
+      'maskClosable': true,
+      'data-seed': 'logId',
+      wrapProps,
+    }, buttonIndex => {
+      if (cancelButtonIndex !== buttonIndex) {
+        _this.props.dispatch({ 
+          'type': 'cart/changeBuyWay', 
+          'buyWay': _this.buyWaySheetList[buttonIndex]
+        });
+      }
+    });
+  }
+
   renderShoppingCartItem() {
     const _this = this;
     let shoppingCartList = this.props.shoppingCartList ? this.props.shoppingCartList : [];
@@ -432,7 +454,10 @@ class ShoppingCart extends Component {
                     <div className="description-date">收寄日期：2018-03-19,2018-03-28</div>
                     <div className="description-other">
                       <div className="description-deposit">押金: ￥50.00</div>
-                      <div className="description-logistic">{_this.props.buyWay} ></div>
+                      <div 
+                        onClick={_this.showBuyWaySheet.bind(this)}
+                        className="description-logistic"
+                      >{_this.props.buyWay} ></div>
                     </div>
                   </div>
                 </div>
