@@ -9,8 +9,6 @@ import MyTabBar from './../../components/MyTabBar/index';
 
 import config from './../../config/index';
 
-let testURL = 'http://192.168.2.102:8080';
-
 class Equipment extends Component {
   constructor(props) {
     super(props);
@@ -63,7 +61,7 @@ class Equipment extends Component {
   }
 
   getEquipmentProduct() {
-    return fetch(`${testURL}/Dvt-rent-web/rentItem.do`, {
+    return fetch(`${config.URLbase}/Dvt-rent-web/rentItem.do`, {
       'method': 'GET',
       'contentType': 'application/json; charset=utf-8'
     }).then(
@@ -85,7 +83,7 @@ class Equipment extends Component {
           >
             <div className="item-content">
               <div className="item-img">
-                <img src={ val.firstPic ? `${testURL}/${val.firstPic}` : ''}/>
+                <img src={ val.firstPic ? `${config.URLbase}/${val.firstPic}` : ''}/>
               </div>
               <div className="item-description">
                 <div className="description-title">{val.title}</div>

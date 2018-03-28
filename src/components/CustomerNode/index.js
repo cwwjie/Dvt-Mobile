@@ -31,7 +31,6 @@ class CustomerNode extends Component {
           >微信客服</List.Item>
         </List>
 
-
         <WhiteSpace size="lg" />
         <List>
           <List.Item

@@ -7,6 +7,9 @@ import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
 import onMenuShare from './../../../utils/weixin-onMenuShare';
 
+// 192.168.2.102:8080/Dvt-rent-web/rentItem/2.do
+// let data = {"result":"0","message":"Success.","data":{"rentPicture":[{"created":null,"updated":null,"id":2,"title":null,"itemId":2,"picDesc":null,"url":"\\rent\\pic\\D493CA538ED44DD0AF5503E6DD071E86.jpg","thumbUrl":"\\rent\\pic\\thumb/thum_D493CA538ED44DD0AF5503E6DD071E86.jpg","sortOrder":1,"status":1},{"created":null,"updated":null,"id":16,"title":null,"itemId":2,"picDesc":null,"url":"\\rent\\pic\\EFDE984AE48E45799382A7BED685A986.jpg","thumbUrl":"\\rent\\pic\\thumb/thum_EFDE984AE48E45799382A7BED685A986.jpg","sortOrder":0,"status":1}],"rentItem":{"created":1519854438000,"updated":1521793970000,"id":2,"firstPic":"\\rent\\pic\\D493CA538ED44DD0AF5503E6DD071E86.jpg","matchedProduct":"3,4,5","title":"装备1","sellPoint":"装备1","price":20.0,"num":null,"cid":1,"status":1,"clickCount":null,"isNew":1,"itemDesc":"<img src=\"\\rent\\pic\\B42316C5A3494C419B0C0601945BDD1A.jpg\" width=\"1024\" height=\"768\" alt=\"\" />","rental":100.0,"deposit":2000.0,"code":"dsfafsdf"},"matchedProducts":[{"created":1522115425000,"updated":null,"id":3,"productName":"安心保障维修费用70%","rental":60.0,"price":0.0},{"created":1522115461000,"updated":null,"id":4,"productName":"gopro潜水镜","rental":20.0,"price":300.0},{"created":1522115509000,"updated":null,"id":5,"productName":"gopro头带","rental":20.0,"price":100.0}]},"date":"2018-03-27T17:01:18.668+08:00"};
+
 let wrapProps;
 if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
   wrapProps = {

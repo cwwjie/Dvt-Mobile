@@ -97,6 +97,7 @@ class Home extends Component {
     const documentDOM = document || window.document;
     documentDOM.onscroll = null;
     this.hasCanceled = true;
+    localStorage.setItem('MyTabBar-router', '/'); // 初始化Tab
   }
 
   getProductData() {
