@@ -6,9 +6,7 @@ import { Toast, Carousel, List, Steps, ActionSheet, Modal } from 'antd-mobile';
 import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
 import onMenuShare from './../../../utils/weixin-onMenuShare';
-
-// 192.168.2.102:8080/Dvt-rent-web/rentItem/2.do
-// let data = {"result":"0","message":"Success.","data":{"rentPicture":[{"created":null,"updated":null,"id":2,"title":null,"itemId":2,"picDesc":null,"url":"\\rent\\pic\\D493CA538ED44DD0AF5503E6DD071E86.jpg","thumbUrl":"\\rent\\pic\\thumb/thum_D493CA538ED44DD0AF5503E6DD071E86.jpg","sortOrder":1,"status":1},{"created":null,"updated":null,"id":16,"title":null,"itemId":2,"picDesc":null,"url":"\\rent\\pic\\EFDE984AE48E45799382A7BED685A986.jpg","thumbUrl":"\\rent\\pic\\thumb/thum_EFDE984AE48E45799382A7BED685A986.jpg","sortOrder":0,"status":1}],"rentItem":{"created":1519854438000,"updated":1521793970000,"id":2,"firstPic":"\\rent\\pic\\D493CA538ED44DD0AF5503E6DD071E86.jpg","matchedProduct":"3,4,5","title":"装备1","sellPoint":"装备1","price":20.0,"num":null,"cid":1,"status":1,"clickCount":null,"isNew":1,"itemDesc":"<img src=\"\\rent\\pic\\B42316C5A3494C419B0C0601945BDD1A.jpg\" width=\"1024\" height=\"768\" alt=\"\" />","rental":100.0,"deposit":2000.0,"code":"dsfafsdf"},"matchedProducts":[{"created":1522115425000,"updated":null,"id":3,"productName":"安心保障维修费用70%","rental":60.0,"price":0.0},{"created":1522115461000,"updated":null,"id":4,"productName":"gopro潜水镜","rental":20.0,"price":300.0},{"created":1522115509000,"updated":null,"id":5,"productName":"gopro头带","rental":20.0,"price":100.0}]},"date":"2018-03-27T17:01:18.668+08:00"};
+import cookies from './../../../utils/cookies';
 
 let wrapProps;
 if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
@@ -22,13 +20,74 @@ class EquipmentDetail extends Component {
     super(props);
 
     this.state = {
-      'carousel': [{'src': null, 'width': null}],
-      'equipmentItem': {
-        'name': 'GoPro运动摄像机遥控器Smart Remote'
-      }
+      carousel: [{'src': null, 'width': null}],
+      
+      equipmentItem: {
+        // "created": 1519854438000,
+        // "updated": 1521793970000,
+        // "id": 2,
+        // "firstPic": "\\rent\\pic\\D493CA538ED44DD0AF5503E6DD071E86.jpg",
+        // "matchedProduct": "3,4,5",
+        // "title": "装备1",
+        // "sellPoint": "装备1",
+        // "price": 20.0,
+        // "num": null,
+        // "cid": 1,
+        // "status": 1,
+        // "clickCount": null,
+        // "isNew": 1,
+        // "itemDesc": "<img src=\"\\rent\\pic\\B42316C5A3494C419B0C0601945BDD1A.jpg\" width=\"1024\" height=\"768\" alt=\"\" />",
+        // "rental": 100.0,
+        // "deposit": 2000.0,
+        // "code": "dsfafsdf"
+      },
+
+      matchedProducts: [
+        // {
+        //   "created": 1522115425000,
+        //   "updated": null,
+        //   "id": 3,
+        //   "productName": "安心保障维修费用70%",
+        //   "rental": 60.0,
+        //   "price": 0.0
+        // }
+      ]
     }
 
     this.buyWaySheetList = ['快递', '度假村自取', '潜游时光公司自取', '取消'];
+    this.rentItemId = parseInt(window.location.hash.substring(30, window.location.hash.length));
+  }
+
+  componentDidMount() {
+    const _this = this;
+
+    this.getRentItem().then(val=> {
+      this.setState({
+        carousel: val.rentPicture.map(picture => ({
+          'src': `${config.URLbase}${picture.url}`, 'width': document.body.clientWidth
+        })),
+        equipmentItem: val.rentItem,
+        matchedProducts: val.matchedProducts,
+      })
+    });
+  }
+
+  getRentItem() {
+    return new Promise((resolve, reject) => {
+      fetch(`${config.URLbase}/Dvt-rent-web/rentItem/${this.rentItemId}.do`, {
+        method: 'GET',
+        contentType: 'application/json; charset=utf-8'
+      }).then(
+        response => response.json(),
+        error => ({result: '1', message: error})
+      ).then(val => {
+        if (val.result === '0') {
+          resolve(val.data)
+        } else {
+          reject(Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${val.message}`));
+        }
+      }).catch(error => reject(Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${error}`)))
+    });
   }
 
   jumpToShoppingCart() {
@@ -48,15 +107,40 @@ class EquipmentDetail extends Component {
 
   dispatchToShoppingCart() {
     const _this = this;
-    this.props.dispatch({ 
-      'type': 'cart/addEquipment', 
-      'equipmentItem': this.state.equipmentItem
-    });
 
-    Modal.alert('添加成功', <div>恭喜你,成功添加至购物车.</div>, [
-      { 'text': '查看购物车', 'onPress': _this.jumpToShoppingCart.bind(this), 'style': {'color': '#108ee9'} },
-      { 'text': '返回', 'style': {'color': '#000'} }
-    ]);
+    fetch(`${config.URLbase}/Dvt-rent-web/cart.do`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'token': cookies.getItem('token'),
+        'digest': cookies.getItem('digest')
+      },
+      body: JSON.stringify({
+        userId: 69,
+        itemId: 2,
+        itemNum: 1,
+        rentTime: 1522307369000,
+        endTime: 1522566569000,
+        matchedProduct: "3",
+      })
+    }).then(
+      response => response.json(),
+      error => ({'result': '1', 'message': error})
+    ).then(val => {
+      console.log(val)
+    }).catch(error => {
+      Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${error}`);
+    })
+
+    // this.props.dispatch({ 
+    //   'type': 'cart/addEquipment', 
+    //   'equipmentItem': this.state.equipmentItem
+    // });
+
+    // Modal.alert('添加成功', <div>恭喜你,成功添加至购物车.</div>, [
+    //   { 'text': '查看购物车', 'onPress': _this.jumpToShoppingCart.bind(this), 'style': {'color': '#108ee9'} },
+    //   { 'text': '返回', 'style': {'color': '#000'} }
+    // ]);
   }
 
   showBuyWaySheet() {
@@ -130,6 +214,7 @@ class EquipmentDetail extends Component {
 const mapStateToProps = (state) => ({
   'buyWay': state.cart.buyWay,
   'shoppingCartList': state.cart.shoppingCartList,
-})
+  'userId': state.user.userId,
+});
 
 export default connect(mapStateToProps)(EquipmentDetail);

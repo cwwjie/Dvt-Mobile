@@ -16,22 +16,23 @@ class Equipment extends Component {
     this.state = {
       'rentList': [
         // {
-        //   "created":1521796901000,
-        //   "updated":null,"id":27,
-        //   "firstPic":"\\rent\\pic\\5B8062B6D8384D16817B3CF778F7B637.jpg",
-        //   "matchedProduct":null,
-        //   "title":"按时大大",
-        //   "sellPoint":"为分狗头人又好听",
-        //   "price":123123.0,
-        //   "num":null,
-        //   "cid":1,
-        //   "status":1,
-        //   "clickCount":null,
-        //   "isNew":1,
-        //   "itemDesc":"",
-        //   "rental":123.0,
-        //   "deposit":1231.0,
-        //   "code":"全文单位沸腾"
+        //   "created": 1521796901000,
+        //   "updated": null,
+        //   "id": 27,
+        //   "firstPic": "\\rent\\pic\\5B8062B6D8384D16817B3CF778F7B637.jpg",
+        //   "matchedProduct": null,
+        //   "title": "按时大大",
+        //   "sellPoint": "为分狗头人又好听",
+        //   "price": 123123.0,
+        //   "num": null,
+        //   "cid": 1,
+        //   "status": 1,
+        //   "clickCount": null,
+        //   "isNew": 1,
+        //   "itemDesc": "",
+        //   "rental": 123.0,
+        //   "deposit": 1231.0,
+        //   "code": "全文单位沸腾"
         // }
       ]
     };
@@ -56,8 +57,8 @@ class Equipment extends Component {
     });
   }
 
-  jumpToDetail() {
-    this.props.dispatch(routerRedux.push('/equipment/detail'));
+  jumpToDetail(val) {
+    this.props.dispatch(routerRedux.push(`/equipment/detail?rentItemId=${val.id}`));
   }
 
   getEquipmentProduct() {
@@ -79,11 +80,11 @@ class Equipment extends Component {
           <div 
             key={key}
             className="Equipment-item" 
-            onClick={this.jumpToDetail.bind(this)}
+            onClick={() => this.jumpToDetail(val)}
           >
             <div className="item-content">
               <div className="item-img">
-                <img src={ val.firstPic ? `${config.URLbase}/${val.firstPic}` : ''}/>
+                <img src={ val.firstPic ? `${config.URLbase}${val.firstPic}` : ''}/>
               </div>
               <div className="item-description">
                 <div className="description-title">{val.title}</div>
@@ -106,15 +107,6 @@ class Equipment extends Component {
           <Tabs tabs={this.tabs} initialPage={0} animated={false} useOnPan={false}>
             <div>
               {this.renderProduct.call(this)}
-              <div className="Equipment-item" onClick={this.jumpToDetail.bind(this)}>
-                <div className="item-content">
-                  <div className="item-img"><img src="null"/></div>
-                  <div className="item-description">
-                    12321321321
-                  </div>
-                </div>
-                <div className="item-line" />
-              </div>
             </div>
             <div>
               Content of second tab
