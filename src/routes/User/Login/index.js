@@ -13,7 +13,11 @@ import cookies from './../../../utils/cookies';
 import request from './../../../utils/request';
 import config from './../../../config';
 
-import { Button, Flex, WingBlank, WhiteSpace, Toast, Checkbox, Modal } from 'antd-mobile';
+import { 
+  Button, Flex, WingBlank, 
+  WhiteSpace, Toast, Checkbox, 
+  Modal 
+} from 'antd-mobile';
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;

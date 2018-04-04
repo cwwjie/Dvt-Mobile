@@ -9,8 +9,9 @@ import {
 
 import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
-import onMenuShare from './../../../utils/weixin-onMenuShare';
 import cookies from './../../../utils/cookies';
+import convertDate from './../../../utils/convertDate';
+import ajaxs from './ajaxs';
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;
@@ -20,6 +21,11 @@ if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent))
     onTouchStart: e => e.preventDefault(),
   };
 }
+const imgCarouselStyle = {
+  'height': document.body.clientWidth * 950 / 1280,
+  'width': '100%',
+  'verticalAlign': 'top'
+};
 
 class EquipmentDetail extends Component {
   constructor(props) {
@@ -34,6 +40,18 @@ class EquipmentDetail extends Component {
       selector: { // 选择产品数量
         num: 1,
         max: false
+      },
+
+      rentSize: { // 选择产品尺寸
+        isSucceed: false,
+        data: '',
+        list: []
+      },
+
+      rentColor: { // 选择产品颜色
+        isSucceed: false,
+        data: '',
+        list: []
       },
 
       equipmentItem: {
@@ -86,8 +104,9 @@ class EquipmentDetail extends Component {
   componentDidMount() {
     const _this = this;
 
-    this.getRentItem().then(val=> {
-      let matchedProducts = _this.initMatchedProducts(val.matchedProducts);
+    ajaxs.getRentItembyId(this.rentItemId)
+    .then(val=> {
+      let matchedProducts = _this.initRentItemToState(val.matchedProducts);
       
       _this.setState({
         carousel: val.rentPicture.map(picture => ({
@@ -97,10 +116,92 @@ class EquipmentDetail extends Component {
         targetMatchedProducts: matchedProducts.target,
         matchedProducts: matchedProducts.list
       });
+    }, error => Modal.alert('请求出错', `向服务器发起请求度设备详情信息失败, 原因: ${error}`));
+
+    ajaxs.getRentSizebyId(this.rentItemId)
+    .then(val=> {
+      if (val.length !== 0) {
+        _this.setState({
+          rentSize: {
+            isSucceed: true,
+            data: '',
+            list: val.map(size => size)
+          }
+        });
+      }
+    });
+
+    ajaxs.getRentColorbyId(this.rentItemId)
+    .then(val=> {
+      if (val.length !== 0) {
+        _this.setState({
+          rentSize: {
+            isSucceed: true,
+            data: '',
+            list: val.map(size => size)
+          }
+        });
+      }
     });
   }
 
-  initMatchedProducts(value) {
+  addRentItemToCart() {
+    
+    if (this.props.isLogin === false) {
+      return Modal.alert('请登录', '你尚未登录, 暂不能将此产品加入购物车!!', [
+        {
+          text: '取消',
+          style: 'default'
+        }, {
+          text: '登录',
+          onPress: () => _this.props.dispatch(routerRedux.push('/user/login')),
+          style: 'default'
+        }
+      ]);
+    }
+    
+    let rentItem = {
+      "userId": 69,
+      "itemId": this.rentItemId,
+      "itemNum": this.state.selector.num,
+      "rentDate": convertDate.dateToYYYYmmNumber(this.state.rentTime),
+      "endDate": convertDate.dateToYYYYmmNumber(this.state.endTime),
+      "matchedProduct": ""
+    }
+
+    ajaxs.addRentItemToCart(rentItem)
+    .then(val=> {
+      console.log(val)
+    }, error => {
+
+    });
+  }
+
+  findItemSku(rentTime, endTime) {
+    let itemSize = this.state.rentSize.data;
+    let itemColor = this.state.rentColor.data;
+
+    let condition = {
+      itemId: this.rentItemId,
+      rentDate: Date.parse(rentTime || this.state.rentTime),
+      endDate: Date.parse(rentTime || this.state.endTime),
+    }
+
+    itemSize ? condition.itemSize = itemSize : null;
+    itemColor ? condition.itemColor = itemColor : null;
+
+    Toast.loading('正在查询...');
+
+    ajaxs.findItemSku(condition)
+    .then(val => {
+      Toast.hide();
+
+    }, error => {
+      Toast.hide();
+    });
+  }
+
+  initRentItemToState(value) {
     let products = {
       target: null,
       list: []
@@ -122,24 +223,6 @@ class EquipmentDetail extends Component {
     return products;
   }
 
-  getRentItem() {
-    return new Promise((resolve, reject) => {
-      fetch(`${config.URLbase}/Dvt-rent-web/rentItem/${this.rentItemId}.do`, {
-        method: 'GET',
-        contentType: 'application/json; charset=utf-8'
-      }).then(
-        response => response.json(),
-        error => ({result: '1', message: error})
-      ).then(val => {
-        if (val.result === '0') {
-          resolve(val.data);
-        } else {
-          reject(Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${val.message}`));
-        }
-      }).catch(error => reject(Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${error}`)));
-    });
-  }
-
   jumpToShoppingCart() {
     localStorage.setItem('EquipmentDetailURL', window.location.hash.substring(1, window.location.hash.length)); 
     this.props.dispatch(routerRedux.push('/user/cart/index'));
@@ -157,30 +240,6 @@ class EquipmentDetail extends Component {
 
   dispatchToShoppingCart() {
     const _this = this;
-
-    fetch(`${config.URLbase}/Dvt-rent-web/cart.do`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'token': cookies.getItem('token'),
-        'digest': cookies.getItem('digest')
-      },
-      body: JSON.stringify({
-        userId: 69,
-        itemId: 2,
-        itemNum: 1,
-        rentTime: 1522307369000,
-        endTime: 1522566569000,
-        matchedProduct: "3",
-      })
-    }).then(
-      response => response.json(),
-      error => ({'result': '1', 'message': error})
-    ).then(val => {
-      console.log(val)
-    }).catch(error => {
-      Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${error}`);
-    });
 
     // this.props.dispatch({ 
     //   'type': 'cart/addEquipment', 
@@ -211,7 +270,7 @@ class EquipmentDetail extends Component {
       //   if (json.result === '0') {
       //     _this.dealwithResort(json.data);
       //   } else {
-      //     Modal.alert('数据有误', `成功请求服务器, 但是度假村直定信息有误， 原因: ${json.message}`);
+      //     Modal.alert('数据有误', `成功请求服务器, 但是度设备详情信息有误， 原因: ${json.message}`);
       //   }
       //   Toast.hide();
       // });
@@ -233,7 +292,7 @@ class EquipmentDetail extends Component {
     //   if (json.result === '0') {
     //     _this.dealwithResort(json.data);
     //   } else {
-    //     alert('度假村直定信息加载失败，原因:' + json.message)
+    //     alert('度设备详情信息加载失败，原因:' + json.message)
     //   }
     //   Toast.hide();
     // });
@@ -390,13 +449,22 @@ class EquipmentDetail extends Component {
     )
   }
 
+  renderRentColor() {
+    if (this.state.rentColor.isSucceed === false) {
+      return <div></div>
+    }
+    
+  }
+
+  renderRentSize() {
+    if (this.state.rentSize.isSucceed === false) {
+      return <div></div>
+    }
+
+  }
+
   render() {
     const _this = this;
-    const imgCarouselStyle = {
-      'height': document.body.clientWidth * 950 / 1280,
-      'width': '100%',
-      'verticalAlign': 'top'
-    };
 
     return (
       <div className="EquipmentDetail">
@@ -429,6 +497,12 @@ class EquipmentDetail extends Component {
           {/* 选择搭配选配产品 */}
           {this.renderSelector()}
 
+          {/* 选择产品配色 */}
+          {this.renderRentColor()}
+
+          {/* 选择产品尺寸 */}
+          {this.renderRentSize()}
+
           {/* 产品详情 */}
           {this.renderProductsDetail()}
 
@@ -457,6 +531,7 @@ const mapStateToProps = (state) => ({
   'buyWay': state.cart.buyWay,
   'shoppingCartList': state.cart.shoppingCartList,
   'userId': state.user.userId,
+  'isLogin': state.user.isLogin,
 });
 
 export default connect(mapStateToProps)(EquipmentDetail);

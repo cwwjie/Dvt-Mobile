@@ -7,6 +7,7 @@ import MyNavBar from './../../../components/MyNavBar/index';
 import config from './../../../config';
 import cookies from './../../../utils/cookies';
 import request from './../../../utils/request';
+import ajaxs from './ajaxs';
 
 import SoldOut from './../../../assets/SoldOut.png';
 import checkboxMarked from './../../../assets/checkbox-marked-circle.svg';
@@ -68,6 +69,10 @@ class ShoppingCart extends Component {
 
   componentDidMount() {
     const _this = this;
+
+    // ajaxs.getCart().then(val => {
+    //   console.log(val)
+    // })
 
     this.getAddressInfo()
     .then(val => {

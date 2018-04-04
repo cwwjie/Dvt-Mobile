@@ -52,9 +52,22 @@ class Equipment extends Component {
       if (json.result === '0') {
         _this.setState({'rentList': json.data})
       } else {
-        Modal.alert('获取度假村直定信息失败', `请求服务器成功, 但是返回的度假村直定信息有误! 原因: ${json.message}`);
+        Modal.alert('获取租赁商品信息失败', `请求服务器成功, 但是返回的租赁商品信息有误! 原因: ${json.message}`);
       }
     });
+  }
+  
+  // 根据分类id查询该分类下商品
+  getEquipmentCartgoryById(id) {
+    return fetch(`${config.URLbase}/Dvt-rent-web/rentItem/cartgory/${id}.do`, {
+      'method': 'GET',
+      'contentType': 'application/json; charset=utf-8'
+    }).then(
+      response => response.json(),
+      error => ({'result': '1', 'message': error})
+    ).catch((error) => {
+      Modal.alert('请求出错', `向服务器发起请求租赁商品信息失败, 原因: ${error}`);
+    })
   }
 
   jumpToDetail(val) {
@@ -69,7 +82,7 @@ class Equipment extends Component {
       response => response.json(),
       error => ({'result': '1', 'message': error})
     ).catch((error) => {
-      Modal.alert('请求出错', `向服务器发起请求度假村直定信息失败, 原因: ${error}`);
+      Modal.alert('请求出错', `向服务器发起请求租赁商品信息失败, 原因: ${error}`);
     })
   }
 
