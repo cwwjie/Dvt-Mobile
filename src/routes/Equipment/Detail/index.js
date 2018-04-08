@@ -4,7 +4,8 @@ import { routerRedux } from 'dva/router';
 import { 
   Toast, Carousel, List, 
   Checkbox, Steps, ActionSheet, 
-  Modal, Stepper, DatePicker 
+  Modal, Stepper, DatePicker,
+  Picker
 } from 'antd-mobile';
 
 import MyNavBar from './../../../components/MyNavBar/index';
@@ -44,13 +45,18 @@ class EquipmentDetail extends Component {
 
       rentSize: { // 选择产品尺寸
         isSucceed: false,
-        data: '',
-        list: []
+        data: [null],
+        list: [
+          // {
+          //   value: 'XL',
+          //   label: 'XL',
+          // }
+        ]
       },
 
       rentColor: { // 选择产品颜色
         isSucceed: false,
-        data: '',
+        data: [null],
         list: []
       },
 
@@ -125,24 +131,41 @@ class EquipmentDetail extends Component {
           rentSize: {
             isSucceed: true,
             data: '',
-            list: val.map(size => size)
+            list: val.map(size => ({
+              value: size,
+              label: size
+            }))
           }
         });
       }
-    });
+    }, error => Modal.alert('请求出错', `向服务器发起请求度设备尺寸信息失败, 原因: ${error}`));
 
     ajaxs.getRentColorbyId(this.rentItemId)
     .then(val=> {
       if (val.length !== 0) {
+        let colorList = {
+          black: '黑色',
+          while: '白色',
+          grey: '灰色',
+          red: '红色',
+          yellow: '黄色',
+          blue: '蓝色',
+          green: '绿色',
+          purple: '紫色',
+        }
+
         _this.setState({
-          rentSize: {
+          rentColor: {
             isSucceed: true,
             data: '',
-            list: val.map(size => size)
+            list: val.map(color => ({
+              value: colorList[color] ? colorList[color] : color,
+              label: color
+            }))
           }
         });
       }
-    });
+    }, error => Modal.alert('请求出错', `向服务器发起请求度设备颜色信息失败, 原因: ${error}`));
   }
 
   addRentItemToCart() {
@@ -450,17 +473,59 @@ class EquipmentDetail extends Component {
   }
 
   renderRentColor() {
+    const _this = this;
+
     if (this.state.rentColor.isSucceed === false) {
-      return <div></div>
+      return null
     }
-    
+
+    return (
+      <div className="equipmentdetail-color">
+        <List renderHeader={() => '设备颜色'}>
+          <Picker 
+            cols={1}
+            value={this.state.rentColor.data}
+            data={this.state.rentColor.list}
+            onChange={val => {
+              let rentColor = JSON.parse(JSON.stringify(_this.state.rentColor));
+              rentColor.data = val;
+              _this.setState({rentColor: rentColor});
+            }}
+          >
+            <List.Item arrow="horizontal">选择设备颜色</List.Item>
+          </Picker>
+        </List>
+        <div className="equipmentdetail-line" />
+      </div>
+    )
   }
 
   renderRentSize() {
+    const _this = this;
+
     if (this.state.rentSize.isSucceed === false) {
-      return <div></div>
+      return null
     }
 
+    return (
+      <div className="equipmentdetail-size">
+        <List renderHeader={() => '设备尺寸'}>
+          <Picker 
+            cols={1}
+            value={this.state.rentSize.data}
+            data={this.state.rentSize.list}
+            onChange={val => {
+              let rentSize = JSON.parse(JSON.stringify(_this.state.rentSize));
+              rentSize.data = val;
+              _this.setState({rentSize: rentSize});
+            }}
+          >
+            <List.Item arrow="horizontal">选择设备尺寸</List.Item>
+          </Picker>
+        </List>
+        <div className="equipmentdetail-line" />
+      </div>
+    )
   }
 
   render() {

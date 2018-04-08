@@ -25,7 +25,11 @@ class HomeDetail extends Component {
       'carousel': [{'src': null, 'width': null}],
       'initialHeight': 120,
 
-      'productDetail': { 'productPrice': 0, 'promotePrice': 0 },
+      'productDetail': { 
+        'productPrice': 0, 
+        'promotePrice': 0,
+        'productType': '', // "package"
+      },
       'productTravel': [],
       'productRoute': [],
       'productInclude': [],
@@ -331,6 +335,33 @@ class HomeDetail extends Component {
     return this.props.dispatch(routerRedux.push('/user/login'));
   }
 
+  renderTrip() {
+    if (this.state.productDetail.productType === 'package') {
+      return (
+        <div id='Trip'>
+          <WhiteSpace size="lg" />
+          <WingBlank size="md">套餐行程</WingBlank>
+          <WhiteSpace size="lg" />
+          <List>
+            <Item arrow="horizontal" onClick={this.jumpToTravel.bind(this)} multipleLine>
+              <div>查看行程详情</div>
+            </Item>
+            {this.state.productRoute.map((data, key) => (
+              <div key={key}>
+                <Item extra={`第${data.tripDay}天`} wrap>
+                  {data.tripPlace}
+                  <Brief>{data.tripEvent}</Brief>
+                </Item>
+              </div>
+            ))}
+          </List>
+        </div>
+      )
+    }
+
+    return (<div id='Trip'></div>)
+  }
+
   render() {
     const _this = this;
     const imgCarouselStyle = {
@@ -383,24 +414,7 @@ class HomeDetail extends Component {
             </div>
           ))}</div>
 
-          <div id='Trip'>
-            <WhiteSpace size="lg" />
-            <WingBlank size="md">套餐行程</WingBlank>
-            <WhiteSpace size="lg" />
-            <List>
-              <Item arrow="horizontal" onClick={this.jumpToTravel.bind(this)} multipleLine>
-                <div>查看行程详情</div>
-              </Item>
-              {this.state.productRoute.map((data, key) => (
-                <div key={key}>
-                  <Item extra={`第${data.tripDay}天`} wrap>
-                    {data.tripPlace}
-                    <Brief>{data.tripEvent}</Brief>
-                  </Item>
-                </div>
-              ))}
-            </List>
-          </div>
+          {this.renderTrip()}
 
           <div id='Include'>
             {this.state.productInclude.map((data, key) => (

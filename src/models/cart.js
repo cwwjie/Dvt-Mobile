@@ -2,6 +2,30 @@ import config from './../config';
 import cookies from './../utils/cookies';
 import request from './../utils/request';
 
+import cartAjaxs from './../routes/User/Shopping-Cart/ajaxs';
+
+let ajaxs = {
+  getRegionByType(type) {
+    return new Promise((resolve, reject) => {
+      fetch(`${config.URLversion}/system/region/regiontype/${type}/list.do`, {
+        'method': 'GET',
+        'contentType': 'application/json; charset=utf-8'
+      }).then(
+        response => response.json(),
+        error => ({'result': '1', 'message': error})
+      ).then((json) => {
+        if (json.result === '0') {
+          resolve(json.data.regionList);
+        } else {
+          reject('获取地区列表信息失败', `请求服务器成功, 但是返回的地区列表序列号${type} 有误! 原因: ${json.message}`);
+        }
+      }).catch((error) => {
+        reject(`请求出错, 向服务器发起请求地区列表序列号${type} 失败, 原因: ${error}`);
+      })
+    })
+  }
+}
+
 let ShoppingCart = {
   'data': {
     'namespace': 'cart',
@@ -29,28 +53,25 @@ let ShoppingCart = {
         'mobile': "", 
       },
       'shoppingCartList': [ // 购物车列表
-        {
-          'id': 1, // 产品标示的ID
-          'name': 'GoPro运动摄像机遥控器Smart Remote', // 商品名称
-          'img': '', // 商品图片
-          'isSelected': false, // 是否被选中
-          'inventory': null, // 库存量 false 或者 0 表示无, null 表示暂未查询
-          'count': 1, // 购买的数量
-        }, {
-          'id': 1, // 产品标示的ID
-          'name': 'GoPro运动摄像机遥控器Smart Remote', // 商品名称
-          'img': '', // 商品图片
-          'isSelected': false, // 是否被选中
-          'inventory': 2, // 库存量 false 或者 0 表示无, null 表示暂未查询
-          'count': 1, // 购买的数量
-        }, {
-          'id': 2, // 产品标示的ID
-          'name': 'GoPro运动摄像机遥控器Smart Remote', // 商品名称
-          'img': '', // 商品图片
-          'isSelected': true, // 是否被选中
-          'inventory': 2, // 库存量 false 或者 0 表示无, null 表示暂未查询
-          'count': 1, // 购买的数量
-        }
+        // {
+        //   isSelected: false, // 是否被选中
+        //   inventory: null, // 库存量 false 或者 0 表示无, null 表示暂未查询
+        //   count: 1, // 购买的数量
+
+        //   cartId: 4
+        //   created: 1522835045000
+        //   endDate: "2018-04-09"
+        //   itemDeposit: 6000
+        //   itemId: 1
+        //   itemName: "相机修改"
+        //   itemNum: 1
+        //   itemPic: "\rent\pic\D6C671874C844DA2A73905D8B05892D3.jpg"
+        //   itemRental: 10
+        //   matchedProduct: ""
+        //   rentDate: "2018-04-04"
+        //   updated: null
+        //   userId: 69
+        // }
       ],
       // 地区代码列表
       'region': {
@@ -75,6 +96,17 @@ let ShoppingCart = {
     },
 
     'reducers': {
+      initEquipment(state, data) {
+        return {
+          ...state,
+          'shoppingCartList': data.cart.map(val => {
+            val.isSelected = false;
+            val.inventory = null;
+            val.count = 1;
+          })
+        };
+      },
+
       addEquipment(state, data) {
         let myShoppingCartList = state.shoppingCartList.concat([]);
         let isRepeated = false;
@@ -241,18 +273,27 @@ let ShoppingCart = {
     return state
   },
 
-  init() {
-    let cartState = localStorage.getItem('ShoppingCart');
+  init(app) {
+    // this.initCart(app);
+    this.initAddress(app);
+  },
 
-    if (cartState) {
-      // this.data.state = JSON.parse(cartState);
-    }
-
-    return this.data;
+  // 在 src/models/user.js 执行获取用户信息后, 执行下面购物车的初始化操作.
+  initCart(app) {
+    cartAjaxs.getCart()
+    .then((val) => {
+      if (val || val.length > 0) {
+        app._store.dispatch({
+          'type': 'cart/initEquipment',
+          'cart': val
+        });
+      }
+    });
   },
 
   initAddress(app) {
-    let myRegion = this.getRegionBylocalStorage();
+    let regionlocalStorage = localStorage.getItem('address-region');
+    let myRegion = regionlocalStorage ? JSON.parse(regionlocalStorage) : false;
 
     if (myRegion) {
 
@@ -263,9 +304,9 @@ let ShoppingCart = {
     } else {
 
       Promise.all([
-        this.getRegionByType(1),
-        this.getRegionByType(2),
-        this.getRegionByType(3)
+        ajaxs.getRegionByType(1),
+        ajaxs.getRegionByType(2),
+        ajaxs.getRegionByType(3)
       ]).then(values => {
         let region = {
           'result': true,
@@ -293,31 +334,6 @@ let ShoppingCart = {
         });
       });
     }
-  },
-
-  getRegionBylocalStorage() {
-    let region = localStorage.getItem('address-region');
-    return region ? JSON.parse(region) : false;
-  },
-
-  getRegionByType(type) {
-    return new Promise((resolve, reject) => {
-      fetch(`${config.URLversion}/system/region/regiontype/${type}/list.do`, {
-        'method': 'GET',
-        'contentType': 'application/json; charset=utf-8'
-      }).then(
-        response => response.json(),
-        error => ({'result': '1', 'message': error})
-      ).then((json) => {
-        if (json.result === '0') {
-          resolve(json.data.regionList);
-        } else {
-          reject('获取地区列表信息失败', `请求服务器成功, 但是返回的地区列表序列号${type} 有误! 原因: ${json.message}`);
-        }
-      }).catch((error) => {
-        reject(`请求出错, 向服务器发起请求地区列表序列号${type} 失败, 原因: ${error}`);
-      })
-    })
   }
 }
 

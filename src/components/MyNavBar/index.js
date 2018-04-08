@@ -18,10 +18,6 @@ class MyNavBar extends Component {
     super(props);
   }
 
-  componentDidMount() {
-    this.props.dispatch({ type: 'user/checkLogin' });
-  }
-
   onLeftClick() {
     if (this.props.returnURL) {
       this.props.dispatch(routerRedux.push(this.props.returnURL));

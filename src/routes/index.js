@@ -4,11 +4,14 @@ import { connect } from 'dva';
 import dynamic from 'dva/dynamic';
 
 import cartModel from './../models/cart';
+import userModel from './../models/user';
 
 function RouterConfig({ history, app }) {
+  // 初始化 用户
+  userModel.init(app);
 
-  // 初始化地址
-  cartModel.initAddress(app);
+  // 初始化 地址 购物车
+  cartModel.init(app);
 
   const Home = dynamic({ app, component: () => import('./Home/index') });
   const Homedetail = dynamic({ app, component: () => import('./Home/Detail/index') });

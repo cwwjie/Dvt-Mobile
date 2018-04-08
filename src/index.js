@@ -12,8 +12,8 @@ import routes from './routes';
 
 const app = dva();
 
-app.model(userModels);
-app.model(cartModels.init());
+app.model(userModels.data);
+app.model(cartModels.data);
 
 app.router(routes);
 

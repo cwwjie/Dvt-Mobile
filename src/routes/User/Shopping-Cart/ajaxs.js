@@ -5,6 +5,21 @@ import request from './../../../utils/request';
 const ajaxs = {
   // 根据用户id查找所有该用户的购物车
   getCart() {
+    // {
+    //   cartId: 4
+    //   created: 1522835045000
+    //   endDate: "2018-04-09"
+    //   itemDeposit: 6000
+    //   itemId: 1
+    //   itemName: "相机修改"
+    //   itemNum: 1
+    //   itemPic: "\rent\pic\D6C671874C844DA2A73905D8B05892D3.jpg"
+    //   itemRental: 10
+    //   matchedProduct: ""
+    //   rentDate: "2018-04-04"
+    //   updated: null
+    //   userId: 69
+    // }
     return new Promise((resolve, reject) => {
       fetch(`${config.URLbase}/Dvt-rent-web/cart/mine.do`, {
         'method': 'GET',
