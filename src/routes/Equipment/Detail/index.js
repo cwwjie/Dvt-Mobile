@@ -27,6 +27,7 @@ const imgCarouselStyle = {
   'width': '100%',
   'verticalAlign': 'top'
 };
+const minTimeInterval = 86400000 * 5;
 
 class EquipmentDetail extends Component {
   constructor(props) {
@@ -36,7 +37,7 @@ class EquipmentDetail extends Component {
       carousel: [{'src': null, 'width': null}],
 
       rentTime: new Date(),
-      endTime: new Date(Date.parse(new Date()) + ( 86400000 * 5 ) ),
+      endTime: new Date(Date.parse(new Date()) + minTimeInterval ),
 
       selector: { // 选择产品数量
         num: 1,
@@ -105,14 +106,39 @@ class EquipmentDetail extends Component {
 
     this.buyWaySheetList = ['快递', '度假村自取', '潜游时光公司自取', '取消'];
     this.rentItemId = parseInt(window.location.hash.substring(30, window.location.hash.length));
+    this.jumpTo.bind(this);
   }
 
+  // 初始化数据
   componentDidMount() {
     const _this = this;
 
+    // 初始化产品数据
+    const initProducts = (value) => {
+      let products = {
+        target: null,
+        list: []
+      };
+  
+      if (value.length !== 0) {
+        for (let i = 0; i < value.length; i++) {
+          let valList = value[i];
+          valList.isSelected = false;
+  
+          if (value[i].productName === '安心保障维修费用70%') {
+            products.target = valList;
+          } else {
+            products.list.push(valList);
+          }
+        }
+      }
+  
+      return products;
+    }
+
     ajaxs.getRentItembyId(this.rentItemId)
-    .then(val=> {
-      let matchedProducts = _this.initRentItemToState(val.matchedProducts);
+    .then(val => {
+      let matchedProducts = initProducts(val.matchedProducts);
       
       _this.setState({
         carousel: val.rentPicture.map(picture => ({
@@ -159,8 +185,8 @@ class EquipmentDetail extends Component {
             isSucceed: true,
             data: '',
             list: val.map(color => ({
-              value: colorList[color] ? colorList[color] : color,
-              label: color
+              value: color,
+              label: colorList[color] ? colorList[color] : color,
             }))
           }
         });
@@ -168,8 +194,8 @@ class EquipmentDetail extends Component {
     }, error => Modal.alert('请求出错', `向服务器发起请求度设备颜色信息失败, 原因: ${error}`));
   }
 
-  addRentItemToCart() {
-    
+  // 加入 购物车
+  addToCart() {
     if (this.props.isLogin === false) {
       return Modal.alert('请登录', '你尚未登录, 暂不能将此产品加入购物车!!', [
         {
@@ -200,7 +226,8 @@ class EquipmentDetail extends Component {
     });
   }
 
-  findItemSku(rentTime, endTime) {
+  // 查看 库存 
+  findInventory(rentTime, endTime) {
     let itemSize = this.state.rentSize.data;
     let itemColor = this.state.rentColor.data;
 
@@ -224,125 +251,128 @@ class EquipmentDetail extends Component {
     });
   }
 
-  initRentItemToState(value) {
-    let products = {
-      target: null,
-      list: []
-    };
-
-    if (value.length !== 0) {
-      for (let i = 0; i < value.length; i++) {
-        let valList = value[i];
-        valList.isSelected = false;
-
-        if (value[i].productName === '安心保障维修费用70%') {
-          products.target = valList;
-        } else {
-          products.list.push(valList);
-        }
-      }
+  // 跳转
+  jumpTo(url) {
+    if (url === 'ShoppingCart') {
+      localStorage.setItem('EquipmentDetailURL', window.location.hash.substring(1, window.location.hash.length)); 
+      this.props.dispatch(routerRedux.push('/user/cart/index'));
     }
-
-    return products;
   }
 
-  jumpToShoppingCart() {
-    localStorage.setItem('EquipmentDetailURL', window.location.hash.substring(1, window.location.hash.length)); 
-    this.props.dispatch(routerRedux.push('/user/cart/index'));
-  }
-
+  // 加入购物车
   addToShoppingCartAction() {
+    const _this = this;
     const shoppingCartList = this.props.shoppingCartList;
 
+    const showBuyWaySheet = () => {
+      const cancelButtonIndex = this.buyWaySheetList.length - 1;
+  
+      ActionSheet.showActionSheetWithOptions({
+        'options': this.buyWaySheetList,
+        'cancelButtonIndex': cancelButtonIndex,
+        'title': '请选择收货方式',
+        'maskClosable': true,
+        'data-seed': 'logId',
+        wrapProps,
+      }, buttonIndex => {
+        if (cancelButtonIndex !== buttonIndex) {
+          _this.props.dispatch({ 
+            'type': 'cart/changeBuyWay', 
+            'buyWay': _this.buyWaySheetList[buttonIndex]
+          });
+          _this.dispatchToShoppingCart();
+        }
+      });
+    }
+
     if (shoppingCartList.length === 0) {
-      this.showBuyWaySheet();
+      showBuyWaySheet();
     } else {
       this.dispatchToShoppingCart();
     }
   }
 
-  dispatchToShoppingCart() {
+  // 渲染 租借日期
+  renderRentTime() {
     const _this = this;
 
-    // this.props.dispatch({ 
-    //   'type': 'cart/addEquipment', 
-    //   'equipmentItem': this.state.equipmentItem
-    // });
+    const rentTimeHandle = val => {
+      const selectedTimeStamp = Date.parse(val);
+      const endTimeStamp = Date.parse(this.state.endTime);
+      const newendTime = selectedTimeStamp + minTimeInterval;
+      
+      console.log(new Date(selectedTimeStamp));
+      console.log(new Date(endTimeStamp));
 
-    // Modal.alert('添加成功', <div>恭喜你,成功添加至购物车.</div>, [
-    //   { 'text': '查看购物车', 'onPress': _this.jumpToShoppingCart.bind(this), 'style': {'color': '#108ee9'} },
-    //   { 'text': '返回', 'style': {'color': '#000'} }
-    // ]);
-  }
+      // 新时间 必须大于 结束时间
+      if (newendTime >= endTimeStamp) {
 
-  rentTimeHandle(val) {
-    const _this = this;
-    const rentTimeStamp = Date.parse(val);
-    const endTimeStamp = Date.parse(this.state.endTime);
+        this.setState({
+          'rentTime': val,
+          'endTime': new Date(newendTime)
+        });
+  
+        // Toast.loading('正在查询...');
+        // this.getResortby(val, newLeaveDate)
+        // .then(json => {
+        //   if (json.result === '0') {
+        //     _this.dealwithResort(json.data);
+        //   } else {
+        //     Modal.alert('数据有误', `成功请求服务器, 但是度设备详情信息有误， 原因: ${json.message}`);
+        //   }
+        //   Toast.hide();
+        // });
+      } else {
+        this.setState({
+          'rentTime': val
+        });
+      }
+    }
 
-    if (rentTimeStamp >= endTimeStamp) {
-      const newendTime = new Date(rentTimeStamp + 86400000) 
-      this.setState({
-        'rentTime': val,
-        'endTime': newendTime
-      });
-
+    const endTimeHandle = (val) => {
+      this.setState({ 'endTime': val });
+  
       // Toast.loading('正在查询...');
-      // this.getResortby(val, newLeaveDate)
+      // this.getResortby(this.state.checkInDate, val)
       // .then(json => {
       //   if (json.result === '0') {
       //     _this.dealwithResort(json.data);
       //   } else {
-      //     Modal.alert('数据有误', `成功请求服务器, 但是度设备详情信息有误， 原因: ${json.message}`);
+      //     alert('度设备详情信息加载失败，原因:' + json.message)
       //   }
       //   Toast.hide();
       // });
-    } else {
-      this.setState({
-        'rentTime': val
-      });
     }
+
+    return (
+      <div className="main-rentTime">
+        <List renderHeader={() => '租还日期'}>
+          <DatePicker
+            mode="date"
+            title="租赁日期"
+            minDate={new Date()}
+            value={this.state.rentTime}
+            onChange={val => rentTimeHandle(val)}
+          >
+            <List.Item arrow="horizontal">租赁日期</List.Item>
+          </DatePicker>
+          <div className="equipmentdetail-line" />
+          <DatePicker
+            mode="date"
+            title="退还日期"
+            minDate={new Date(Date.parse(this.state.rentTime) + (86400000 * 5) )}
+            value={this.state.endTime}
+            onChange={val => endTimeHandle(val)}
+          >
+            <List.Item arrow="horizontal">退还日期</List.Item>
+          </DatePicker>
+        </List>
+        <div className="equipmentdetail-line" />
+      </div>
+    )
   }
 
-  endTimeHandle(val) {
-    const _this = this;
-
-    this.setState({ 'endTime': val });
-
-    // Toast.loading('正在查询...');
-    // this.getResortby(this.state.checkInDate, val)
-    // .then(json => {
-    //   if (json.result === '0') {
-    //     _this.dealwithResort(json.data);
-    //   } else {
-    //     alert('度设备详情信息加载失败，原因:' + json.message)
-    //   }
-    //   Toast.hide();
-    // });
-  }
-
-  showBuyWaySheet() {
-    const _this = this;
-    const cancelButtonIndex = this.buyWaySheetList.length - 1;
-
-    ActionSheet.showActionSheetWithOptions({
-      'options': this.buyWaySheetList,
-      'cancelButtonIndex': cancelButtonIndex,
-      'title': '请选择收货方式',
-      'maskClosable': true,
-      'data-seed': 'logId',
-      wrapProps,
-    }, buttonIndex => {
-      if (cancelButtonIndex !== buttonIndex) {
-        _this.props.dispatch({ 
-          'type': 'cart/changeBuyWay', 
-          'buyWay': _this.buyWaySheetList[buttonIndex]
-        });
-        _this.dispatchToShoppingCart();
-      }
-    });
-  }
-
+  // 渲染 产品描述信息
   renderEquipmentHeader() {
     return (
       <div className="main-header">
@@ -356,17 +386,17 @@ class EquipmentDetail extends Component {
     )
   }
 
-  matchedProductHandle(event, key) {
-    let newMatchedProducts = this.state.matchedProducts.concat([]);
-
-    newMatchedProducts[key].isSelected = event.target.checked;
-
-    this.setState({matchedProducts: newMatchedProducts});
-  }
-
+  // 渲染 选配产品
   renderMatchedProducts() {
-    let matchedProducts = this.state.matchedProducts;
-    let targetMatchedProducts = this.state.targetMatchedProducts;
+    const _this = this;
+    const matchedProducts = this.state.matchedProducts;
+    const targetMatchedProducts = this.state.targetMatchedProducts;
+    const matchedProductHandle = (event, key) => {
+      let newMatchedProducts = _this.state.matchedProducts.concat([]);
+  
+      newMatchedProducts[key].isSelected = event.target.checked;
+      this.setState({matchedProducts: newMatchedProducts});
+    }
 
     if (matchedProducts.length !== 0) {
       return (
@@ -384,7 +414,7 @@ class EquipmentDetail extends Component {
               <CheckboxItem 
                 key={key} 
                 checked={val.isSelected}
-                onChange={(event) => this.matchedProductHandle(event, key)}
+                onChange={(event) => matchedProductHandle(event, key)}
               >
                 {val.productName}
               </CheckboxItem>
@@ -396,6 +426,39 @@ class EquipmentDetail extends Component {
     }
   }
 
+  // 渲染 产品数量
+  renderSelector() {
+    const _this = this;
+    const selectorHandle = (val) => {
+      let selector = JSON.parse(JSON.stringify(_this.state.selector));
+      selector.num = val;
+  
+      _this.setState({selector: selector});
+    }
+
+    return (
+      <div className="main-selector">
+        <List>
+            <List.Item
+              wrap
+              extra={
+                <Stepper
+                  style={{ width: '100%', minWidth: '100px' }}
+                  showNumber
+                  max={10}
+                  min={1}
+                  value={this.state.selector.num}
+                  onChange={(val) => selectorHandle(val)}
+                />}
+            >已选数量
+            </List.Item>
+        </List>
+        <div className="equipmentdetail-line" />
+      </div>
+    )
+  }
+
+  // 渲染 产品详情
   renderProductsDetail() {
     let equipmentItem = this.state.equipmentItem;
 
@@ -413,65 +476,7 @@ class EquipmentDetail extends Component {
     }
   }
 
-  selectorHandle(val) {
-    let selector = this.state.selector;
-    selector.num = val;
-
-    this.setState({selector: selector});
-  }
-
-  renderSelector() {
-    return (
-      <div className="main-selector">
-        <List>
-            <List.Item
-              wrap
-              extra={
-                <Stepper
-                  style={{ width: '100%', minWidth: '100px' }}
-                  showNumber
-                  max={10}
-                  min={1}
-                  value={this.state.selector.num}
-                  onChange={this.selectorHandle.bind(this)}
-                />}
-            >已选数量
-            </List.Item>
-        </List>
-        <div className="equipmentdetail-line" />
-      </div>
-    )
-  }
-
-  renderRentTime() {
-    return (
-      <div className="main-rentTime">
-        <List renderHeader={() => '租赁日期'}>
-          <DatePicker
-            mode="date"
-            title="入住日期"
-            minDate={new Date()}
-            value={this.state.rentTime}
-            onChange={this.rentTimeHandle.bind(this)}
-          >
-            <List.Item arrow="horizontal">租赁日期</List.Item>
-          </DatePicker>
-          <div className="equipmentdetail-line" />
-          <DatePicker
-            mode="date"
-            title="退房日期"
-            minDate={new Date(Date.parse(this.state.rentTime) + (86400000 * 5) )}
-            value={this.state.endTime}
-            onChange={this.endTimeHandle.bind(this)}
-          >
-            <List.Item arrow="horizontal">退还日期</List.Item>
-          </DatePicker>
-        </List>
-        <div className="equipmentdetail-line" />
-      </div>
-    )
-  }
-
+  // 渲染 选择产品配色
   renderRentColor() {
     const _this = this;
 
@@ -500,6 +505,7 @@ class EquipmentDetail extends Component {
     )
   }
 
+  // 渲染 选择产品尺寸
   renderRentSize() {
     const _this = this;
 
@@ -556,10 +562,10 @@ class EquipmentDetail extends Component {
           {/* 选择租借日期 */}
           {this.renderRentTime()}
 
-          {/* 选择搭配选配产品 */}
+          {/* 选择选配产品 */}
           {this.renderMatchedProducts()}
 
-          {/* 选择搭配选配产品 */}
+          {/* 选择产品数量 */}
           {this.renderSelector()}
 
           {/* 选择产品配色 */}
@@ -584,7 +590,7 @@ class EquipmentDetail extends Component {
             onClick={this.addToShoppingCartAction.bind(this)}
           >加入购物车</div>
           <div className='bottom-right'
-            onClick={this.jumpToShoppingCart.bind(this)}
+            onClick={() => this.jumpTo('ShoppingCart')}
           >我的购物车</div>
         </div>
       </div>

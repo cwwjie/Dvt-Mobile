@@ -12,7 +12,11 @@ import ajaxs from './ajaxs';
 import SoldOut from './../../../assets/SoldOut.png';
 import checkboxMarked from './../../../assets/checkbox-marked-circle.svg';
 
-import { Stepper, Modal, List, ActionSheet, InputItem, Toast, DatePicker } from 'antd-mobile';
+import { 
+  Stepper, Modal, List, 
+  ActionSheet, InputItem, Toast, 
+  DatePicker 
+} from 'antd-mobile';
 
 let wrapProps;
 if (new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent)) {
@@ -70,9 +74,15 @@ class ShoppingCart extends Component {
   componentDidMount() {
     const _this = this;
 
-    // ajaxs.getCart().then(val => {
-    //   console.log(val)
-    // })
+    ajaxs.getCart()
+    .then(val => {
+      if (val || val.length > 0) {
+        _this.props.dispatch({
+          'type': 'cart/initEquipment',
+          'cart': val
+        });
+      }
+    })
 
     this.getAddressInfo()
     .then(val => {
@@ -451,7 +461,7 @@ class ShoppingCart extends Component {
                   </div>
                 )}
                 <div className="description-picture">
-                  <img src={val.img} />
+                  <img src={`${config.URLbase}${val.itemPic}`} />
                 </div>
                 <div className="description-main">
                   <div className="description-main-content">

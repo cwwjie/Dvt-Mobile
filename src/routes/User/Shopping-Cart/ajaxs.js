@@ -16,6 +16,7 @@ const ajaxs = {
     //   itemPic: "\rent\pic\D6C671874C844DA2A73905D8B05892D3.jpg"
     //   itemRental: 10
     //   matchedProduct: ""
+    //   skuNum: null                 // 显示库存不足就好 与 itemNum 有关
     //   rentDate: "2018-04-04"
     //   updated: null
     //   userId: 69

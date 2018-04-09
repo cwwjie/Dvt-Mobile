@@ -1,30 +1,5 @@
-import config from './../config';
-import cookies from './../utils/cookies';
-import request from './../utils/request';
-
 import cartAjaxs from './../routes/User/Shopping-Cart/ajaxs';
-
-let ajaxs = {
-  getRegionByType(type) {
-    return new Promise((resolve, reject) => {
-      fetch(`${config.URLversion}/system/region/regiontype/${type}/list.do`, {
-        'method': 'GET',
-        'contentType': 'application/json; charset=utf-8'
-      }).then(
-        response => response.json(),
-        error => ({'result': '1', 'message': error})
-      ).then((json) => {
-        if (json.result === '0') {
-          resolve(json.data.regionList);
-        } else {
-          reject('获取地区列表信息失败', `请求服务器成功, 但是返回的地区列表序列号${type} 有误! 原因: ${json.message}`);
-        }
-      }).catch((error) => {
-        reject(`请求出错, 向服务器发起请求地区列表序列号${type} 失败, 原因: ${error}`);
-      })
-    })
-  }
-}
+import addressAjaxs from './../routes/User/Address/ajaxs';
 
 let ShoppingCart = {
   'data': {
@@ -103,6 +78,7 @@ let ShoppingCart = {
             val.isSelected = false;
             val.inventory = null;
             val.count = 1;
+            return val
           })
         };
       },
@@ -274,14 +250,13 @@ let ShoppingCart = {
   },
 
   init(app) {
-    // this.initCart(app);
     this.initAddress(app);
   },
 
   // 在 src/models/user.js 执行获取用户信息后, 执行下面购物车的初始化操作.
   initCart(app) {
     cartAjaxs.getCart()
-    .then((val) => {
+    .then(val => {
       if (val || val.length > 0) {
         app._store.dispatch({
           'type': 'cart/initEquipment',
@@ -304,16 +279,16 @@ let ShoppingCart = {
     } else {
 
       Promise.all([
-        ajaxs.getRegionByType(1),
-        ajaxs.getRegionByType(2),
-        ajaxs.getRegionByType(3)
+        addressAjaxs.getRegionByType(1),
+        addressAjaxs.getRegionByType(2),
+        addressAjaxs.getRegionByType(3)
       ]).then(values => {
         let region = {
           'result': true,
           'message': '成功',
-          'provinceList': values[0],
-          'cityList': values[1],
-          'districtList': values[2],
+          'provinceList': values[0].regionList,
+          'cityList': values[1].regionList,
+          'districtList': values[2].regionList,
         }
 
         localStorage.setItem('address-region', JSON.stringify(region));

@@ -139,7 +139,10 @@ class UserLogin extends Component {
           _this.props.dispatch(routerRedux.push('/'));
         }
 
-        return
+        return _this.props.dispatch({
+          'type': 'user/tologin',
+          'getUserInfo': json.data
+        });
       } else if (json.result == -9) {
         Modal.alert('账户未激活', `您的账号尚未激活`);
       } else if (json.result == -5) {

@@ -217,7 +217,7 @@ class Home extends Component {
                   onClick={() => { _this.jumpToDetail(productItem.productId) }}
                 >
                   <div className="Item-img">
-                    <img src={`${config.URLbase}${productItem.productThumb}`} />
+                    <img src={`${config.URLbase}${productItem.productImg}`} />
                   </div>
                   <div className="Item-description">
                     <div className="description-tiltle">{productItem.productName}</div>
@@ -241,7 +241,7 @@ class Home extends Component {
                   onClick={() => { _this.jumpToDetail(productItem.productId) }}
                 >
                   <div className="Item-img">
-                    <img src={`${config.URLbase}${productItem.productThumb}`} />
+                    <img src={`${config.URLbase}${productItem.productImg}`} />
                   </div>
                   <div className="Item-description">
                     <div className="description-tiltle">{productItem.productName}</div>
@@ -283,9 +283,6 @@ class Home extends Component {
           </Tabs>
         </div>
 
-        {/* {this.renderHomeNav.call(this)}
-        {this.renderHomeMain.call(this)} */}
-
         <Copyright/>
         <MyTabBar
           selectedTab='Home'
@@ -295,65 +292,65 @@ class Home extends Component {
   }
 
   /* 用不上的方法放到 render 后面 */
-  renderHomeMain() {
-    const _this = this,
-      dataList = this.state.dataList;
+  // renderHomeMain() {
+  //   const _this = this,
+  //     dataList = this.state.dataList;
 
-    return dataList.length === 0 ? (<div id='Product-List'></div>) : (
-      <div id='Product-List' className='Product-List'>{dataList.map((ListItem, Listkey) => (
-        <div id={`list-position${Listkey}`} key={Listkey}>
-          <div className='List-title'>
-            <div className='title-name'>{ListItem.catName}</div>
-            <div className='title-name-ping'>{convertToPinyinLower.getFullChars(ListItem.catName)}</div>
-            <img src={`${config.URLbase}${ListItem.productList[ListItem.productList.length - 1].productThumb}`} />
-          </div>
-          {ListItem.productList.map((productItem, productItemKey) => (
-            <div className="List-Item" key={productItemKey}>
-              <div className="Item-content"
-                onClick={() => { _this.jumpToDetail(productItem.productId) }}
-              >
-                <div className="Item-img">
-                  <img src={`${config.URLbase}${productItem.productThumb}`} />
-                </div>
-                <div className="Item-description">
-                  <div className="description-tiltle">{productItem.productName}</div>
-                  <div className="description-caption">
-                    <div className="description-price">￥{productItem.productPrice} 起</div>
-                    <div className="description-opera">预定</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}</div>
-    )
-  }
+  //   return dataList.length === 0 ? (<div id='Product-List'></div>) : (
+  //     <div id='Product-List' className='Product-List'>{dataList.map((ListItem, Listkey) => (
+  //       <div id={`list-position${Listkey}`} key={Listkey}>
+  //         <div className='List-title'>
+  //           <div className='title-name'>{ListItem.catName}</div>
+  //           <div className='title-name-ping'>{convertToPinyinLower.getFullChars(ListItem.catName)}</div>
+  //           <img src={`${config.URLbase}${ListItem.productList[ListItem.productList.length - 1].productThumb}`} />
+  //         </div>
+  //         {ListItem.productList.map((productItem, productItemKey) => (
+  //           <div className="List-Item" key={productItemKey}>
+  //             <div className="Item-content"
+  //               onClick={() => { _this.jumpToDetail(productItem.productId) }}
+  //             >
+  //               <div className="Item-img">
+  //                 <img src={`${config.URLbase}${productItem.productThumb}`} />
+  //               </div>
+  //               <div className="Item-description">
+  //                 <div className="description-tiltle">{productItem.productName}</div>
+  //                 <div className="description-caption">
+  //                   <div className="description-price">￥{productItem.productPrice} 起</div>
+  //                   <div className="description-opera">预定</div>
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     ))}</div>
+  //   )
+  // }
 
-  renderHomeNav() {
-    const _this = this,
-      dataList = this.state.dataList,
-      navClassName = this.state.isNavFixed ? 'Home-nav Home-Fixed' : 'Home-nav';
+  // renderHomeNav() {
+  //   const _this = this,
+  //     dataList = this.state.dataList,
+  //     navClassName = this.state.isNavFixed ? 'Home-nav Home-Fixed' : 'Home-nav';
 
-    const changeNav = (key) => {
-      _this.setState({activeNav: key});
-      window.scrollTo(0, document.getElementById(`list-position${key}`).offsetTop);
-    }
+  //   const changeNav = (key) => {
+  //     _this.setState({activeNav: key});
+  //     window.scrollTo(0, document.getElementById(`list-position${key}`).offsetTop);
+  //   }
 
-    return dataList.length === 0 ? (<div id='Home-nav'></div>) : (
-      <div id='Home-nav' className={navClassName}>{dataList.map((val, key) => {
-        if (_this.state.activeNav === key) {
-          return <div className='Home-nav-active' key={key}>
-            {val.catName}
-          </div>
-        } else {
-          return <div key={key} onClick={() => {changeNav(key)}}>
-            {val.catName}
-          </div>
-        }
-      })}</div>
-    )
-  }
+  //   return dataList.length === 0 ? (<div id='Home-nav'></div>) : (
+  //     <div id='Home-nav' className={navClassName}>{dataList.map((val, key) => {
+  //       if (_this.state.activeNav === key) {
+  //         return <div className='Home-nav-active' key={key}>
+  //           {val.catName}
+  //         </div>
+  //       } else {
+  //         return <div key={key} onClick={() => {changeNav(key)}}>
+  //           {val.catName}
+  //         </div>
+  //       }
+  //     })}</div>
+  //   )
+  // }
 }
 
 class Copyright extends Component {

@@ -7,6 +7,8 @@ import config from './../../../config';
 import cookies from './../../../utils/cookies';
 import request from './../../../utils/request';
 
+import ajaxs from './ajaxs';
+
 import { Toast, Modal, List, InputItem, TextareaItem, Picker } from 'antd-mobile';
 
 class EditAddress extends Component {
@@ -51,37 +53,19 @@ class EditAddress extends Component {
         ));
       } else {
         Promise.all([
-          _this.getRegionByType(1),
-          _this.getRegionByType(2),
-          _this.getRegionByType(3)
+          ajaxs.getRegionByType(1),
+          ajaxs.getRegionByType(2),
+          ajaxs.getRegionByType(3)
         ]).then((values) => {
-          let provinceList = values[0];
-          let cityList = values[1];
-          let districtList = values[2];
+          let provinceList = values[0].regionList;
+          let cityList = values[1].regionList;
+          let districtList = values[2].regionList;
   
           resolve(_this.dealWithRegion(provinceList, cityList, districtList));
-        }, error => reject(Modal.alert(error)));
+        }, error => reject(
+          Modal.alert(`请求出错, 向服务器发起请求地区列表失败, 原因: ${error}`)
+        ));
       }
-    })
-  }
-
-  getRegionByType(type) {
-    return new Promise((resolve, reject) => {
-      fetch(`${config.URLversion}/system/region/regiontype/${type}/list.do`, {
-        'method': 'GET',
-        'contentType': 'application/json; charset=utf-8'
-      }).then(
-        response => response.json(),
-        error => ({'result': '1', 'message': error})
-      ).then((json) => {
-        if (json.result === '0') {
-          resolve(json.data.regionList);
-        } else {
-          reject('获取地区列表信息失败', `请求服务器成功, 但是返回的地区列表序列号${type} 有误! 原因: ${json.message}`);
-        }
-      }).catch((error) => {
-        reject(`请求出错, 向服务器发起请求地区列表序列号${type} 失败, 原因: ${error}`);
-      })
     })
   }
 

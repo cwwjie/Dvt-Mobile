@@ -55,7 +55,7 @@ class HomeDetail extends Component {
       this.getTrip.call(this), // 套餐行程相关
       this.getCostIncludes.call(this) // 套餐包含相关
     ]).then(values => {
-      _this.bindScroll()
+      // _this.bindScroll()
       _this.onMenuShare()
     });
   }
@@ -134,7 +134,7 @@ class HomeDetail extends Component {
 
           for (let i = 0; i < _data.length; i++) {
             let obj = {
-              'src': config.URLbase + _data[i].gallery.thumbUrl,
+              'src': config.URLbase + _data[i].gallery.imgUrl,
               'width': _Width
             }
             _Array.push(obj);
