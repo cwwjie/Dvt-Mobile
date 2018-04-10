@@ -37,8 +37,8 @@ class EquipmentDetail extends Component {
       carousel: [{'src': null, 'width': null}],
 
       rentTime: new Date(),
-      endTime: new Date(Date.parse(new Date()) + minTimeInterval ),
-
+      endTime: new Date(Date.parse(new Date()) + minTimeInterval),
+      
       selector: { // 选择产品数量
         num: 1,
         max: false
@@ -46,7 +46,7 @@ class EquipmentDetail extends Component {
 
       rentSize: { // 选择产品尺寸
         isSucceed: false,
-        data: [null],
+        data: [ null ],
         list: [
           // {
           //   value: 'XL',
@@ -57,7 +57,7 @@ class EquipmentDetail extends Component {
 
       rentColor: { // 选择产品颜色
         isSucceed: false,
-        data: [null],
+        data: [ null ],
         list: []
       },
 
@@ -104,7 +104,7 @@ class EquipmentDetail extends Component {
       ]
     }
 
-    this.buyWaySheetList = ['快递', '度假村自取', '潜游时光公司自取', '取消'];
+    this.buyWaySheetList = ['快递', '潜游时光公司自取', '取消'];
     this.rentItemId = parseInt(window.location.hash.substring(30, window.location.hash.length));
     this.jumpTo.bind(this);
   }
@@ -112,9 +112,7 @@ class EquipmentDetail extends Component {
   // 初始化数据
   componentDidMount() {
     const _this = this;
-
-    // 初始化产品数据
-    const initProducts = (value) => {
+    const initProducts = value => { // 初始化产品数据 的方法
       let products = {
         target: null,
         list: []
@@ -136,6 +134,7 @@ class EquipmentDetail extends Component {
       return products;
     }
 
+    // 初始化产品数据
     ajaxs.getRentItembyId(this.rentItemId)
     .then(val => {
       let matchedProducts = initProducts(val.matchedProducts);
@@ -150,8 +149,9 @@ class EquipmentDetail extends Component {
       });
     }, error => Modal.alert('请求出错', `向服务器发起请求度设备详情信息失败, 原因: ${error}`));
 
+    // 初始化产品尺寸
     ajaxs.getRentSizebyId(this.rentItemId)
-    .then(val=> {
+    .then(val => {
       if (val.length !== 0) {
         _this.setState({
           rentSize: {
@@ -166,8 +166,9 @@ class EquipmentDetail extends Component {
       }
     }, error => Modal.alert('请求出错', `向服务器发起请求度设备尺寸信息失败, 原因: ${error}`));
 
+    // 初始化产品颜色
     ajaxs.getRentColorbyId(this.rentItemId)
-    .then(val=> {
+    .then(val => {
       if (val.length !== 0) {
         let colorList = {
           black: '黑色',
@@ -192,11 +193,64 @@ class EquipmentDetail extends Component {
         });
       }
     }, error => Modal.alert('请求出错', `向服务器发起请求度设备颜色信息失败, 原因: ${error}`));
+
+    // 查询产品库存
+    this.findInventory();
   }
 
   // 加入 购物车
   addToCart() {
-    if (this.props.isLogin === false) {
+    const _this = this;
+    const shoppingCartList = this.props.shoppingCartList;
+    const itemSize = this.state.rentSize.data;
+    const itemColor = this.state.rentColor.data;
+    const targetMatchedProducts = this.state.targetMatchedProducts;
+    const matchedProducts = this.state.matchedProducts;
+    const initMatchedProduct = () => {
+      let data = [];
+      data.push(targetMatchedProducts.id);
+
+      matchedProducts.map(val => {
+        if (val.isSelected) {
+          data.push(val.id);
+        }
+        
+        return val
+      });
+
+      return data.join(',');
+    }
+    const showBuyWaySheet = () => {
+      const cancelButtonIndex = this.buyWaySheetList.length - 1;
+  
+      return new Promise((resolve, reject) => {
+        // 如果购物车列表为空 则选择 收货方式
+        if (shoppingCartList.length === 0) {
+          ActionSheet.showActionSheetWithOptions({
+            'options': this.buyWaySheetList,
+            'cancelButtonIndex': cancelButtonIndex,
+            'title': '请选择收货方式',
+            'maskClosable': true,
+            'data-seed': 'logId',
+            wrapProps,
+          }, buttonIndex => {
+
+            if (cancelButtonIndex !== buttonIndex) {
+
+              _this.props.dispatch({
+                'type': 'cart/changeBuyWay', 
+                'buyWay': _this.buyWaySheetList[buttonIndex]
+              });
+              resolve();
+            }
+          });
+        } else {
+          resolve();
+        }
+      });
+    }
+    
+    if (!this.props.isLogin) {
       return Modal.alert('请登录', '你尚未登录, 暂不能将此产品加入购物车!!', [
         {
           text: '取消',
@@ -208,47 +262,68 @@ class EquipmentDetail extends Component {
         }
       ]);
     }
-    
-    let rentItem = {
-      "userId": 69,
-      "itemId": this.rentItemId,
-      "itemNum": this.state.selector.num,
-      "rentDate": convertDate.dateToYYYYmmNumber(this.state.rentTime),
-      "endDate": convertDate.dateToYYYYmmNumber(this.state.endTime),
-      "matchedProduct": ""
+
+    if (!this.state.selector.max) {
+      return alert('此日期暂时无货, 请选择其他时间点。');
     }
 
-    ajaxs.addRentItemToCart(rentItem)
-    .then(val=> {
-      console.log(val)
-    }, error => {
+    let rentItem = {
+      userId: this.props.userId,
+      itemId: this.rentItemId,
+      itemNum: this.state.selector.num,
+      rentDate: convertDate.dateToYYYYmmNumber(this.state.rentTime),
+      endDate: convertDate.dateToYYYYmmNumber(this.state.endTime),
+      matchedProduct: initMatchedProduct(),
+      itemSize: itemSize[0] || null,
+      itemColor: itemColor[0] || null,
+    }
 
-    });
+    showBuyWaySheet().then(buttonIndex => {
+
+      ajaxs.addRentItemToCart(rentItem)
+      .then(val=> {
+
+        Modal.alert(
+          '添加成功', 
+          (<div>恭喜你,成功添加至购物车.</div>), 
+          [
+            { 
+              'text': '查看购物车', 
+              'onPress': () => _this.jumpTo('ShoppingCart'), 
+              'style': {'color': '#108ee9'} 
+            }, { 
+              'text': '返回', 
+              'style': {'color': '#000'} 
+            }
+          ]
+        );
+
+      }, error => alert(error));
+    })
   }
 
   // 查看 库存 
   findInventory(rentTime, endTime) {
+    const _this = this;
+    let selector = this.state.selector;
     let itemSize = this.state.rentSize.data;
     let itemColor = this.state.rentColor.data;
 
     let condition = {
       itemId: this.rentItemId,
-      rentDate: Date.parse(rentTime || this.state.rentTime),
-      endDate: Date.parse(rentTime || this.state.endTime),
+      skuNum: this.state.selector.num,
+      rentDate: convertDate.dateToYYYYmmNumber(rentTime || this.state.rentTime),
+      endDate: convertDate.dateToYYYYmmNumber(endTime || this.state.endTime),
+      itemSize: itemSize[0] || null,
+      itemColor: itemColor[0] || null,
     }
 
-    itemSize ? condition.itemSize = itemSize : null;
-    itemColor ? condition.itemColor = itemColor : null;
-
     Toast.loading('正在查询...');
-
     ajaxs.findItemSku(condition)
     .then(val => {
-      Toast.hide();
-
-    }, error => {
-      Toast.hide();
-    });
+      selector.max = val;
+      _this.setState({selector: selector}, () => Toast.hide());
+    }, error => alert(error));
   }
 
   // 跳转
@@ -295,14 +370,12 @@ class EquipmentDetail extends Component {
   // 渲染 租借日期
   renderRentTime() {
     const _this = this;
+    const maxStepper = this.state.selector.max;
 
     const rentTimeHandle = val => {
       const selectedTimeStamp = Date.parse(val);
       const endTimeStamp = Date.parse(this.state.endTime);
       const newendTime = selectedTimeStamp + minTimeInterval;
-      
-      console.log(new Date(selectedTimeStamp));
-      console.log(new Date(endTimeStamp));
 
       // 新时间 必须大于 结束时间
       if (newendTime >= endTimeStamp) {
@@ -311,42 +384,24 @@ class EquipmentDetail extends Component {
           'rentTime': val,
           'endTime': new Date(newendTime)
         });
-  
-        // Toast.loading('正在查询...');
-        // this.getResortby(val, newLeaveDate)
-        // .then(json => {
-        //   if (json.result === '0') {
-        //     _this.dealwithResort(json.data);
-        //   } else {
-        //     Modal.alert('数据有误', `成功请求服务器, 但是度设备详情信息有误， 原因: ${json.message}`);
-        //   }
-        //   Toast.hide();
-        // });
+        this.findInventory(val, new Date(newendTime));
       } else {
+
         this.setState({
           'rentTime': val
         });
+        this.findInventory(val, this.state.endTime);
       }
     }
 
-    const endTimeHandle = (val) => {
+    const endTimeHandle = val => {
       this.setState({ 'endTime': val });
-  
-      // Toast.loading('正在查询...');
-      // this.getResortby(this.state.checkInDate, val)
-      // .then(json => {
-      //   if (json.result === '0') {
-      //     _this.dealwithResort(json.data);
-      //   } else {
-      //     alert('度设备详情信息加载失败，原因:' + json.message)
-      //   }
-      //   Toast.hide();
-      // });
+      this.findInventory(this.state.rentTime, val);
     }
 
     return (
-      <div className="main-rentTime">
-        <List renderHeader={() => '租还日期'}>
+      <div className={ maxStepper ? "main-rentTime" : "main-rentTime outStock"}>
+        <List renderHeader={() => `${ maxStepper ? '租还日期' : '此日期暂时无货, 请选择其他时间。'}`}>
           <DatePicker
             mode="date"
             title="租赁日期"
@@ -429,33 +484,37 @@ class EquipmentDetail extends Component {
   // 渲染 产品数量
   renderSelector() {
     const _this = this;
-    const selectorHandle = (val) => {
+    const maxStepper = this.state.selector.max;
+    const selectorHandle = val => {
       let selector = JSON.parse(JSON.stringify(_this.state.selector));
       selector.num = val;
   
       _this.setState({selector: selector});
     }
 
-    return (
-      <div className="main-selector">
-        <List>
-            <List.Item
-              wrap
-              extra={
-                <Stepper
-                  style={{ width: '100%', minWidth: '100px' }}
-                  showNumber
-                  max={10}
-                  min={1}
-                  value={this.state.selector.num}
-                  onChange={(val) => selectorHandle(val)}
-                />}
-            >已选数量
-            </List.Item>
-        </List>
-        <div className="equipmentdetail-line" />
-      </div>
-    )
+    if (maxStepper) {
+      return (
+        <div className="main-selector">
+          <List>
+              <List.Item
+                wrap
+                extra={
+                  <Stepper
+                    style={{ width: '100%', minWidth: '100px' }}
+                    showNumber
+                    max={maxStepper}
+                    min={1}
+                    value={this.state.selector.num}
+                    onChange={(val) => selectorHandle(val)}
+                  />}
+              >已选数量
+              </List.Item>
+          </List>
+          <div className="equipmentdetail-line" />
+        </div>
+      )
+    }
+
   }
 
   // 渲染 产品详情
@@ -587,7 +646,7 @@ class EquipmentDetail extends Component {
             </div>
           </div>
           <div className='bottom-mid'
-            onClick={this.addToShoppingCartAction.bind(this)}
+            onClick={this.addToCart.bind(this)}
           >加入购物车</div>
           <div className='bottom-right'
             onClick={() => this.jumpTo('ShoppingCart')}

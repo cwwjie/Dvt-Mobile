@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
-import { Carousel, Toast, List, TabBar, Tabs } from 'antd-mobile';
+import { Carousel, Toast, List, Tabs } from 'antd-mobile';
 
 import taobao from './../../assets/taobao.png';
 import weibo from './../../assets/weibo.png';
@@ -278,7 +278,10 @@ class Home extends Component {
         ))}</Carousel>
 
         <div className={this.state.isNavFixed ? 'Home-tabs' : 'tabs'}>
-          <Tabs tabs={this.state.tabs}>
+          <Tabs 
+            tabs={this.state.tabs}
+            useOnPan={false}  
+          >
             {this.rendertabs.call(this)}
           </Tabs>
         </div>

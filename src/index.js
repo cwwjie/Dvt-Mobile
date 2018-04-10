@@ -6,6 +6,9 @@ import React from 'react';
 import index from './index.less';
 import 'antd-mobile/dist/antd-mobile.less';
 
+// import VConsole from 'vconsole';
+// new VConsole();
+
 import userModels from './models/user';
 import cartModels from './models/cart';
 import routes from './routes';

@@ -263,7 +263,7 @@ let ShoppingCart = {
           'cart': val
         });
       }
-    });
+    }, error => console.log(error));
   },
 
   initAddress(app) {

@@ -69,26 +69,33 @@ const ajaxs = {
   findItemSku(data) {  
     // {
     //   "itemId": 4,
-    //   "rentDate": 1522307369000,
-    //   "endDate": 1522566569000,
-    //   "itemSize": "L", // 单选 非必填
-    //   "itemColor": "red", // 单选 非必填
+    //   "rentDate": "20180410",
+    //   "endDate": "20180415",
+    //   "skuNum": 1,         // 非必填
+    //   "itemSize": "L",     // 单选 非必填
+    //   "itemColor": "red",  // 单选 非必填
     // }
     return new Promise((resolve, reject) => {
       fetch(`${config.URLbase}/Dvt-rent-web/sku/findItemSku.do`, {
         'method': 'POST',
-        'contentType': 'application/json; charset=utf-8',
+        'headers':{
+          "Content-Type": "application/json; charset=utf-8",
+        },
         'body': JSON.stringify(data)  
       }).then(
         response => response.json(),
         error => ({result: '1', message: error})
       ).then(val => {
         if (val.result === '0') {
-          resolve(val.data);
+          if (val.data) {
+            resolve(val.data);
+          } else {
+            resolve(0);
+          }
         } else {
-          reject(`向服务器发起请求度设备详情信息失败, 原因: ${val.message}`);
+          reject(`向服务器发起请求设备库存数量失败, 原因: ${val.message}`);
         }
-      }).catch(error => reject(`向服务器发起请求度设备详情信息失败, 原因: ${error}`));
+      }).catch(error => reject(`向服务器发起请求设备库存数量失败, 原因: ${error}`));
     });
   },
 
@@ -98,8 +105,8 @@ const ajaxs = {
     //   "userId": 111,
     //   "itemId": 4,
     //   "itemNum": 1,
-    //   "rentDate": 1522307369000,
-    //   "endDate": 1522566569000,
+    //   "rentDate": "20180410",
+    //   "endDate": "20180415",
     //   "matchedProduct": "3,5,1"
     // } 
     return new Promise((resolve, reject) => {

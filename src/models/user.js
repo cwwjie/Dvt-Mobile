@@ -96,7 +96,7 @@ let User = {
           'getUserInfo': val
         });
         resolve();
-      });
+      }, error => console.log(error));
     });
   }
 }
